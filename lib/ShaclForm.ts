@@ -51,7 +51,6 @@ export class ShaclForm extends HTMLElement {
     this.#store.add(df.quad(this.subject, rdf('type'), this.shapeUri))
 
     const tree = await this.validate()
-    console.log(tree)
     this.render(tree)
   }
 
@@ -72,7 +71,7 @@ export class ShaclForm extends HTMLElement {
 
   async validate () {
     const report = await this.#validator.validate({ dataset: this.#shaclDataset, terms: [this.subject] })
-    return shaclReportToNested(report, this.#store)
+    return shaclReportToNested(report)
   }
 
   get shapeUri () {
