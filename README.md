@@ -1,7 +1,19 @@
 # SHACL Form
 
-SHACL form is a frontend library to show forms that conform to a SHACL shape.
-It will be based on customElements, also for the widgets, this will enable a third party developer to bring their own widgets that might be made with any other technology as long as it is exported as a customElement.
+SHACL form is a frontend library that shows forms from a SHACL shape.
+It uses customElements, also for the widgets, this will enable a third party developer to bring their own widgets that might be made with any other technology as long as it is exported as a customElement.
+
+### Future usage
+
+HTML attributes on the customElement:
+
+- __subject__   - Useful when creating data. It will set the subject to this uri. It is possible to rename the subject when using the form.
+- __shacl-url__ - The place where the SHACL turtle is stored, it should allow CORS.
+- __shape-uri__ - Set this attribute if you have multiple shapes in your shape turtle file and do not want to use the first shape.
+
+```html
+<shacl-form shacl-url="YOUR_SHACL_TTL"></shacl-form>
+```
 
 ### Priorities
 
