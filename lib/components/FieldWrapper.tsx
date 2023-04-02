@@ -1,20 +1,13 @@
-import { String } from '../widgets/String'
+export function FieldWrapper ({ properties, Widget, children }: { properties: ShaclPropertes, Widget: any, children: any }) {
 
-const widgetRegistry = {
-  string: String
-}
-
-export function FieldWrapper ({ predicate, children, widgets }: { predicate: string, children: any, widgets: any }) {
+  console.log(children)
 
   return (
-    <div>
-      {widgets?.map((widget: any, index: number) => {
-        const Widget = widgetRegistry[widget.widget as keyof typeof widgetRegistry]
-
-        return (
-          <Widget key={predicate + index} predicate={predicate} properties={widget.properties}></Widget>
-        )
-      })}
-    </div>
+    <Widget key={properties.path} properties={properties}>
+      {children ? (<div>
+        <span>Children</span>
+        {children}
+      </div>) : null}
+    </Widget>
   )
 }

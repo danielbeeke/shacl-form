@@ -4,7 +4,9 @@ import grapoi from 'grapoi'
 import { rdfTermValueToTypedVariable } from '../helpers/rdfTermValueToTypedVariable'
 
 const getPathForOrResult = (result: any) => {
-  const shaclPropertyQuad = [...result.shape.ptr.out().quads()].find((quad: Quad) => quad.predicate.equals(sh('property')))
+  const shaclPropertyQuad = [...result.shape.ptr.out().quads()]
+    .find((quad: Quad) => quad.predicate.equals(sh('property')))
+  
   const shaclProperty = grapoi({ 
     dataset: result.shape.ptr.dataset, 
     term: shaclPropertyQuad.object,
@@ -37,16 +39,18 @@ const extractMessages = (constraints: Array<any>) => {
   }
 }
 
-const propertiesToObject = (propertiesQuads: Array<Quad>) => {
+/**
+ * Transforms the pointers to SHACL triples of one SHACL property to a JS object.
+ */
+const propertiesToObject = (pointers: Array<any>) => {
   const properties: any = {}
 
-  for (const propertyQuad of propertiesQuads) {
+  const processProperty = (propertyQuad: any) => {
     let propertyName = propertyQuad.predicate.value.replace(sh('').value, '')
     if ([
       'or', 
       'qualifiedValueShape', 
-      'path'
-    ].includes(propertyName)) continue
+    ].includes(propertyName)) return
 
     const type = (propertyQuad.object as Literal).datatype
     const cleanedValue = rdfTermValueToTypedVariable(propertyQuad.object)
@@ -58,6 +62,19 @@ const propertiesToObject = (propertiesQuads: Array<Quad>) => {
     }
     else {
       properties[propertyName] = cleanedValue
+    }
+  }
+
+  for (const pointer of pointers) {
+    if (pointer.isList()) {
+      const propertyQuad = [...pointer.quads()][0]
+      const children = [...pointer.trim().list()].flatMap( i => [...i.quads()])
+      let propertyName = propertyQuad.predicate.value.replace(sh('').value, '')
+      properties[propertyName] = children.map(child => rdfTermValueToTypedVariable(child.object))
+    }
+    else {
+      const propertyQuads = [...pointer.quads()]
+      for (const propertyQuad of propertyQuads) processProperty(propertyQuad)
     }
   }
 
@@ -85,7 +102,7 @@ const processConstraints = (constraints: Array<any>) => {
       const pointers = [properties, orConstraint.shape.ptr.trim().out()]
       
       return {
-        properties: propertiesToObject(pointers.flatMap(pointer => [...pointer.quads()])),
+        properties: propertiesToObject(pointers),
         messages: extractMessages([...rootConstraints, orConstraint]),
         widget: 'string',
         ptrs: pointers,
@@ -94,7 +111,7 @@ const processConstraints = (constraints: Array<any>) => {
   }
   else {
     return [{
-      properties: propertiesToObject([...properties.quads()]),
+      properties: propertiesToObject([properties]),
       messages: extractMessages(rootConstraints),
       widget: 'string',
       ptrs: [properties],
@@ -128,6 +145,8 @@ export const shaclReportToNested = (report: any) => {
     let pointer = tree
     for (const [index, pathPart] of path.entries()) {
       const predicateName = pathPart.predicates[0].value
+
+      // TODO atleast create a group widget
       if (!pointer[predicateName]) pointer[predicateName] = {}
   
       if (index === path.length - 1) {
