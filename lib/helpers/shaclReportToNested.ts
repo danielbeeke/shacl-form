@@ -1,126 +1,10 @@
-import { sh, rdf, xsd } from '../namespaces'
-import type { Literal, Quad } from 'n3'
+import { sh } from '../namespaces'
+import type { Quad } from 'n3'
 import grapoi from 'grapoi'
-import { rdfTermValueToTypedVariable } from '../helpers/rdfTermValueToTypedVariable'
-
-const getPathForOrResult = (result: any) => {
-  const shaclPropertyQuad = [...result.shape.ptr.out().quads()]
-    .find((quad: Quad) => quad.predicate.equals(sh('property')))
-  
-  const shaclProperty = grapoi({ 
-    dataset: result.shape.ptr.dataset, 
-    term: shaclPropertyQuad.object,
-    factory: result.shape.ptr.factory
-  })
-
-  const pathQuad = [...shaclProperty.out([sh('path')]).quads()].pop()
-  if (!pathQuad) throw new Error('This is unexpected (for now)')
-
-  const path = [{ quantifier: "one", start: "subject", end: "object", predicates: [pathQuad.object] }]
-  return path
-}
-
-const toMesssages = (constraints: Array<any>) => {
-  return [... new Set(constraints.flatMap((constraint: any) => constraint.message.map((message: any) => message.value)))]
-}
+import { grapoiPointersToJsObject } from './grapoiPointersToJsObject'
 
 /**
- * Extracts the messages and groups by type
- */
-const extractMessages = (constraints: Array<any>) => {
-  const errors = constraints.filter((constraint: any) => constraint.severity.equals(sh('Violation')))
-  const infos = constraints.filter((constraint: any) => constraint.severity.equals(sh('Info')))
-  const warnings = constraints.filter((constraint: any) => constraint.severity.equals(sh('Warning')))
-
-  return {
-    errors: toMesssages(errors),
-    infos: toMesssages(infos),
-    warnings: toMesssages(warnings)
-  }
-}
-
-/**
- * Transforms the pointers to SHACL triples of one SHACL property to a JS object.
- */
-const propertiesToObject = (pointers: Array<any>) => {
-  const properties: any = {}
-
-  const processProperty = (propertyQuad: any) => {
-    let propertyName = propertyQuad.predicate.value.replace(sh('').value, '')
-    if ([
-      'or', 
-      'qualifiedValueShape', 
-    ].includes(propertyName)) return
-
-    const type = (propertyQuad.object as Literal).datatype
-    const cleanedValue = rdfTermValueToTypedVariable(propertyQuad.object)
-
-    if (type && [rdf('langString').value, xsd('string').value].includes(type.value)) {
-      if (!properties[propertyName]) properties[propertyName] = {}
-      const prefix = (propertyQuad.object as Literal).language ? (propertyQuad.object as Literal).language : 'default'
-      properties[propertyName][prefix] = cleanedValue
-    }
-    else {
-      properties[propertyName] = cleanedValue
-    }
-  }
-
-  for (const pointer of pointers) {
-    if (pointer.isList()) {
-      const propertyQuad = [...pointer.quads()][0]
-      const children = [...pointer.trim().list()].flatMap( i => [...i.quads()])
-      let propertyName = propertyQuad.predicate.value.replace(sh('').value, '')
-      properties[propertyName] = children.map(child => rdfTermValueToTypedVariable(child.object))
-    }
-    else {
-      const propertyQuads = [...pointer.quads()]
-      for (const propertyQuad of propertyQuads) processProperty(propertyQuad)
-    }
-  }
-
-  return properties
-}
-
-/**
- * Are we going to allow nested ORs?
- */
-const processConstraints = (constraints: Array<any>) => {
-  const processedTerms = new Set()
-  constraints = constraints.filter(constraint => {
-    const term = constraint.shape.ptr.term
-    if (processedTerms.has(term.value)) return null
-    processedTerms.add(term.value)
-    return true
-  })
-
-  const orConstraints = constraints.filter(constraint => constraint.isOr)
-  const rootConstraints = constraints.filter(constraint => !constraint.isOr)
-  const properties = rootConstraints[0].shape.ptr.trim().out()
-
-  if (orConstraints?.length) {
-    return orConstraints.map(orConstraint => {
-      const pointers = [properties, orConstraint.shape.ptr.trim().out()]
-      
-      return {
-        properties: propertiesToObject(pointers),
-        messages: extractMessages([...rootConstraints, orConstraint]),
-        widget: 'string',
-        ptrs: pointers,
-      }
-    })
-  }
-  else {
-    return [{
-      properties: propertiesToObject([properties]),
-      messages: extractMessages(rootConstraints),
-      widget: 'string',
-      ptrs: [properties],
-    }]
-  }
-}
-
-/**
- * First merge all constraints into a map with the path as the key,
+ * Converts the shacl report to a tree structure containing all possible combinations of the SHACL data.
  */
 export const shaclReportToNested = (report: any) => {
   const pathMap: Map<string, Array<any>> = new Map()
@@ -159,4 +43,83 @@ export const shaclReportToNested = (report: any) => {
   }
 
   return tree
+}
+
+
+/**
+ * Convert the constraints to an intermediate format.
+ */
+const processConstraints = (constraints: Array<any>) => {
+  const processedTerms = new Set()
+  constraints = constraints.filter(constraint => {
+    const term = constraint.shape.ptr.term
+    if (processedTerms.has(term.value)) return null
+    processedTerms.add(term.value)
+    return true
+  })
+
+  const orConstraints = constraints.filter(constraint => constraint.isOr)
+  const rootConstraints = constraints.filter(constraint => !constraint.isOr)
+  const properties = rootConstraints[0].shape.ptr.trim().out()
+
+  if (orConstraints?.length) {
+    return orConstraints.map(orConstraint => {
+      const pointers = [properties, orConstraint.shape.ptr.trim().out()]
+      
+      return {
+        properties: grapoiPointersToJsObject(pointers),
+        messages: extractMessages([...rootConstraints, orConstraint]),
+        widget: 'string',
+        ptrs: pointers,
+      }
+    })
+  }
+  else {
+    return [{
+      properties: grapoiPointersToJsObject([properties]),
+      messages: extractMessages(rootConstraints),
+      widget: 'string',
+      ptrs: [properties],
+    }]
+  }
+}
+
+/**
+ * Constraints that re inside an sh:or blankNode do not have a direct path available.
+ * This will fetch the path and add it into the structure.
+ */
+const getPathForOrResult = (result: any) => {
+  const shaclPropertyQuad = [...result.shape.ptr.out().quads()]
+    .find((quad: Quad) => quad.predicate.equals(sh('property')))
+  
+  const shaclProperty = grapoi({ 
+    dataset: result.shape.ptr.dataset, 
+    term: shaclPropertyQuad.object,
+    factory: result.shape.ptr.factory
+  })
+
+  const pathQuad = [...shaclProperty.out([sh('path')]).quads()].pop()
+  if (!pathQuad) throw new Error('This is unexpected (for now)')
+
+  const path = [{ quantifier: "one", start: "subject", end: "object", predicates: [pathQuad.object] }]
+  return path
+}
+
+const toMesssages = (constraints: Array<any>) => {
+  return [... new Set(constraints.flatMap((constraint: any) => constraint.message.map((message: any) => message.value)))]
+}
+
+/**
+ * Extracts the messages and groups by type
+ */
+const extractMessages = (constraints: Array<any>) => {
+  const errors = constraints.filter((constraint: any) => constraint.severity.equals(sh('Violation')))
+  const infos = constraints.filter((constraint: any) => constraint.severity.equals(sh('Info')))
+  const warnings = constraints.filter((constraint: any) => constraint.severity.equals(sh('Warning')))
+
+  return {
+    errors: toMesssages(errors),
+    infos: toMesssages(infos),
+    warnings: toMesssages(warnings)
+  }
 }

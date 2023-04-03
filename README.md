@@ -22,6 +22,19 @@ HTML attributes on the customElement:
     - SHACL Property path: ( ex:parent ex:firstName )
     - SHACL Property path: [ sh:alternativePath ( ex:father ex:mother  ) ]
 
+### Ideas
+
+- Use IRIs as object for sh:group to create a special widget / group such as the language tabs and the subject iri widget.
+- Allow invalid data and a way to recover so invalid data can be reshaped to valid data
+- Allow form buttons (agent has to click to update) or binding to triple change events (instant update)
+
+### Questions
+
+- Can Hydra be used to rename a subject?
+- Would it be wise to include or exclude Hydra? (couple or decouple)
+
 ### Interesting links
 
 - The browser does not support namespacing customElements: https://github.com/WICG/webcomponents/issues/488
+- https://docs.google.com/document/d/1hOTMH9mhzSjVzCK0HL5f_B8GHie9PcsXqYAFxr-nPNM/edit#heading=h.4ikvkr55u1o1
+- https://docs.google.com/document/d/1U1fHwFZUKjjIRG7gxsJrBNMHXkEs7pR2e3IkeK7qh5U/edit#heading=h.4ikvkr55u1o1
