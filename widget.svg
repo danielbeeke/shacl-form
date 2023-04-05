@@ -25,7 +25,7 @@
      showgrid="false"
      inkscape:zoom="1.2810466"
      inkscape:cx="224.03557"
-     inkscape:cy="295.46154"
+     inkscape:cy="420.35942"
      inkscape:window-width="2560"
      inkscape:window-height="1376"
      inkscape:window-x="1920"
@@ -613,31 +613,31 @@
        transform="matrix(0.7439388,0,0,0.74391872,-3.6566904,54.662545)"><tspan
          x="175.25233"
          y="114.6634"
-         id="tspan284428">Nullam vel eleifend purus, vel </tspan><tspan
+         id="tspan1307">Nullam vel eleifend purus, vel </tspan><tspan
          x="175.25233"
          y="120.86837"
-         id="tspan284430">vulputate lacus. Aliquam lacinia nibh </tspan><tspan
+         id="tspan1309">vulputate lacus. Aliquam lacinia nibh </tspan><tspan
          x="175.25233"
          y="127.07334"
-         id="tspan284432">sit amet tellus ultricies aliquam. </tspan><tspan
+         id="tspan1311">sit amet tellus ultricies aliquam. </tspan><tspan
          x="175.25233"
          y="133.27831"
-         id="tspan284434">Praesent facilisis hendrerit tellus, </tspan><tspan
+         id="tspan1313">Praesent facilisis hendrerit tellus, </tspan><tspan
          x="175.25233"
          y="139.48328"
-         id="tspan284436">quis pulvinar sem rhoncus ac. </tspan><tspan
+         id="tspan1315">quis pulvinar sem rhoncus ac. </tspan><tspan
          x="175.25233"
          y="145.68825"
-         id="tspan284438">Praesent sollicitudin orci at neque </tspan><tspan
+         id="tspan1317">Praesent sollicitudin orci at neque </tspan><tspan
          x="175.25233"
          y="151.89323"
-         id="tspan284440">molestie mattis. In sed orci eu ex </tspan><tspan
+         id="tspan1319">molestie mattis. In sed orci eu ex </tspan><tspan
          x="175.25233"
          y="158.0982"
-         id="tspan284442">imperdiet sollicitudin vitae vitae </tspan><tspan
+         id="tspan1321">imperdiet sollicitudin vitae vitae </tspan><tspan
          x="175.25233"
          y="164.30317"
-         id="tspan284444">ipsum. </tspan></text>
+         id="tspan1323">ipsum. </tspan></text>
     <g
        id="g167654"
        transform="matrix(-0.22994556,0,0,-0.22993936,225.62529,143.17719)"
@@ -1115,7 +1115,8 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="info"
-     style="display:inline">
+     style="display:none"
+     sodipodi:insensitive="true">
     <rect
        style="opacity:1;fill:none;stroke:#5500d4;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect268932"
@@ -1163,16 +1164,16 @@
          transform="matrix(0.59571192,0,0,0.59569584,106.85554,-16.435045)"><tspan
            x="175.25233"
            y="114.6634"
-           id="tspan284446">This widget will disappear </tspan><tspan
+           id="tspan1325">This widget will disappear </tspan><tspan
            x="175.25233"
            y="120.86837"
-           id="tspan284448">when the ui language is </tspan><tspan
+           id="tspan1327">when the ui language is </tspan><tspan
            x="175.25233"
            y="127.07334"
-           id="tspan284450">set via the customElement </tspan><tspan
+           id="tspan1329">set via the customElement </tspan><tspan
            x="175.25233"
            y="133.27831"
-           id="tspan284452">attribute.</tspan></text>
+           id="tspan1331">attribute.</tspan></text>
       <rect
          style="fill:#ffcc00;stroke:none;stroke-width:0.175;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
          id="rect268762"
@@ -1202,7 +1203,7 @@
        transform="matrix(0.59571192,0,0,0.59569584,-90.494652,-19.678164)"><tspan
          x="175.25233"
          y="114.6634"
-         id="tspan284454">shfrm:Languages</tspan></text>
+         id="tspan1333">shfrm:Languages</tspan></text>
     <rect
        style="opacity:1;fill:none;stroke:#5500d4;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect272668"
@@ -1230,7 +1231,7 @@
        transform="matrix(0.59571192,0,0,0.59569584,55.734608,-0.2157555)"><tspan
          x="175.25233"
          y="114.6634"
-         id="tspan284456">sh:group &quot;side&quot;</tspan></text>
+         id="tspan1335">sh:group &quot;side&quot;</tspan></text>
     <rect
        style="opacity:1;fill:none;stroke:#5500d4;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect275008"
@@ -1258,7 +1259,7 @@
        transform="matrix(0.59571192,0,0,0.59569584,-91.032276,113.73595)"><tspan
          x="175.25233"
          y="114.6634"
-         id="tspan284458">sh:group &quot;main&quot;</tspan></text>
+         id="tspan1337">sh:group &quot;main&quot;</tspan></text>
     <rect
        style="opacity:1;fill:none;stroke:#5500d4;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect278578"
@@ -1286,7 +1287,7 @@
        transform="matrix(0.59571192,0,0,0.59569584,-89.088276,163.52992)"><tspan
          x="175.25233"
          y="114.6634"
-         id="tspan284460">shfrm:Actions</tspan></text>
+         id="tspan1339">shfrm:Actions</tspan></text>
     <g
        id="g283568"
        transform="translate(-95.714992,-45.00634)">
@@ -1326,7 +1327,7 @@
          transform="matrix(0.59571192,0,0,0.59569584,106.85554,-11.763737)"><tspan
            x="175.25233"
            y="114.6634"
-           id="tspan284462">Not part of shacl-form</tspan></text>
+           id="tspan1341">Not part of shacl-form</tspan></text>
       <rect
          style="fill:#ffcc00;stroke:none;stroke-width:0.175;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
          id="rect283566"

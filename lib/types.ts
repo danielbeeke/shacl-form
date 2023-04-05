@@ -1,12 +1,4 @@
-declare module "*?raw" {
-  const content: string;
-  export default content;
-}
-
-declare module 'shacl-engine';
-declare module 'grapoi';
-
-type ShaclPropertes = {
+export type ShaclProperties = {
   description?: { [key: string]: string },
   group?: string,
   languageIn?: Array<string>,

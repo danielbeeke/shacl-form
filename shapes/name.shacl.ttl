@@ -1,0 +1,25 @@
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+@prefix ex: <http://example.com/>.
+@prefix schema: <https://schema.org/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ex:NameShape
+	a sh:NodeShape ;
+
+	sh:property [
+		sh:path schema:name ;
+		sh:order 1 ;
+		sh:datatype xsd:string;
+		sh:name "given name"@en ;
+		sh:name "Gegeven name"@nl ;
+		sh:description "How do people call you?"@en ;
+		sh:minCount 1 ;
+		sh:qualifiedMinCount 1 ;
+		sh:qualifiedMaxCount 1 ;
+		sh:qualifiedValueShape [
+				sh:languageIn ( "en" )
+		] ;
+		sh:uniqueLang true ;
+] .

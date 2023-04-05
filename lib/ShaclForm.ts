@@ -7,8 +7,8 @@ import { sh, rdf } from './namespaces'
 import { shaclReportToNested } from './helpers/shaclReportToNested'
 import { createRoot } from 'react-dom/client'
 import type { Root } from 'react-dom/client'
-import { createElement } from 'react'
-import { Form } from './components/Form'
+import { createElement, StrictMode } from 'react'
+import { FormLevelBase } from './components/FormLevel'
 
 /**
  * A customElement to render SHACL as a form.
@@ -59,7 +59,11 @@ export class ShaclForm extends HTMLElement {
   }
 
   render (tree: any) {
-    this.#root.render(createElement(Form, { tree }))
+    this.#root.render(createElement(StrictMode, {
+      children: [
+        createElement(FormLevelBase, { tree, key: 'form' })
+      ]
+    }))
   }
 
   set subject (newValue: NamedNode) {
