@@ -9,13 +9,14 @@ ex:NameShape
 	a sh:NodeShape ;
 
 	sh:property [
-		sh:path schema:name ;
+		sh:path schema:name;
 		sh:order 1 ;
-		sh:datatype xsd:string;
+		sh:datatype xsd:langString;
 		sh:name "given name"@en ;
-		sh:name "Gegeven name"@nl ;
+		sh:name "Gegeven naam"@nl ;
 		sh:description "How do people call you?"@en ;
 		sh:minCount 1 ;
+		sh:maxCount 3 ;
 		sh:qualifiedMinCount 1 ;
 		sh:qualifiedMaxCount 1 ;
 		sh:qualifiedValueShape [

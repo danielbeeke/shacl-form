@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ShaclProperties } from '../types'
-import { mergePointers } from '../helpers/mergePointers'
+import { sh } from '../namespaces'
+import { bestLanguage } from '../helpers/bestLanguage'
 
-export function FieldWrapper ({ properties, Widget, children, messages, ptrs }: { properties: ShaclProperties, Widget: any, children: any, messages: any, ptrs: Array<any> }) {
-
-  const name = properties.name?.default ?? properties.name?.en
-  const description = properties.description?.default ?? properties.description?.en
+export function FieldWrapper ({ Widget, children, structure, languagePriorities }: { Widget: any, children: any, structure: any, languagePriorities: Array<string> }) {
+  const { shaclPointer, messages, dataPointer, index } = structure
   const [widgetInstance, setWidgetInstance] = useState<HTMLElement>()
 
   useEffect(() => {
@@ -15,22 +13,27 @@ export function FieldWrapper ({ properties, Widget, children, messages, ptrs }: 
       }
 
       const element = document.createElement(Widget.elementName)
-      element.properties = properties
-      element.pointer = mergePointers(ptrs)
+      element.shaclPointer = shaclPointer
       element.messages = messages
+      element.dataPointer = dataPointer
+      element.index = index
+      structure.element = element
       setWidgetInstance(element)
     }
 
-    return () => {
-      widgetInstance?.remove()
-    }
+    return () => widgetInstance?.remove()
   }, [])
+
+  const name = bestLanguage(shaclPointer.out([sh('name')]), languagePriorities)
+  const description = bestLanguage(shaclPointer.out([sh('description')]), languagePriorities)
 
   return (
     <div className='field'>
-      <label>{name}</label>
+      {name ? (<label>{name}</label>) : null}
       <div ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div>
-      <p>{description}</p>
+      {description ? (<p>{description}</p>) : null}
+
+      {children}
     </div>
   )
 }

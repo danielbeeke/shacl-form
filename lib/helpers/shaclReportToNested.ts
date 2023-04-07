@@ -1,7 +1,6 @@
 import { sh } from '../namespaces'
 import type { Quad } from 'n3'
 import grapoi from 'grapoi'
-import { grapoiPointersToJsObject } from './grapoiPointersToJsObject'
 
 /**
  * Converts the shacl report to a tree structure containing all possible combinations of the SHACL data.
@@ -31,7 +30,9 @@ export const shaclReportToNested = (report: any) => {
       const predicateName = pathPart.predicates[0].value
 
       // TODO atleast create a group widget
-      if (!pointer[predicateName]) pointer[predicateName] = {}
+      if (!pointer[predicateName]) {
+        pointer[predicateName] = {}
+      }
   
       if (index === path.length - 1) {
         pointer[predicateName]._widgets = processConstraints(constraints)
@@ -48,6 +49,7 @@ export const shaclReportToNested = (report: any) => {
 
 /**
  * Convert the constraints to an intermediate format.
+ * This is for one SHACL property.
  */
 const processConstraints = (constraints: Array<any>) => {
   const processedTerms = new Set()
@@ -60,28 +62,44 @@ const processConstraints = (constraints: Array<any>) => {
 
   const orConstraints = constraints.filter(constraint => constraint.isOr)
   const rootConstraints = constraints.filter(constraint => !constraint.isOr)
-  const properties = rootConstraints[0].shape.ptr.trim().out()
+  const dataPointer = (rootConstraints[0] ?? orConstraints[0]).focusNode
+
+  let widgets: Array<any> = []
 
   if (orConstraints?.length) {
-    return orConstraints.map(orConstraint => {
-      const pointers = [properties, orConstraint.shape.ptr.trim().out()]
-      
+    widgets = orConstraints.map(orConstraint => {
+      const pointers = [orConstraint.shape.ptr.ptrs[0], rootConstraints[0].shape.ptr.ptrs[0]]
+      const shaclPointer = orConstraint.shape.ptr.clone({ ptrs: pointers })
+
       return {
-        properties: grapoiPointersToJsObject(pointers),
         messages: extractMessages([...rootConstraints, orConstraint]),
-        widget: 'string',
-        ptrs: pointers,
+        widget: 'string', // TODO set these via a class.
+        shaclPointer,
+        dataPointer
       }
     })
   }
   else {
-    return [{
-      properties: grapoiPointersToJsObject([properties]),
+    const pointers = [rootConstraints[0].shape.ptr.ptrs[0]]
+    const shaclPointer = rootConstraints[0].shape.ptr.clone({ ptrs: pointers })
+
+    widgets = [{
       messages: extractMessages(rootConstraints),
       widget: 'string',
-      ptrs: [properties],
+      shaclPointer,
+      dataPointer
     }]
   }
+
+  const values = [...dataPointer.out().quads()]
+
+  return values.flatMap((value, index) => {
+    return widgets.map(widget => {
+      widget.value = value
+      widget.index = index
+      return widget
+    })
+  })
 }
 
 /**

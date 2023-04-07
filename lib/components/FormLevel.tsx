@@ -1,13 +1,15 @@
 import { FieldWrapper } from './FieldWrapper'
-import String from '../widgets/String'
 import { hash } from '../helpers/hash'
-import { mergePointers } from '../helpers/mergePointers'
+
+import String from '../widgets/String'
+import BlankNode from '../widgets/BlankNode'
 
 const widgetRegistry = {
-  string: String
+  'blank-node': BlankNode,
+  string: String,
 }
 
-export function FormLevel ({ tree, depth = 0 }: { tree: any, depth: number }) {
+export function FormLevel ({ tree, depth = 0, languagePriorities }: { tree: any, depth: number, languagePriorities: Array<string> }) {
   depth++
 
   const cid = Object.keys(tree).join(',') + depth
@@ -16,22 +18,22 @@ export function FormLevel ({ tree, depth = 0 }: { tree: any, depth: number }) {
     <>
       {Object.entries(tree).flatMap(([predicate, field]: [any, any], outerIndex: number) => {
         const childrenObject = Object.fromEntries(Object.entries(field as any).filter(([name]) => name[0] !== '_'))
-        const children = Object.keys(childrenObject).length ? (<FormLevel key={hash(cid + predicate + outerIndex + 'children')} depth={depth} tree={childrenObject}></FormLevel>) : null
+        const children = Object.keys(childrenObject).length ? (<FormLevel languagePriorities={languagePriorities} key={hash(cid + predicate + outerIndex + 'children')} depth={depth} tree={childrenObject}></FormLevel>) : null
 
         return [
           field._widgets ? field._widgets
           .filter((widget: any) => {
             const Widget = widgetRegistry[widget.widget as keyof typeof widgetRegistry]
-            return Widget.applies(mergePointers(widget.ptrs))
+            return Widget.applies(widget.shaclPointer)
           })
           .map((widget: any, index: number) => {
-            const { properties, messages, ptrs } = widget
             const Widget = widgetRegistry[widget.widget as keyof typeof widgetRegistry]
-
             return (
-              <FieldWrapper key={hash(cid + Widget + outerIndex + index)} properties={properties} messages={messages} ptrs={ptrs} Widget={Widget}>{children}</FieldWrapper>
+              <FieldWrapper languagePriorities={languagePriorities} key={hash(cid + Widget + outerIndex + index)} structure={widget} Widget={Widget}>{children}</FieldWrapper>
             )
           }) : null,
+          // TODO these children should be rendered by widgets that are groups
+          // However how to do that? This would be a perfect way of rendering address fields etc.
           children
         ]
      })}
@@ -39,6 +41,6 @@ export function FormLevel ({ tree, depth = 0 }: { tree: any, depth: number }) {
   )
 }
 
-export function FormLevelBase ({ tree }: { tree: any }) {
-  return (<FormLevel key="main" depth={0} tree={tree}></FormLevel>)
+export function FormLevelBase ({ tree, languagePriorities }: { tree: any, languagePriorities: Array<string> }) {
+  return (<FormLevel languagePriorities={languagePriorities} key="main" depth={0} tree={tree}></FormLevel>)
 }

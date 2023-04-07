@@ -1,7 +1,7 @@
 import { Validator } from 'shacl-engine'
 import { Parser, Store, DataFactory as df } from 'n3'
 import rdfDataset from '@rdfjs/dataset'
-import type { NamedNode } from 'n3'
+import { NamedNode } from 'n3'
 import DatasetCore from '@rdfjs/dataset/DatasetCore'
 import { sh, rdf } from './namespaces'
 import { shaclReportToNested } from './helpers/shaclReportToNested'
@@ -20,15 +20,16 @@ import { FormLevelBase } from './components/FormLevel'
 export class ShaclForm extends HTMLElement {
 
   #validator: typeof Validator
-  #subject: NamedNode
+  #subject: NamedNode = new NamedNode('')
   #store: Store = new Store()
   #shaclDataset: DatasetCore = rdfDataset.dataset()
   shapeUris: Array<NamedNode> = []
   #root: Root
+  #languagePriorities: Array<string> = ['*']
+
 
   constructor () {
     super()
-    this.#subject = df.namedNode(this.attributes.getNamedItem('subject')?.value ?? 'urn:default-shacl-form-subject')
     this.init()
     this.#root = createRoot(this)
   }
@@ -46,9 +47,23 @@ export class ShaclForm extends HTMLElement {
     for (const nodeShapeQuad of nodeShapeQuads) {
       this.shapeUris.push(nodeShapeQuad.subject as NamedNode)
     }
-    
-    // Set the fallback subject.
-    this.#store.add(df.quad(this.subject, rdf('type'), this.shapeUri))
+
+    const dataUrl = this.attributes.getNamedItem('data-url')?.value
+    if (dataUrl) {
+      const dataText = await fetch(dataUrl).then(response => response.text())
+      const dataQuads = await parser.parse(dataText)
+      await this.#store.addQuads(dataQuads)
+      this.#subject = dataQuads[0].subject as NamedNode
+    }
+    else {
+      this.#subject = df.namedNode(this.attributes.getNamedItem('subject')?.value ?? 'urn:default-shacl-form-subject')
+      // Set the fallback subject.
+      // TODO change to the target class.
+      this.#store.add(df.quad(this.subject, rdf('type'), this.shapeUri))
+    }
+
+    this.#languagePriorities = this.attributes.getNamedItem('language-priorities')?.value?.split(',') ?? ['*']
+    this.#languagePriorities.push('*')
 
     const tree = await this.validate()
     this.render(tree)
@@ -61,7 +76,7 @@ export class ShaclForm extends HTMLElement {
   render (tree: any) {
     this.#root.render(createElement(StrictMode, {
       children: [
-        createElement(FormLevelBase, { tree, key: 'form' })
+        createElement(FormLevelBase, { tree, key: 'form', languagePriorities: this.#languagePriorities })
       ]
     }))
   }
@@ -74,7 +89,7 @@ export class ShaclForm extends HTMLElement {
   }
 
   async validate () {
-    const report = await this.#validator.validate({ dataset: this.#shaclDataset, terms: [this.subject] })
+    const report = await this.#validator.validate({ dataset: this.#store, terms: [this.subject] })
     return shaclReportToNested(report)
   }
 

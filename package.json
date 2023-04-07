@@ -16,6 +16,7 @@
     "@types/rdfjs__data-model": "^2.0.3",
     "@types/rdfjs__dataset": "^2.0.2",
     "@types/rdfjs__namespace": "^2.0.3",
+    "@types/rdfjs__score": "^0.1.1",
     "@types/react-dom": "^18.0.11",
     "patch-package": "^6.5.1",
     "typescript": "^5.0.3",
@@ -24,10 +25,12 @@
   "dependencies": {
     "@rdfjs/dataset": "^2.0.1",
     "@rdfjs/namespace": "^2.0.0",
+    "@rdfjs/score": "^0.1.1",
     "grapoi": "^1.0.0",
     "n3": "^1.16.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "shacl-engine": "^0.1.0"
+    "shacl-engine": "^0.1.0",
+    "uhtml": "^3.1.0"
   }
 }
