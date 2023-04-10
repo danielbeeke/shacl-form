@@ -1,6 +1,9 @@
 import { sh } from '../namespaces'
-import type { Quad } from 'n3'
+import { Quad } from 'n3'
 import grapoi from 'grapoi'
+import rdf from 'rdf-ext'
+import { DataFactory } from 'rdf-ext'
+const df = new DataFactory()
 
 /**
  * Converts the shacl report to a tree structure containing all possible combinations of the SHACL data.
@@ -29,14 +32,31 @@ export const shaclReportToNested = (report: any) => {
     for (const [index, pathPart] of path.entries()) {
       const predicateName = pathPart.predicates[0].value
 
-      // TODO atleast create a group widget
+      if (!pointer[predicateName] && index !== path.length - 1) {
+        const dataset = rdf.dataset([df.quad(
+          df.namedNode('urn:unknown'),
+          sh('path'),
+          pathPart.predicates[0],
+          null as unknown as undefined
+        )])
+        
+        const shaclPointer = grapoi({ dataset, term: df.namedNode('urn:unknown') })
+
+        pointer[predicateName] = {
+          _constraintsSet: [{
+            widget: 'field-blank-node',
+            shaclPointer,
+            path
+          }]
+        }
+      }
+
       if (!pointer[predicateName]) {
         pointer[predicateName] = {}
       }
   
       if (index === path.length - 1) {
-        pointer[predicateName]._widgets = processConstraints(constraints)
-        // pointer[predicateName]._activeWidget = ''
+        pointer[predicateName]._constraintsSet = processConstraints(constraints)
       }
   
       pointer = tree[predicateName]
@@ -62,20 +82,24 @@ const processConstraints = (constraints: Array<any>) => {
 
   const orConstraints = constraints.filter(constraint => constraint.isOr)
   const rootConstraints = constraints.filter(constraint => !constraint.isOr)
-  const dataPointer = (rootConstraints[0] ?? orConstraints[0]).focusNode
+  const firstConstraint = (rootConstraints?.[0] ?? orConstraints?.[0])
+  const dataPointer = firstConstraint.focusNode
+
+  console.log(firstConstraint)
 
   let widgets: Array<any> = []
 
   if (orConstraints?.length) {
     widgets = orConstraints.map(orConstraint => {
-      const pointers = [orConstraint.shape.ptr.ptrs[0], rootConstraints[0].shape.ptr.ptrs[0]]
+      const pointers = [orConstraint.shape.ptr.ptrs[0], rootConstraints?.[0]?.shape.ptr.ptrs[0]].filter(Boolean)
       const shaclPointer = orConstraint.shape.ptr.clone({ ptrs: pointers })
 
       return {
         messages: extractMessages([...rootConstraints, orConstraint]),
         widget: 'string', // TODO set these via a class.
         shaclPointer,
-        dataPointer
+        dataPointer,
+        path: firstConstraint.path
       }
     })
   }
@@ -87,7 +111,8 @@ const processConstraints = (constraints: Array<any>) => {
       messages: extractMessages(rootConstraints),
       widget: 'string',
       shaclPointer,
-      dataPointer
+      dataPointer,
+      path: firstConstraint.path
     }]
   }
 
@@ -119,8 +144,7 @@ const getPathForOrResult = (result: any) => {
   const pathQuad = [...shaclProperty.out([sh('path')]).quads()].pop()
   if (!pathQuad) throw new Error('This is unexpected (for now)')
 
-  const path = [{ quantifier: "one", start: "subject", end: "object", predicates: [pathQuad.object] }]
-  return path
+  return [{ quantifier: "one", start: "subject", end: "object", predicates: [pathQuad.object] }]
 }
 
 const toMesssages = (constraints: Array<any>) => {

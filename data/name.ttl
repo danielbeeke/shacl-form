@@ -1,4 +1,8 @@
 @prefix schema: <https://schema.org/>.
 @prefix ex: <http://example.com/>.
 
-ex:name schema:name "Daniel"@en .
+ex:name 
+  schema:name "Pieter"@nl ;
+  schema:knows [
+    schema:name "Daniel"@en
+  ] .

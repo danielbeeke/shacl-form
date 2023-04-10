@@ -33,7 +33,7 @@ export function FieldWrapper ({ Widget, children, structure, languagePriorities 
       <div ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div>
       {description ? (<p>{description}</p>) : null}
 
-      {children}
+      {children ? (<div className='children'>{children}</div>) : null}
     </div>
   )
 }

@@ -12,6 +12,7 @@
   "devDependencies": {
     "@types/n3": "^1.10.4",
     "@types/node": "^18.15.11",
+    "@types/rdf-ext": "^2.0.2",
     "@types/rdf-validate-shacl": "^0.4.2",
     "@types/rdfjs__data-model": "^2.0.3",
     "@types/rdfjs__dataset": "^2.0.2",
@@ -28,6 +29,7 @@
     "@rdfjs/score": "^0.1.1",
     "grapoi": "^1.0.0",
     "n3": "^1.16.4",
+    "rdf-ext": "^2.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "shacl-engine": "^0.1.0",

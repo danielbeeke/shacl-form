@@ -5,7 +5,7 @@ import String from '../widgets/String'
 import BlankNode from '../widgets/BlankNode'
 
 const widgetRegistry = {
-  'blank-node': BlankNode,
+  'field-blank-node': BlankNode,
   string: String,
 }
 
@@ -21,7 +21,7 @@ export function FormLevel ({ tree, depth = 0, languagePriorities }: { tree: any,
         const children = Object.keys(childrenObject).length ? (<FormLevel languagePriorities={languagePriorities} key={hash(cid + predicate + outerIndex + 'children')} depth={depth} tree={childrenObject}></FormLevel>) : null
 
         return [
-          field._widgets ? field._widgets
+          field._constraintsSet ? field._constraintsSet
           .filter((widget: any) => {
             const Widget = widgetRegistry[widget.widget as keyof typeof widgetRegistry]
             return Widget.applies(widget.shaclPointer)
@@ -34,7 +34,7 @@ export function FormLevel ({ tree, depth = 0, languagePriorities }: { tree: any,
           }) : null,
           // TODO these children should be rendered by widgets that are groups
           // However how to do that? This would be a perfect way of rendering address fields etc.
-          children
+          // children
         ]
      })}
     </>
