@@ -70,8 +70,6 @@ export class ShaclForm extends HTMLElement {
 
     const tree = shaclTree(report, this.#shaclDataset)
 
-    console.log(tree)
-
     this.render({})
   }
 

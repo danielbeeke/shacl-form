@@ -1,5 +1,5 @@
 import type { NamedNode } from '@rdfjs/types'
-import { Quad } from 'n3'
+import { Quad, Term } from 'n3'
 export { BlankNode, Literal, Quad, Variable } from 'n3'
 
 export type ShaclProperties = {
@@ -23,7 +23,11 @@ export type GrapoiPointer = {
   quads: () => Array<Quad>
   trim(): GrapoiPointer
   values: Array<any>
+  filter: (item: any) => boolean
   value: any
   isList: () => Boolean,
   list: () => Array<GrapoiPointer>
+  ptrs: Array<any>
+  node: (pointers: Array<any>) => GrapoiPointer
+  term: Term
 }

@@ -4,6 +4,21 @@ import { rdf, sh } from '../namespaces'
 import factory from 'rdf-ext'
 import parsePath from 'shacl-engine/lib/parsePath.js'
 import * as _ from 'lodash-es'
+import { GrapoiPointer } from '../types'
+import { rdfTermValueToTypedVariable } from './rdfTermValueToTypedVariable'
+
+type TreeItem = {
+  _pointers: Array<GrapoiPointer>,
+  _messages: {
+    errors: Array<string>,
+    infos: Array<string>,
+    warnings: Array<string>
+  },
+  _pathPart: any,
+  _types: Array<string>,
+  _alternatives: () => Array<any>
+  _widgets: () => Array<any>
+}
 
 /**
  * One predicate
@@ -12,6 +27,7 @@ import * as _ from 'lodash-es'
  * @see https://github.com/w3c/shacl/blob/9715ee1d8661ffd87322ab655161174ecc8d3967/shacl-compact-syntax/tests/valid/complex2.ttl#L32
  * 
  * TODO make recursive
+ * Grab the required languages and think about language tabs in a recursive situation.
  */
 export const shaclTree = (report: any, dataset: DatasetCore) => {
   const shacl = grapoi({ dataset, factory })
@@ -37,7 +53,7 @@ export const shaclTree = (report: any, dataset: DatasetCore) => {
         // We MUST merge multiple paths into one and they all apply.
         // See end of https://www.w3.org/TR/shacl/#constraints
         if (!pointer[predicate.value]) {
-          pointer[predicate.value] = {
+          const item: TreeItem = {
             _messages: {
               errors: [],
               infos: [],
@@ -46,14 +62,25 @@ export const shaclTree = (report: any, dataset: DatasetCore) => {
             _pointers: [],
             _pathPart: pathPart,
             _types: [],
-            // Widgets can be multiple when sh:or, sh:xone etc is used.
-            // It can also be multiple when the configuration allows more widgets than only the best one.
-            // _widgets: []
+            /**
+             * Alternatives caused by
+             * 
+             * sh:or
+             * sh:xone
+             * sh:qualifiedValueShape <-- must always render.. so the render object needs a property for that.
+             * 
+             * But not by sh:alternativePath because that causes different paths.
+             * 
+             */
+            _alternatives: _.once(() => pointersToAlternatives(item._pointers)),
 
-            // Used to grapb all the pointers for one sh:or option.
-            // If sh:or is not used this array will just have one item.
-            _alternatives: [] // TODO lazily calculate?
+            _widgets: _.once(() => {
+              const alternatives = item._alternatives()
+              console.log(alternatives)
+              return []
+            })
           }
+          pointer[predicate.value] = item
         }
 
         // Messages are part of a widget that does have a definition.
@@ -69,10 +96,14 @@ export const shaclTree = (report: any, dataset: DatasetCore) => {
         }
 
         pointer[predicate.value]._pointers.push(shaclPropertyInner)
+
+        // Set the pointer for the next round.
         pointer = pointer[predicate.value]
       }
     }
   }
+
+  tree['https://schema.org/knows']['https://schema.org/name']._widgets()
 
   return tree
 }
@@ -95,4 +126,35 @@ const extractMessages = (constraints: Array<any>) => {
     infos: toMesssages(infos),
     warnings: toMesssages(warnings)
   }
+}
+
+export const pointersToAlternatives = (pointers: Array<GrapoiPointer>) => {
+  const baseTerms = pointers.flatMap((p: any) => p.terms)
+  const baseAlternatives = pointers[0].node(baseTerms)
+  const orAlternatives = [...baseAlternatives.out([sh('or')]).trim()?.list() ?? []].map(pointer => pointer.trim().out())
+  const qualifiedAlternative = baseAlternatives.out([sh('qualifiedValueShape')]).trim().out()
+
+  const qualifiedValueShapesDisjointValue = baseAlternatives.out([sh('qualifiedValueShapesDisjoint')]).term
+  const qualifiedValueShapesDisjoint = qualifiedValueShapesDisjointValue ? rdfTermValueToTypedVariable(qualifiedValueShapesDisjointValue) : false
+
+  // I could not find in the spec that sh:or would merge with the base properties 
+  // but I think it might, because it works that way when using qualifiedValueShapesDisjoint.
+  const qualifiedValuePointer = qualifiedAlternative.ptrs.length ? (
+    qualifiedValueShapesDisjoint ? qualifiedAlternative : pointers[0].node([...baseTerms, qualifiedAlternative.term].filter(Boolean))
+  ) : null
+
+  return [
+    orAlternatives.length ? null : {
+      pointer: baseAlternatives,
+      type: 'base'
+    },
+    ...orAlternatives.map((orAlternative: GrapoiPointer) => ({
+      pointer: orAlternative.node([...baseTerms, orAlternative.term]),
+      type: 'or'
+    })),
+    qualifiedValuePointer ? {
+      pointer: qualifiedValuePointer,
+      type: 'qualified'
+    } : null
+  ].filter(Boolean)
 }
