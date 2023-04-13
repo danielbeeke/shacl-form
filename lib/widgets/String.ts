@@ -14,6 +14,8 @@ export default class String extends ShaclFormField<typeof String> {
   static applies(shaclPointer: GrapoiPointer): boolean {
     const datatypes = shaclPointer.out([sh('datatype')]).values
 
+    console.log([...shaclPointer.out().quads()])
+
     return datatypes.some(datatype => [
       xsd('langString').value,
       xsd('string').value

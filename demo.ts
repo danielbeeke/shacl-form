@@ -1,4 +1,11 @@
-import './lib/ShaclForm'
+import { init } from './lib/ShaclForm'
+import String from './lib/widgets/String'
+
+init({
+  widgets: {
+    String,
+  }
+})
 
 document.body.innerHTML = `
   <shacl-form 

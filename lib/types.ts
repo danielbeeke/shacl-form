@@ -31,3 +31,9 @@ export type GrapoiPointer = {
   node: (pointers: Array<any>) => GrapoiPointer
   term: Term
 }
+
+export type Options = {
+  widgets: {
+    [key: string]: any
+  }
+}

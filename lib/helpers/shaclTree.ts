@@ -4,7 +4,7 @@ import { rdf, sh } from '../namespaces'
 import factory from 'rdf-ext'
 import parsePath from 'shacl-engine/lib/parsePath.js'
 import * as _ from 'lodash-es'
-import { GrapoiPointer } from '../types'
+import { GrapoiPointer, Options } from '../types'
 import { rdfTermValueToTypedVariable } from './rdfTermValueToTypedVariable'
 
 type TreeItem = {
@@ -29,7 +29,7 @@ type TreeItem = {
  * TODO make recursive
  * Grab the required languages and think about language tabs in a recursive situation.
  */
-export const shaclTree = (report: any, dataset: DatasetCore) => {
+export const shaclTree = (report: any, dataset: DatasetCore, options: Options) => {
   const shacl = grapoi({ dataset, factory })
   const shaclShapes = shacl.hasOut([rdf('type')], [sh('NodeShape')])
   const shaclProperties = shaclShapes.hasOut([sh('property')])
@@ -54,30 +54,25 @@ export const shaclTree = (report: any, dataset: DatasetCore) => {
         // See end of https://www.w3.org/TR/shacl/#constraints
         if (!pointer[predicate.value]) {
           const item: TreeItem = {
-            _messages: {
-              errors: [],
-              infos: [],
-              warnings: []
-            },
+            _messages: { errors: [], infos: [], warnings: [] },
             _pointers: [],
             _pathPart: pathPart,
             _types: [],
-            /**
-             * Alternatives caused by
-             * 
-             * sh:or
-             * sh:xone
-             * sh:qualifiedValueShape <-- must always render.. so the render object needs a property for that.
-             * 
-             * But not by sh:alternativePath because that causes different paths.
-             * 
-             */
+            // sh:or, sh:xone, sh:qualifiedValueShape
             _alternatives: _.once(() => pointersToAlternatives(item._pointers)),
-
             _widgets: _.once(() => {
-              const alternatives = item._alternatives()
-              console.log(alternatives)
-              return []
+
+              const { widgets } = options
+
+              return item._alternatives().map(alternative => {
+                return Object.values(widgets).map(widget => {
+                  return {
+                    _pointer: alternative.pointer,
+                    _score: widget.applies(alternative.pointer),
+                    _alternative: alternative
+                  }
+                })
+              })
             })
           }
           pointer[predicate.value] = item
@@ -103,11 +98,10 @@ export const shaclTree = (report: any, dataset: DatasetCore) => {
     }
   }
 
-  tree['https://schema.org/knows']['https://schema.org/name']._widgets()
+  console.log(tree['https://schema.org/knows']['https://schema.org/name']._widgets())
 
   return tree
 }
-
 
 const toMesssages = (constraints: Array<any>) => {
   return [... new Set(constraints.flatMap((constraint: any) => constraint.message.map((message: any) => message.value)))]
@@ -128,6 +122,10 @@ const extractMessages = (constraints: Array<any>) => {
   }
 }
 
+/**
+ * The pointers should be always at the root of a SHACL property.
+ * It is allowed to have multiple properties for the same SHACL property.
+ */
 export const pointersToAlternatives = (pointers: Array<GrapoiPointer>) => {
   const baseTerms = pointers.flatMap((p: any) => p.terms)
   const baseAlternatives = pointers[0].node(baseTerms)
@@ -144,17 +142,22 @@ export const pointersToAlternatives = (pointers: Array<GrapoiPointer>) => {
   ) : null
 
   return [
+    qualifiedValuePointer ? {
+      pointer: qualifiedValuePointer,
+      type: 'qualified'
+    } : null,
     orAlternatives.length ? null : {
       pointer: baseAlternatives,
       type: 'base'
     },
     ...orAlternatives.map((orAlternative: GrapoiPointer) => ({
-      pointer: orAlternative.node([...baseTerms, orAlternative.term]),
+      // TODO why does this need an in()?
+      pointer: orAlternative.node([...baseTerms, orAlternative.term]).in(),
       type: 'or'
     })),
-    qualifiedValuePointer ? {
-      pointer: qualifiedValuePointer,
-      type: 'qualified'
-    } : null
   ].filter(Boolean)
+}
+
+const determineWidgets = (widgets: Options['widgets']) => {
+
 }

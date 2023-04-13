@@ -15,13 +15,14 @@ ex:NameShape
 		sh:name "Gegeven naam"@nl ;
 		sh:description "How do people call you?"@en ;
 		sh:maxCount 3 ;
-		sh:or (
-			[ sh:datatype xsd:langString;]
-			[ sh:datatype xsd:string;]
-		) ;
+		sh:datatype xsd:langString;
+		# sh:or (
+		# 	[ sh:datatype xsd:langString;]
+		# 	[ sh:datatype xsd:string;]
+		# ) ;
 		sh:qualifiedMinCount 1 ;
 		sh:qualifiedMaxCount 1 ;
-		sh:qualifiedValueShapesDisjoint true ;
+		# sh:qualifiedValueShapesDisjoint true ;
 		sh:qualifiedValueShape [
 				sh:languageIn ( "en" )
 		] ;
