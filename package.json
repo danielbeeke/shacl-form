@@ -10,6 +10,7 @@
     "postinstall": "patch-package"
   },
   "devDependencies": {
+    "@types/lodash-es": "^4.17.7",
     "@types/n3": "^1.10.4",
     "@types/node": "^18.15.11",
     "@types/rdf-ext": "^2.0.2",
@@ -28,6 +29,7 @@
     "@rdfjs/namespace": "^2.0.0",
     "@rdfjs/score": "^0.1.1",
     "grapoi": "^1.0.0",
+    "lodash-es": "^4.17.21",
     "n3": "^1.16.4",
     "rdf-ext": "^2.2.0",
     "react": "^18.2.0",

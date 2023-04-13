@@ -4,4 +4,6 @@ declare module "*?raw" {
 }
 
 declare module 'shacl-engine';
+declare module 'shacl-engine/lib/parsePath.js';
+
 declare module 'grapoi';

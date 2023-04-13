@@ -6,6 +6,23 @@ import { DataFactory } from 'rdf-ext'
 const df = new DataFactory()
 
 /**
+ * What should happen here?
+ * 
+ * A SHACL report contains Grapoi pointers that are of interest but it has pointers for each constraint.
+ * Somehow we should make them unique and also grab the focusNodes.
+ * 
+ * context.focusNode.executeAll(this.shape.path) inside of ShapeValidator of shacl-engine seems to be interesting.
+ * 
+ * Multiple phases
+ * Building the hierarchy
+ * Adding the values.. but these are intertwined because of the values inside sh:or.
+ * 
+ * Try out:
+ * 
+ * 
+ */
+
+/**
  * Converts the shacl report to a tree structure containing all possible combinations of the SHACL data.
  */
 export const shaclReportToNested = (report: any) => {
@@ -85,8 +102,6 @@ const processConstraints = (constraints: Array<any>) => {
   const firstConstraint = (rootConstraints?.[0] ?? orConstraints?.[0])
   const dataPointer = firstConstraint.focusNode
 
-  console.log(firstConstraint)
-
   let widgets: Array<any> = []
 
   if (orConstraints?.length) {
@@ -130,6 +145,8 @@ const processConstraints = (constraints: Array<any>) => {
 /**
  * Constraints that re inside an sh:or blankNode do not have a direct path available.
  * This will fetch the path and add it into the structure.
+ * 
+ * TODO might not be needed if we follow shacl-engines logic more closely.
  */
 const getPathForOrResult = (result: any) => {
   const shaclPropertyQuad = [...result.shape.ptr.out().quads()]

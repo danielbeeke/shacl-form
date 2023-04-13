@@ -9,6 +9,7 @@ import { createRoot } from 'react-dom/client'
 import type { Root } from 'react-dom/client'
 import { createElement, StrictMode } from 'react'
 import { FormLevelBase } from './components/FormLevel'
+import { shaclTree } from './helpers/shaclTree'
 
 /**
  * A customElement to render SHACL as a form.
@@ -65,8 +66,13 @@ export class ShaclForm extends HTMLElement {
     this.#languagePriorities = this.attributes.getNamedItem('language-priorities')?.value?.split(',') ?? ['*']
     this.#languagePriorities.push('*')
 
-    const tree = await this.validate()
-    this.render(tree)
+    const report = await this.validate()
+
+    const tree = shaclTree(report, this.#shaclDataset)
+
+    console.log(tree)
+
+    this.render({})
   }
 
   get subject () {
@@ -88,9 +94,8 @@ export class ShaclForm extends HTMLElement {
     this.#store.addQuads(quadsToChange.map((quad) => df.quad(this.subject, quad.predicate, quad.object, quad.graph)))
   }
 
-  async validate () {
-    const report = await this.#validator.validate({ dataset: this.#store, terms: [this.subject] })
-    return shaclReportToNested(report)
+  validate () {
+    return this.#validator.validate({ dataset: this.#store, terms: [this.subject] })
   }
 
   get shapeUri () {
