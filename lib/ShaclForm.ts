@@ -28,7 +28,7 @@ export const init = (options: Options) => {
     #shaclDataset: DatasetCore = rdfDataset.dataset()
     shapeUris: Array<NamedNode> = []
     #root: Root
-    #languagePriorities: Array<string> = ['*']
+    #uiLanguagePriorities: Array<string> = ['*']
 
     constructor () {
       super()
@@ -58,20 +58,20 @@ export const init = (options: Options) => {
         this.#subject = dataQuads[0].subject as NamedNode
       }
       else {
-        this.#subject = df.namedNode(this.attributes.getNamedItem('subject')?.value ?? 'urn:default-shacl-form-subject')
+        this.#subject = df.namedNode(this.attributes.getNamedItem('data-iri')?.value ?? 'urn:default-shacl-form-subject')
         // Set the fallback subject.
         // TODO change to the target class.
         this.#store.add(df.quad(this.subject, rdf('type'), this.shapeUri))
       }
 
-      this.#languagePriorities = this.attributes.getNamedItem('language-priorities')?.value?.split(',') ?? ['*']
-      this.#languagePriorities.push('*')
+      this.#uiLanguagePriorities = this.attributes.getNamedItem('ui-language-priorities')?.value?.split(',') ?? ['*']
+      this.#uiLanguagePriorities.push('*')
 
       const report = await this.validate()
 
-      const tree = shaclTree(report, this.#shaclDataset, options)
+      const tree = shaclTree(report, this.#shaclDataset, options, this.#store, this.#subject)
 
-      this.render({})
+      this.render(tree)
     }
 
     get subject () {
@@ -81,7 +81,7 @@ export const init = (options: Options) => {
     render (tree: any) {
       this.#root.render(createElement(StrictMode, {
         children: [
-          createElement(FormLevelBase, { tree, key: 'form', languagePriorities: this.#languagePriorities })
+          createElement(FormLevelBase, { tree, key: 'form', uiLanguagePriorities: this.#uiLanguagePriorities })
         ]
       }))
     }

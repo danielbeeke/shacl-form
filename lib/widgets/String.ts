@@ -1,25 +1,18 @@
-import type { Literal } from 'n3'
 import { ShaclFormField } from '../ShaclFormField'
-import { xsd, sh } from '../namespaces'
+import { xsd } from '../namespaces'
 import { GrapoiPointer } from '../types'
-
-// Just here for a quick example.
-// You could use React, Vue, Angular, basically anything and export it to a customElement.
-import { html, render } from 'uhtml'
+import { scorer } from '../Scorer'
+import type { Literal } from 'n3'
+import { html, render } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
 
 export default class String extends ShaclFormField<typeof String> {
 
-  static elementName = 'field-string'
+  static elementName = 'string'
 
-  static applies(shaclPointer: GrapoiPointer): boolean {
-    const datatypes = shaclPointer.out([sh('datatype')]).values
-
-    console.log([...shaclPointer.out().quads()])
-
-    return datatypes.some(datatype => [
-      xsd('langString').value,
-      xsd('string').value
-    ].includes(datatype))
+  static score(shaclPointer: GrapoiPointer) {
+    return scorer(shaclPointer)
+      .datatypes([xsd('langString'), xsd('string')])
+      .toNumber()
   }
 
   async connectedCallback () {

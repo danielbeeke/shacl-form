@@ -1,14 +1,6 @@
 import { FieldWrapper } from './FieldWrapper'
 import { hash } from '../helpers/hash'
 
-import String from '../widgets/String'
-import BlankNode from '../widgets/BlankNode'
-
-const widgetRegistry = {
-  'field-blank-node': BlankNode,
-  string: String,
-}
-
 export function FormLevel ({ tree, depth = 0, languagePriorities }: { tree: any, depth: number, languagePriorities: Array<string> }) {
   depth++
 
@@ -18,18 +10,23 @@ export function FormLevel ({ tree, depth = 0, languagePriorities }: { tree: any,
     <>
       {Object.entries(tree).flatMap(([predicate, field]: [any, any], outerIndex: number) => {
         const childrenObject = Object.fromEntries(Object.entries(field as any).filter(([name]) => name[0] !== '_'))
-        const children = Object.keys(childrenObject).length ? (<FormLevel languagePriorities={languagePriorities} key={hash(cid + predicate + outerIndex + 'children')} depth={depth} tree={childrenObject}></FormLevel>) : null
+        const children = Object.keys(childrenObject).length ? 
+          (<FormLevel languagePriorities={languagePriorities} key={hash(cid + predicate + outerIndex + 'children')} depth={depth} tree={childrenObject} />)
+        : null
 
         return [
-          field._constraintsSet ? field._constraintsSet
-          .filter((widget: any) => {
-            const Widget = widgetRegistry[widget.widget as keyof typeof widgetRegistry]
-            return Widget.applies(widget.shaclPointer)
-          })
+          field._widgets?.length ? field._widgets
+          .filter((widget: any) => widget._score > 0)
           .map((widget: any, index: number) => {
-            const Widget = widgetRegistry[widget.widget as keyof typeof widgetRegistry]
             return (
-              <FieldWrapper languagePriorities={languagePriorities} key={hash(cid + Widget + outerIndex + index)} structure={widget} Widget={Widget}>{children}</FieldWrapper>
+              <FieldWrapper 
+                uiLanguagePriorities={languagePriorities} 
+                key={hash(cid + widget._widget.name + outerIndex + index)} 
+                structure={widget} 
+                Widget={widget._widget}
+              >
+                {children}
+              </FieldWrapper>
             )
           }) : null,
           // TODO these children should be rendered by widgets that are groups
@@ -41,6 +38,6 @@ export function FormLevel ({ tree, depth = 0, languagePriorities }: { tree: any,
   )
 }
 
-export function FormLevelBase ({ tree, languagePriorities }: { tree: any, languagePriorities: Array<string> }) {
+export function FormLevelBase ({ tree, uiLanguagePriorities: languagePriorities }: { tree: any, uiLanguagePriorities: Array<string> }) {
   return (<FormLevel languagePriorities={languagePriorities} key="main" depth={0} tree={tree}></FormLevel>)
 }

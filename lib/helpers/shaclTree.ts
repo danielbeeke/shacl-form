@@ -6,6 +6,7 @@ import parsePath from 'shacl-engine/lib/parsePath.js'
 import * as _ from 'lodash-es'
 import { GrapoiPointer, Options } from '../types'
 import { rdfTermValueToTypedVariable } from './rdfTermValueToTypedVariable'
+import NamedNodeExt from 'rdf-ext/lib/NamedNode'
 
 type TreeItem = {
   _pointers: Array<GrapoiPointer>,
@@ -16,8 +17,8 @@ type TreeItem = {
   },
   _pathPart: any,
   _types: Array<string>,
-  _alternatives: () => Array<any>
-  _widgets: () => Array<any>
+  _alternatives: Array<any>
+  _widgets: Array<any>
 }
 
 /**
@@ -29,18 +30,24 @@ type TreeItem = {
  * TODO make recursive
  * Grab the required languages and think about language tabs in a recursive situation.
  */
-export const shaclTree = (report: any, dataset: DatasetCore, options: Options) => {
-  const shacl = grapoi({ dataset, factory })
+export const shaclTree = (report: any, shaclDataset: DatasetCore, options: Options, contentDataset: DatasetCore, term: NamedNodeExt) => {
+  const shacl = grapoi({ dataset: shaclDataset, factory })
   const shaclShapes = shacl.hasOut([rdf('type')], [sh('NodeShape')])
   const shaclProperties = shaclShapes.hasOut([sh('property')])
+  const tree = processLevel(shaclProperties, report, options, contentDataset, term)
+  return tree
+}
 
-  const tree: any = {}
+export const processLevel = (shaclProperties: GrapoiPointer, report: any, options: Options, contentDataset: DatasetCore, term: NamedNodeExt) => {
+  const level: any = {}
 
   for (const shaclProperty of shaclProperties) {
     const shaclPropertyInner = shaclProperty.out().trim()
     const path = parsePath(shaclPropertyInner.out([sh('path')]))
 
-    let pointer = tree
+    const _dataPointer = grapoi({ dataset: contentDataset, factory, term }).execute(path).trim()
+
+    let pointer = level
 
     // Levels
     for (const [index, pathPart] of path.entries()) {
@@ -59,22 +66,27 @@ export const shaclTree = (report: any, dataset: DatasetCore, options: Options) =
             _pathPart: pathPart,
             _types: [],
             // sh:or, sh:xone, sh:qualifiedValueShape
-            _alternatives: _.once(() => pointersToAlternatives(item._pointers)),
-            _widgets: _.once(() => {
+            get _alternatives () {
+              return _.once(() => pointersToAlternatives(item._pointers))()
+            },
+            get _widgets () {
+              return _.once(() => {
+                const { widgets } = options
 
-              const { widgets } = options
-
-              return item._alternatives().map(alternative => {
-                return Object.values(widgets).map(widget => {
-                  return {
+                return item._alternatives.flatMap(alternative => {
+                  return Object.values(widgets).map(widget => ({
                     _pointer: alternative.pointer,
-                    _score: widget.applies(alternative.pointer),
-                    _alternative: alternative
-                  }
+                    _score: widget.score(alternative.pointer, item._types),
+                    _alternative: alternative,
+                    _widget: widget,
+                    _dataPointer,
+                    _index: 0 // TODO
+                  }))
                 })
-              })
-            })
+              })()
+            }
           }
+
           pointer[predicate.value] = item
         }
 
@@ -85,12 +97,17 @@ export const shaclTree = (report: any, dataset: DatasetCore, options: Options) =
           pointer[predicate.value]._messages.infos = _.uniq([...pointer[predicate.value]._messages.infos, ...messages.infos])
           pointer[predicate.value]._messages.warnings = _.uniq([...pointer[predicate.value]._messages.warnings, ...messages.warnings])
           pointer[predicate.value]._types.push('widget')
+          pointer[predicate.value]._pointers.push(shaclPropertyInner)
         }
         else {
           pointer[predicate.value]._types.push('parent')
-        }
 
-        pointer[predicate.value]._pointers.push(shaclPropertyInner)
+          // Creates a pointer for a group that otherwise does not have a definition.
+          const dataset = factory.dataset()
+          const groupPointer = grapoi({ dataset, factory, term: factory.blankNode() })
+          groupPointer.addOut(sh('datatype'), sh('BlankNodeOrIRI'))
+          pointer[predicate.value]._pointers.push(groupPointer)
+        }
 
         // Set the pointer for the next round.
         pointer = pointer[predicate.value]
@@ -98,9 +115,7 @@ export const shaclTree = (report: any, dataset: DatasetCore, options: Options) =
     }
   }
 
-  console.log(tree['https://schema.org/knows']['https://schema.org/name']._widgets())
-
-  return tree
+  return level
 }
 
 const toMesssages = (constraints: Array<any>) => {
@@ -127,6 +142,7 @@ const extractMessages = (constraints: Array<any>) => {
  * It is allowed to have multiple properties for the same SHACL property.
  */
 export const pointersToAlternatives = (pointers: Array<GrapoiPointer>) => {
+  if (!pointers.length) return []
   const baseTerms = pointers.flatMap((p: any) => p.terms)
   const baseAlternatives = pointers[0].node(baseTerms)
   const orAlternatives = [...baseAlternatives.out([sh('or')]).trim()?.list() ?? []].map(pointer => pointer.trim().out())
@@ -156,8 +172,4 @@ export const pointersToAlternatives = (pointers: Array<GrapoiPointer>) => {
       type: 'or'
     })),
   ].filter(Boolean)
-}
-
-const determineWidgets = (widgets: Options['widgets']) => {
-
 }

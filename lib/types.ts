@@ -30,6 +30,8 @@ export type GrapoiPointer = {
   ptrs: Array<any>
   node: (pointers: Array<any>) => GrapoiPointer
   term: Term
+  terms: Array<Term>
+  [Symbol.iterator]: () => Iterator<any>
 }
 
 export type Options = {

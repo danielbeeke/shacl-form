@@ -1,22 +1,24 @@
 import { useEffect, useState } from 'react'
 import { sh } from '../namespaces'
 import { bestLanguage } from '../helpers/bestLanguage'
+import { ShaclFormField } from '../ShaclFormField'
 
-export function FieldWrapper ({ Widget, children, structure, languagePriorities }: { Widget: any, children: any, structure: any, languagePriorities: Array<string> }) {
-  const { shaclPointer, messages, dataPointer, index } = structure
+export function FieldWrapper ({ Widget, children, structure, uiLanguagePriorities }: { Widget: any, children: any, structure: any, uiLanguagePriorities: Array<string> }) {
+  const { _pointer, _messages, _dataPointer, _index } = structure
   const [widgetInstance, setWidgetInstance] = useState<HTMLElement>()
 
   useEffect(() => {
     if (!widgetInstance) {
-      if (!customElements.get(Widget.elementName)) {
-        customElements.define(Widget.elementName, Widget)
+      const widgetHtmlName = 'sf-' + Widget.elementName
+      if (!customElements.get(widgetHtmlName)) {
+        customElements.define(widgetHtmlName, Widget)
       }
 
-      const element = document.createElement(Widget.elementName)
-      element.shaclPointer = shaclPointer
-      element.messages = messages
-      element.dataPointer = dataPointer
-      element.index = index
+      const element = document.createElement(widgetHtmlName) as ShaclFormField<any>
+      element.shaclPointer = _pointer
+      element.messages = _messages
+      element.dataPointer = _dataPointer
+      element.index = _index
       structure.element = element
       setWidgetInstance(element)
     }
@@ -24,8 +26,8 @@ export function FieldWrapper ({ Widget, children, structure, languagePriorities 
     return () => widgetInstance?.remove()
   }, [])
 
-  const name = bestLanguage(shaclPointer.out([sh('name')]), languagePriorities)
-  const description = bestLanguage(shaclPointer.out([sh('description')]), languagePriorities)
+  const name = bestLanguage(_pointer.out([sh('name')]), uiLanguagePriorities)
+  const description = bestLanguage(_pointer.out([sh('description')]), uiLanguagePriorities)
 
   return (
     <div className='field'>

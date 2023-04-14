@@ -17,7 +17,7 @@ import { DataFactory } from 'n3';
 export interface IShaclFormFieldConstructor {
   new(): IShaclFormField;
   elementName: string
-  applies (shaclPointer: GrapoiPointer): boolean
+  score (shaclPointer: GrapoiPointer): number
 }
 
 export interface IShaclFormField extends HTMLElement {
@@ -40,8 +40,8 @@ export type StaticImplements<I extends new (...args: any[]) => any, C extends I>
  * At minimum a customElements JavaScript class that has not been registered with customElements.define.
  * This class must have a static property 'elementName' which is the HTML tag name.
  * 
- * It must implement a static method applies which receives a Grapoi pointer which has access to the SHACL property.
- * This applies function must return a boolean.
+ * It must implement a static method score which receives a Grapoi pointer which has access to the SHACL property.
+ * This score function must return a boolean.
  * 
  * Proeprties available inside the class (this):
  * 
