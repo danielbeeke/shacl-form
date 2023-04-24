@@ -4,22 +4,9 @@ import { rdf, sh } from '../namespaces'
 import factory from 'rdf-ext'
 import parsePath from 'shacl-engine/lib/parsePath.js'
 import * as _ from 'lodash-es'
-import { GrapoiPointer, Options } from '../types'
+import { GrapoiPointer, Options, TreeItem } from '../types'
 import { rdfTermValueToTypedVariable } from './rdfTermValueToTypedVariable'
-import NamedNodeExt from 'rdf-ext/lib/NamedNode'
-
-type TreeItem = {
-  _pointers: Array<GrapoiPointer>,
-  _messages: {
-    errors: Array<string>,
-    infos: Array<string>,
-    warnings: Array<string>
-  },
-  _pathPart: any,
-  _types: Array<string>,
-  _alternatives: Array<any>
-  _widgets: Array<any>
-}
+import type { NamedNode } from '@rdfjs/types'
 
 /**
  * One predicate
@@ -30,7 +17,7 @@ type TreeItem = {
  * TODO make recursive
  * Grab the required languages and think about language tabs in a recursive situation.
  */
-export const shaclTree = (report: any, shaclDataset: DatasetCore, options: Options, contentDataset: DatasetCore, term: NamedNodeExt) => {
+export const shaclTree = (report: any, shaclDataset: DatasetCore, options: Options, contentDataset: DatasetCore, term: NamedNode) => {
   const shacl = grapoi({ dataset: shaclDataset, factory })
   const shaclShapes = shacl.hasOut([rdf('type')], [sh('NodeShape')])
   const shaclProperties = shaclShapes.hasOut([sh('property')])
@@ -38,19 +25,25 @@ export const shaclTree = (report: any, shaclDataset: DatasetCore, options: Optio
   return tree
 }
 
-export const processLevel = (shaclProperties: GrapoiPointer, report: any, options: Options, contentDataset: DatasetCore, term: NamedNodeExt) => {
+export const processLevel = (shaclProperties: GrapoiPointer, report: any, options: Options, contentDataset: DatasetCore, term: NamedNode) => {
   const level: any = {}
+
+  const data = grapoi({ dataset: contentDataset, factory, term })
 
   for (const shaclProperty of shaclProperties) {
     const shaclPropertyInner = shaclProperty.out().trim()
     const path = parsePath(shaclPropertyInner.out([sh('path')]))
 
-    const _dataPointer = grapoi({ dataset: contentDataset, factory, term }).execute(path).trim()
-
     let pointer = level
 
     // Levels
     for (const [index, pathPart] of path.entries()) {
+      const pathPartsTillNow = path.slice(0, index + 1)
+
+      // TODO why does this happen? I felt like I could just execute the path parts and then do a trim()
+      const tempDataPointer = data.execute(pathPartsTillNow).trim().terms.pop()
+      const _dataPointer = grapoi({ dataset: contentDataset, factory, term: tempDataPointer })
+
       const shaclResults = report.results.filter((result: any) => _.isEqual(result.path, path))
       const messages = extractMessages(shaclResults)
 
@@ -80,8 +73,9 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
                     _alternative: alternative,
                     _widget: widget,
                     _dataPointer,
-                    _index: 0 // TODO
-                  }))
+                    _predicate: predicate,
+                    _path: pathPartsTillNow,
+                  }))  
                 })
               })()
             }
@@ -167,8 +161,7 @@ export const pointersToAlternatives = (pointers: Array<GrapoiPointer>) => {
       type: 'base'
     },
     ...orAlternatives.map((orAlternative: GrapoiPointer) => ({
-      // TODO why does this need an in()?
-      pointer: orAlternative.node([...baseTerms, orAlternative.term]).in(),
+      pointer: orAlternative.node([...baseTerms, orAlternative.term]),
       type: 'or'
     })),
   ].filter(Boolean)

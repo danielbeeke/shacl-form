@@ -23,8 +23,8 @@ ex:NameShape
 		sh:qualifiedMinCount 1 ;
 		sh:qualifiedMaxCount 1 ;
 		# sh:qualifiedValueShapesDisjoint true ;
-		sh:qualifiedValueShape [
-				sh:languageIn ( "en" )
-		] ;
+		# sh:qualifiedValueShape [
+		# 		sh:languageIn ( "en" )
+		# ] ;
 		sh:uniqueLang true ;
 ] .

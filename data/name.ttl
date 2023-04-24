@@ -4,5 +4,5 @@
 ex:name 
   schema:name "Pieter"@nl ;
   schema:knows [
-    schema:name "Daniel"@en
+    schema:name "Daniel"@en, "Daan"@nl ;
   ] .

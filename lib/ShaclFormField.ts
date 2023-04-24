@@ -1,6 +1,7 @@
-import type { Quad } from 'n3'
-import type { GrapoiPointer, ShaclProperties } from './types'
+import { NamedNode, Quad } from 'n3'
+import type { GrapoiPointer } from './types'
 import { DataFactory } from 'n3';
+import type { NamedNode as NamedNodeType } from '@rdfjs/types'
 
 /**
  * At the moment we need:
@@ -53,7 +54,7 @@ export type StaticImplements<I extends new (...args: any[]) => any, C extends I>
  */
 export abstract class ShaclFormField<T extends IShaclFormFieldConstructor> 
 extends HTMLElement implements StaticImplements<IShaclFormFieldConstructor, T> {
-  public properties: ShaclProperties = {}
+
   public messages: {
     errors: Array<string>,
     infos: Array<string>,
@@ -63,6 +64,9 @@ extends HTMLElement implements StaticImplements<IShaclFormFieldConstructor, T> {
     infos: [],
     warnings: []
   }
+
+  public path: any
+  public predicate: NamedNodeType = new NamedNode('')
   public index: number = 0
   public shaclPointer: GrapoiPointer = {} as GrapoiPointer
   public dataPointer: GrapoiPointer = {} as GrapoiPointer
@@ -70,7 +74,7 @@ extends HTMLElement implements StaticImplements<IShaclFormFieldConstructor, T> {
   public df = DataFactory
 
   get value (): Quad {
-    const quads = [...this.dataPointer.out().quads() ?? []]
+    const quads = [...this.dataPointer.out([this.predicate]).quads() ?? []]
     return quads[this.index]
   }
 }

@@ -19,6 +19,7 @@ export default class BlankNodeOrIri extends ShaclFormField<typeof BlankNodeOrIri
 
   render () {
     // TODO make it possible to give the blankNode a name so that we are able to not use blankNodes.
+    this.innerHTML = '<em>Blank Nodes</em>'
   }
 
 }

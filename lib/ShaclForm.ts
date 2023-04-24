@@ -10,6 +10,8 @@ import { createElement, StrictMode } from 'react'
 import { FormLevelBase } from './components/FormLevel'
 import { shaclTree } from './helpers/shaclTree'
 import { Options } from './types'
+import { LocalizationProvider } from '@fluent/react';
+import { l10n } from './Localization'
 
 export const init = (options: Options) => {
 
@@ -37,6 +39,7 @@ export const init = (options: Options) => {
     }
 
     async init () {
+      this.classList.add('shacl-form')
       const parser = new Parser()
       const shaclUrl = this.attributes.getNamedItem('shacl-url')?.value
       if (!shaclUrl) throw new Error('A shacl-url property is required. It should link to a SHACL turtle file')
@@ -66,24 +69,25 @@ export const init = (options: Options) => {
 
       this.#uiLanguagePriorities = this.attributes.getNamedItem('ui-language-priorities')?.value?.split(',') ?? ['*']
       this.#uiLanguagePriorities.push('*')
-
-      const report = await this.validate()
-
-      const tree = shaclTree(report, this.#shaclDataset, options, this.#store, this.#subject)
-
-      this.render(tree)
+      this.render()
     }
 
     get subject () {
       return this.#subject
     }
 
-    render (tree: any) {
-      this.#root.render(createElement(StrictMode, {
-        children: [
-          createElement(FormLevelBase, { tree, key: 'form', uiLanguagePriorities: this.#uiLanguagePriorities })
-        ]
-      }))
+    async render () {
+      const report = await this.validate()
+      const tree = shaclTree(report, this.#shaclDataset, options, this.#store, this.#subject)
+
+      this.#root.render(createElement(LocalizationProvider, { l10n, children: [
+        createElement(StrictMode, {
+          key: 'strictmode',
+          children: [
+            createElement(FormLevelBase, { tree, key: 'form', uiLanguagePriorities: this.#uiLanguagePriorities })
+          ]
+        })
+      ]}))
     }
 
     set subject (newValue: NamedNode) {
