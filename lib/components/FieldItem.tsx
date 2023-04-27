@@ -12,8 +12,7 @@ type FieldItemProps = {
 }
 
 const removeItem = (element: ShaclFormWidget<any>) => {
-  const { predicate, object } = element.value
-  element.dataPointer.deleteOut(predicate, object)
+  element.dataPointer.deleteOut(element.predicate, element.value)
   ;(element.closest('.shacl-form') as any).render()
 }
 
@@ -41,17 +40,23 @@ export function FieldItem ({ structure, Widget, index, children, data }: FieldIt
     return () => widgetInstance?.remove()
   }, [])
 
-  const datatype = _shaclPointer.out([sh('datatype')]).term
-  const isBlankNode = datatype.equals(sh('BlankNodeOrIRI')) || datatype.equals(sh('sh:BlankNode')) || datatype.equals(sh('BlankNodeOrLiteral'))
-  const values = isBlankNode ? data : data.out([_predicate])
+  let resolvedChildren
+
+  if (children) {
+    const childData = data.clone({
+      ptrs: [data.ptrs[index]]
+    }).trim()
+
+    resolvedChildren = children(childData)
+  }
 
   return (
-    <>
-      <div className='item' ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div>
-      <div>
-        {children(values)}
-      </div>
+    <div className="item">
+      <div ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div>
+      {resolvedChildren ? (<div>
+        {resolvedChildren}
+      </div>) : null}
       <button onClick={() => removeItem(widgetInstance!)}>Remove</button>
-    </>
+    </div>
   )
 }

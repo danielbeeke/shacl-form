@@ -13,6 +13,7 @@ import { l10n } from './l10n'
 import type { Root } from 'react-dom/client'
 import type { Options, NamedNode } from '../types'
 import grapoi from 'grapoi'
+import '../scss/style.scss'
 
 export const init = (options: Options) => {
 

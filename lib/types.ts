@@ -28,6 +28,7 @@ export type GrapoiPointer = {
   isList: () => Boolean,
   list: () => Array<GrapoiPointer>
   ptrs: Array<any>
+  clone: (data: any) => GrapoiPointer  
   node: (pointers: Array<any>) => GrapoiPointer
   execute: (paths: Array<any>) => GrapoiPointer
   term: Term
@@ -52,6 +53,7 @@ export type Widget = {
   _widget: any,
   _predicate: NamedNode,
   _path: Array<any>,
+  _pathPart: Array<any>,
   _messages: {
     errors: Array<string>,
     infos: Array<string>,

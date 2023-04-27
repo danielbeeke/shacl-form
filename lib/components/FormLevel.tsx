@@ -11,22 +11,23 @@ export function FormLevel ({ tree, depth = 0, languagePriorities, data }: { tree
     <>
       {Object.entries(tree).flatMap(([predicate, field]: [any, any], outerIndex: number) => {
         const childrenObject = Object.fromEntries(Object.entries(field as any).filter(([name]) => name[0] !== '_'))
-        const children = (data: GrapoiPointer) => Object.keys(childrenObject).length ? 
+        const children = (data: GrapoiPointer) => {
+          return Object.keys(childrenObject).length ? 
           (<FormLevel data={data} languagePriorities={languagePriorities} key={hash(cid + predicate + outerIndex + 'children')} depth={depth} tree={childrenObject} />)
         : null
+        }
 
         return [
           field._widgets?.length ? field._widgets
           .filter((widget: any) => widget._score > 0)
           .map((widget: any, index: number) => {
-            const childData = data.execute(widget._pathPart).trim()
 
             return (
               <FieldWrapper 
                 uiLanguagePriorities={languagePriorities} 
                 key={hash(cid + widget._widget.name + outerIndex + index)} 
                 structure={widget} 
-                data={childData}
+                data={data}
                 Widget={widget._widget}
               >
                 {children}

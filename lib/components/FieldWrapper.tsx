@@ -19,15 +19,16 @@ const addItem = (pointer: GrapoiPointer, predicate: NamedNode, elementRef: any, 
 }
 
 export function FieldWrapper ({ Widget, children, structure, uiLanguagePriorities, data }: FieldWrapperProps) {
-  const { _shaclPointer: _shaclPointer, _predicate } = structure
+  const { _shaclPointer, _predicate, _pathPart } = structure
 
   const name = bestLanguage(_shaclPointer.out([sh('name')]), uiLanguagePriorities)
   const description = bestLanguage(_shaclPointer.out([sh('description')]), uiLanguagePriorities)
-  // const datatype = _shaclPointer.out([sh('datatype')]).term
-  // const isBlankNode = datatype.equals(sh('BlankNodeOrIRI')) || datatype.equals(sh('sh:BlankNode')) || datatype.equals(sh('BlankNodeOrLiteral'))
 
-  const indices = [...[...data.terms].keys()]
+  const childData = data.execute(_pathPart).trim()
+
+  const indices = [...[...childData.terms].keys()]
   const element = useRef<HTMLDivElement>(null)
+
 
   return (
     <div ref={element} className={`field`} data-predicate={_predicate.value}>
@@ -37,7 +38,7 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
 
       <div className='items'>
         {indices.map(index => {
-          return (<FieldItem key={index} index={index} structure={structure} data={data} Widget={Widget}>{children}</FieldItem>)
+          return (<FieldItem key={index} index={index} structure={structure} data={childData} Widget={Widget}>{children}</FieldItem>)
         })}
       </div>
       

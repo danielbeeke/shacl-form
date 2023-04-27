@@ -21,6 +21,7 @@
     "@types/rdfjs__score": "^0.1.1",
     "@types/react-dom": "^18.0.11",
     "patch-package": "^6.5.1",
+    "sass": "^1.62.1",
     "typescript": "^5.0.3",
     "vite": "^4.2.0"
   },
