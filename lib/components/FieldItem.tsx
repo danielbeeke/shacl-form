@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ShaclFormWidget } from '../core/ShaclFormWidget'
 import { GrapoiPointer, Widget } from '../types'
-import { sh } from '../helpers/namespaces'
 
 type FieldItemProps = {
   structure: Widget, 
@@ -9,6 +8,7 @@ type FieldItemProps = {
   index: number,
   children: (values: GrapoiPointer) => Array<any>,
   data: GrapoiPointer
+  parentData: GrapoiPointer
 }
 
 const removeItem = (element: ShaclFormWidget<any>) => {
@@ -16,7 +16,7 @@ const removeItem = (element: ShaclFormWidget<any>) => {
   ;(element.closest('.shacl-form') as any).render()
 }
 
-export function FieldItem ({ structure, Widget, index, children, data }: FieldItemProps) {
+export function FieldItem ({ structure, Widget, index, children, data, parentData }: FieldItemProps) {
   const [widgetInstance, setWidgetInstance] = useState<ShaclFormWidget<any>>()
   const { _shaclPointer: _shaclPointer, _messages, _path, _predicate } = structure
 
@@ -29,6 +29,7 @@ export function FieldItem ({ structure, Widget, index, children, data }: FieldIt
       element.shaclPointer = _shaclPointer
       element.messages = _messages
       element.dataPointer = data
+      element.parentData = parentData
       element.index = index
       element.path = _path
       element.predicate = _predicate
@@ -43,11 +44,7 @@ export function FieldItem ({ structure, Widget, index, children, data }: FieldIt
   let resolvedChildren
 
   if (children) {
-    const childData = data.clone({
-      ptrs: [data.ptrs[index]]
-    }).trim()
-
-    resolvedChildren = children(childData)
+    resolvedChildren = children(data)
   }
 
   return (

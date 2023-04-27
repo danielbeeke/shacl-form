@@ -28,6 +28,7 @@ export interface IShaclFormField extends HTMLElement {
   }
   shaclPointer: GrapoiPointer,
   dataPointer: GrapoiPointer,
+  parentData: GrapoiPointer,
   value: Term
   index: number
 }
@@ -69,10 +70,17 @@ extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> 
   public index: number = 0
   public shaclPointer: GrapoiPointer = {} as GrapoiPointer
   public dataPointer: GrapoiPointer = {} as GrapoiPointer
+  public parentData: GrapoiPointer = {} as GrapoiPointer
 
   public df = factory
 
   get value (): Term {
-    return this.dataPointer.terms[this.index]
+    return this.parentData.out([this.predicate]).terms[this.index]
+  }
+
+  set value (newValue: Term) {
+    this.parentData
+      .deleteOut([this.predicate], [this.value])
+      .addOut([this.predicate], [newValue])
   }
 }

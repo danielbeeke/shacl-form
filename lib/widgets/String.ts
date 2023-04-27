@@ -26,15 +26,7 @@ export default class String extends ShaclFormWidget<typeof String> {
   render () {
     render(this, html`<input onChange=${(event: Event) => {
       const language = (this.value as Literal).language
-      const newObject = this.df.literal((event.target as HTMLInputElement).value, language)
-
-      // const inLanguageList = this.shaclPointer.out([sh('languageIn')]).list()
-      // const languages = [...inLanguageList ?? []].map((shaclPointer: any) => shaclPointer.term.value)
-
-      this.dataPointer
-        .deleteOut([this.predicate], [this.value])
-        .addOut([this.predicate], [newObject])
-
+      this.value = this.df.literal((event.target as HTMLInputElement).value, language)
     }} type="text" value=${this.value?.value} />`)
   }
 
