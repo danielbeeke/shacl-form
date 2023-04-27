@@ -24,7 +24,7 @@ export default class BlankNodeOrIri extends ShaclFormWidget<typeof BlankNodeOrIr
 
   render () {
     // TODO make it possible to give the blankNode a name so that we are able to not use blankNodes.
-    this.innerHTML = `<em>Blank Node (${this.value.value})</em>`
+    this.innerHTML = `<em>Blank Node (${this.value?.value})</em>`
   }
 
 }

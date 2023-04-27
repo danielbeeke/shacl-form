@@ -1,8 +1,9 @@
 import { FieldWrapper } from './FieldWrapper'
 import { hash } from '../helpers/hash'
 import { GrapoiPointer } from '../types'
+import { Writer } from 'n3'
 
-export function FormLevel ({ tree, depth = 0, languagePriorities, data }: { tree: any, depth: number, languagePriorities: Array<string>, data: GrapoiPointer }) {
+export function FormLevel ({ tree, depth = 0, languagePriorities, dataPointer }: { tree: any, depth: number, languagePriorities: Array<string>, dataPointer: GrapoiPointer }) {
   depth++
 
   const cid = Object.keys(tree).join(',') + depth
@@ -11,9 +12,9 @@ export function FormLevel ({ tree, depth = 0, languagePriorities, data }: { tree
     <>
       {Object.entries(tree).flatMap(([predicate, field]: [any, any], outerIndex: number) => {
         const childrenObject = Object.fromEntries(Object.entries(field as any).filter(([name]) => name[0] !== '_'))
-        const children = (data: GrapoiPointer) => {
+        const children = (dataPointer: GrapoiPointer) => {
           return Object.keys(childrenObject).length ? 
-          (<FormLevel data={data} languagePriorities={languagePriorities} key={hash(cid + predicate + outerIndex + 'children')} depth={depth} tree={childrenObject} />)
+          (<FormLevel dataPointer={dataPointer} languagePriorities={languagePriorities} key={hash(cid + predicate + outerIndex + 'children')} depth={depth} tree={childrenObject} />)
         : null
         }
 
@@ -27,22 +28,30 @@ export function FormLevel ({ tree, depth = 0, languagePriorities, data }: { tree
                 uiLanguagePriorities={languagePriorities} 
                 key={hash(cid + widget._widget.name + outerIndex + index)} 
                 structure={widget} 
-                data={data}
+                dataPointer={() => dataPointer}
                 Widget={widget._widget}
               >
                 {children}
               </FieldWrapper>
             )
           }) : null,
-          // TODO these children should be rendered by widgets that are groups
-          // However how to do that? This would be a perfect way of rendering address fields etc.
-          // children
         ]
      })}
     </>
   )
 }
 
-export function FormLevelBase ({ tree, uiLanguagePriorities: languagePriorities, data }: { tree: any, uiLanguagePriorities: Array<string>, data: GrapoiPointer }) {
-  return (<FormLevel languagePriorities={languagePriorities} key="main" depth={0} tree={tree} data={data}></FormLevel>)
+export function FormLevelBase ({ tree, uiLanguagePriorities: languagePriorities, dataPointer }: { tree: any, uiLanguagePriorities: Array<string>, dataPointer: GrapoiPointer }) {
+  return (
+    <>
+      <FormLevel languagePriorities={languagePriorities} key="main" depth={0} tree={tree} dataPointer={dataPointer}></FormLevel>
+
+      <button onClick={() => {
+        const store = dataPointer.ptrs[0].dataset
+        const writer = new Writer()
+        for (const quad of store) writer.addQuad(quad)
+        writer.end((error, result) => console.log(result))
+      }}>Save</button>
+    </>
+  )
 }

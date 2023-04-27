@@ -25,9 +25,9 @@ export default class String extends ShaclFormWidget<typeof String> {
 
   render () {
     render(this, html`<input onChange=${(event: Event) => {
-      const language = (this.value as Literal).language
+      const language = (this.value as Literal).language ? (this.value as Literal).language : undefined
       this.value = this.df.literal((event.target as HTMLInputElement).value, language)
-    }} type="text" value=${this.value?.value} />`)
+    }} type="text" value=${this.value?.value ?? ''} />`)
   }
 
 }

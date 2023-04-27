@@ -11,7 +11,7 @@ import { shaclTree } from './shaclTree'
 import { LocalizationProvider } from '@fluent/react';
 import { l10n } from './l10n'
 import type { Root } from 'react-dom/client'
-import type { Options, NamedNode } from '../types'
+import type { Options, NamedNode, GrapoiPointer } from '../types'
 import grapoi from 'grapoi'
 import '../scss/style.scss'
 
@@ -33,6 +33,7 @@ export const init = (options: Options) => {
     shapeUris: Array<NamedNode> = []
     #root: Root
     #uiLanguagePriorities: Array<string> = ['*']
+    #data: GrapoiPointer = {} as GrapoiPointer
 
     constructor () {
       super()
@@ -72,6 +73,7 @@ export const init = (options: Options) => {
       this.#uiLanguagePriorities = this.attributes.getNamedItem('ui-language-priorities')?.value?.split(',') ?? ['*']
       this.#uiLanguagePriorities.push('*')
       this.render()
+      this.#data = grapoi({ dataset: this.#store, factory, term: this.#subject })
     }
 
     get subject () {
@@ -81,7 +83,6 @@ export const init = (options: Options) => {
     async render () {
       const report = await this.validate()
       const tree = shaclTree(report, this.#shaclDataset, options)
-      const data = grapoi({ dataset: this.#store, factory, term: this.#subject })
 
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [
         createElement(StrictMode, {
@@ -89,7 +90,7 @@ export const init = (options: Options) => {
           children: [
             createElement(FormLevelBase, { 
               tree, 
-              data,
+              dataPointer: this.#data,
               key: 'form', 
               uiLanguagePriorities: this.#uiLanguagePriorities 
             })

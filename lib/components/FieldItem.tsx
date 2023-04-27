@@ -7,17 +7,16 @@ type FieldItemProps = {
   Widget: any, 
   index: number,
   children: (values: GrapoiPointer) => Array<any>,
-  data: GrapoiPointer
-  parentData: GrapoiPointer
+  dataPointer: () => GrapoiPointer
 }
 
 const removeItem = (element: ShaclFormWidget<any>) => {
-  element.parentData.deleteOut(element.predicate, element.value)
+  element.dataPointer().deleteOut(element.predicate, element.value)
   // TODO remove also the children.
   ;(element.closest('.shacl-form') as any).render()
 }
 
-export function FieldItem ({ structure, Widget, index, children, data, parentData }: FieldItemProps) {
+export function FieldItem ({ structure, Widget, index, children, dataPointer }: FieldItemProps) {
   const [widgetInstance, setWidgetInstance] = useState<ShaclFormWidget<any>>()
   const { _shaclPointer: _shaclPointer, _messages, _path, _predicate } = structure
 
@@ -29,8 +28,7 @@ export function FieldItem ({ structure, Widget, index, children, data, parentDat
       const element = document.createElement(widgetHtmlName) as ShaclFormWidget<any>
       element.shaclPointer = _shaclPointer
       element.messages = _messages
-      element.dataPointer = data
-      element.parentData = parentData
+      element.dataPointer = dataPointer
       element.index = index
       element.path = _path
       element.predicate = _predicate
@@ -45,7 +43,7 @@ export function FieldItem ({ structure, Widget, index, children, data, parentDat
   let resolvedChildren
 
   if (children) {
-    resolvedChildren = children(data)
+    resolvedChildren = children(dataPointer().out([_predicate]))
   }
 
   return (
