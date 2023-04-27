@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { ShaclFormWidget } from '../core/ShaclFormWidget'
-import { Widget } from '../types'
+import { GrapoiPointer, Widget } from '../types'
+import { sh } from '../helpers/namespaces'
 
 type FieldItemProps = {
   structure: Widget, 
   Widget: any, 
   index: number,
-  children: () => Array<any>
+  children: (values: GrapoiPointer) => Array<any>,
+  data: GrapoiPointer
 }
 
 const removeItem = (element: ShaclFormWidget<any>) => {
@@ -15,9 +17,9 @@ const removeItem = (element: ShaclFormWidget<any>) => {
   ;(element.closest('.shacl-form') as any).render()
 }
 
-export function FieldItem ({ structure, Widget, index, children }: FieldItemProps) {
+export function FieldItem ({ structure, Widget, index, children, data }: FieldItemProps) {
   const [widgetInstance, setWidgetInstance] = useState<ShaclFormWidget<any>>()
-  const { _pointer, _messages, _dataPointer, _path, _predicate } = structure
+  const { _shaclPointer: _shaclPointer, _messages, _path, _predicate } = structure
 
   useEffect(() => {
     if (!widgetInstance) {
@@ -25,9 +27,9 @@ export function FieldItem ({ structure, Widget, index, children }: FieldItemProp
       if (!customElements.get(widgetHtmlName)) customElements.define(widgetHtmlName, Widget)
 
       const element = document.createElement(widgetHtmlName) as ShaclFormWidget<any>
-      element.shaclPointer = _pointer
+      element.shaclPointer = _shaclPointer
       element.messages = _messages
-      element.dataPointer = _dataPointer
+      element.dataPointer = data
       element.index = index
       element.path = _path
       element.predicate = _predicate
@@ -39,11 +41,15 @@ export function FieldItem ({ structure, Widget, index, children }: FieldItemProp
     return () => widgetInstance?.remove()
   }, [])
 
+  const datatype = _shaclPointer.out([sh('datatype')]).term
+  const isBlankNode = datatype.equals(sh('BlankNodeOrIRI')) || datatype.equals(sh('sh:BlankNode')) || datatype.equals(sh('BlankNodeOrLiteral'))
+  const values = isBlankNode ? data : data.out([_predicate])
+
   return (
     <>
       <div className='item' ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div>
       <div>
-        {children()}
+        {children(values)}
       </div>
       <button onClick={() => removeItem(widgetInstance!)}>Remove</button>
     </>

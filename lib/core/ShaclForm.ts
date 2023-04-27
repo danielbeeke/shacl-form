@@ -12,6 +12,7 @@ import { LocalizationProvider } from '@fluent/react';
 import { l10n } from './l10n'
 import type { Root } from 'react-dom/client'
 import type { Options, NamedNode } from '../types'
+import grapoi from 'grapoi'
 
 export const init = (options: Options) => {
 
@@ -78,15 +79,19 @@ export const init = (options: Options) => {
 
     async render () {
       const report = await this.validate()
-      const tree = shaclTree(report, this.#shaclDataset, options, this.#store, this.#subject)
-
-      console.log(tree)
+      const tree = shaclTree(report, this.#shaclDataset, options)
+      const data = grapoi({ dataset: this.#store, factory, term: this.#subject })
 
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [
         createElement(StrictMode, {
           key: 'strictmode',
           children: [
-            createElement(FormLevelBase, { tree, key: 'form', uiLanguagePriorities: this.#uiLanguagePriorities })
+            createElement(FormLevelBase, { 
+              tree, 
+              data,
+              key: 'form', 
+              uiLanguagePriorities: this.#uiLanguagePriorities 
+            })
           ]
         })
       ]}))

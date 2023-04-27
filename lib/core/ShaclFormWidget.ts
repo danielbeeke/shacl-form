@@ -1,6 +1,6 @@
-import type { GrapoiPointer } from '../types'
-import type { NamedNode, Quad } from '@rdfjs/types'
+import type { GrapoiPointer, Term, NamedNode, Quad } from '../types'
 import factory from 'rdf-ext'
+import { sh } from '../helpers/namespaces'
 
 /**
  * At the moment we need:
@@ -28,7 +28,7 @@ export interface IShaclFormField extends HTMLElement {
   }
   shaclPointer: GrapoiPointer,
   dataPointer: GrapoiPointer,
-  value: Quad
+  value: Term
   index: number
 }
 
@@ -72,8 +72,7 @@ extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> 
 
   public df = factory
 
-  get value (): Quad {
-    const quads = [...this.dataPointer.out([this.predicate]).quads() ?? []]
-    return quads[this.index]
+  get value (): Term {
+    return this.dataPointer.terms[this.index]
   }
 }

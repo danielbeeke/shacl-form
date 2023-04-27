@@ -8,7 +8,8 @@ type FieldWrapperProps = {
   Widget: any, 
   children: any, 
   structure: Widget, 
-  uiLanguagePriorities: Array<string> 
+  uiLanguagePriorities: Array<string>,
+  data: GrapoiPointer
 }
 
 const addItem = (pointer: GrapoiPointer, predicate: NamedNode, elementRef: any, Widget: any) => {
@@ -17,31 +18,31 @@ const addItem = (pointer: GrapoiPointer, predicate: NamedNode, elementRef: any, 
   form.render()
 }
 
-export function FieldWrapper ({ Widget, children, structure, uiLanguagePriorities }: FieldWrapperProps) {
-  const { _pointer, _dataPointer, _predicate } = structure
+export function FieldWrapper ({ Widget, children, structure, uiLanguagePriorities, data }: FieldWrapperProps) {
+  const { _shaclPointer: _shaclPointer, _predicate } = structure
 
-  const name = bestLanguage(_pointer.out([sh('name')]), uiLanguagePriorities)
-  const description = bestLanguage(_pointer.out([sh('description')]), uiLanguagePriorities)
+  const name = bestLanguage(_shaclPointer.out([sh('name')]), uiLanguagePriorities)
+  const description = bestLanguage(_shaclPointer.out([sh('description')]), uiLanguagePriorities)
+  // const datatype = _shaclPointer.out([sh('datatype')]).term
+  // const isBlankNode = datatype.equals(sh('BlankNodeOrIRI')) || datatype.equals(sh('sh:BlankNode')) || datatype.equals(sh('BlankNodeOrLiteral'))
 
-  const isBlankNode = Widget.name === 'BlankNodeOrIri'
-
-  const indices = isBlankNode ? [...[..._dataPointer.quads()].keys()] : [...[..._dataPointer.out([_predicate]).quads()].keys()]
-  
+  const indices = [...[...data.terms].keys()]
   const element = useRef<HTMLDivElement>(null)
 
   return (
     <div ref={element} className={`field`} data-predicate={_predicate.value}>
       {name ? (<h3>{name}</h3>) : null}
 
+      {description ? (<p>{description}</p>) : null}
+
       <div className='items'>
         {indices.map(index => {
-          return (<FieldItem key={index} index={index} structure={structure} Widget={Widget}>{children}</FieldItem>)
+          return (<FieldItem key={index} index={index} structure={structure} data={data} Widget={Widget}>{children}</FieldItem>)
         })}
       </div>
       
-      <button onClick={() => addItem(_dataPointer, _predicate, element, Widget)}>Add item</button>
+      <button onClick={() => addItem(data, _predicate, element, Widget)}>Add item</button>
 
-      {description ? (<p>{description}</p>) : null}
     </div>
   )
 }

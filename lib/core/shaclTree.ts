@@ -6,7 +6,6 @@ import parsePath from 'shacl-engine/lib/parsePath.js'
 import * as _ from 'lodash-es'
 import { rdfTermValueToTypedVariable } from '../helpers/rdfTermValueToTypedVariable'
 import { GrapoiPointer, Options, TreeItem } from '../types'
-import type { NamedNode } from '@rdfjs/types'
 
 /**
  * This method creates the backbone for the form.
@@ -20,18 +19,16 @@ import type { NamedNode } from '@rdfjs/types'
  * TODO make recursive
  * Grab the required languages and think about language tabs in a recursive situation.
  */
-export const shaclTree = (report: any, shaclDataset: DatasetCore, options: Options, contentDataset: DatasetCore, term: NamedNode) => {
+export const shaclTree = (report: any, shaclDataset: DatasetCore, options: Options) => {
   const shacl = grapoi({ dataset: shaclDataset, factory })
   const shaclShapes = shacl.hasOut([rdf('type')], [sh('NodeShape')])
   const shaclProperties = shaclShapes.hasOut([sh('property')])
-  const tree = processLevel(shaclProperties, report, options, contentDataset, term)
+  const tree = processLevel(shaclProperties, report, options)
   return tree
 }
 
-export const processLevel = (shaclProperties: GrapoiPointer, report: any, options: Options, contentDataset: DatasetCore, term: NamedNode) => {
+export const processLevel = (shaclProperties: GrapoiPointer, report: any, options: Options) => {
   const level: any = {}
-
-  const data = grapoi({ dataset: contentDataset, factory, term })
 
   for (const shaclProperty of shaclProperties) {
     const shaclPropertyInner = shaclProperty.out().trim()
@@ -42,7 +39,6 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
     // Levels
     for (const [index, pathPart] of path.entries()) {
       const pathPartsTillNow = path.slice(0, index + 1)
-      const _dataPointer = data.execute(pathPart)
 
       const shaclResults = report.results.filter((result: any) => _.isEqual(result.path, path))
       const messages = extractMessages(shaclResults)
@@ -55,12 +51,12 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
         if (!pointer[predicate.value]) {
           const item: TreeItem = {
             _messages: { errors: [], infos: [], warnings: [] },
-            _pointers: [],
+            _shaclPointers: [],
             _pathPart: pathPart,
             _types: [],
             // sh:or, sh:xone, sh:qualifiedValueShape
             get _alternatives () {
-              return _.once(() => pointersToAlternatives(item._pointers))()
+              return _.once(() => pointersToAlternatives(item._shaclPointers))()
             },
             get _widgets () {
               return _.once(() => {
@@ -68,13 +64,13 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
 
                 return item._alternatives.flatMap(alternative => {
                   return Object.values(widgets).map(widget => ({
-                    _pointer: alternative.pointer,
+                    _shaclPointer: alternative.pointer,
                     _score: widget.score(alternative.pointer, item._types),
                     _alternative: alternative,
                     _widget: widget,
-                    _dataPointer,
                     _predicate: predicate,
                     _path: pathPartsTillNow,
+                    _pathPart: pathPart
                   }))  
                 })
               })()
@@ -91,7 +87,7 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
           pointer[predicate.value]._messages.infos = _.uniq([...pointer[predicate.value]._messages.infos, ...messages.infos])
           pointer[predicate.value]._messages.warnings = _.uniq([...pointer[predicate.value]._messages.warnings, ...messages.warnings])
           pointer[predicate.value]._types.push('widget')
-          pointer[predicate.value]._pointers.push(shaclPropertyInner)
+          pointer[predicate.value]._shaclPointers.push(shaclPropertyInner)
         }
         else {
           pointer[predicate.value]._types.push('parent')
@@ -100,7 +96,7 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
           const dataset = factory.dataset()
           const groupPointer = grapoi({ dataset, factory, term: factory.blankNode() })
           groupPointer.addOut(sh('datatype'), sh('BlankNodeOrIRI'))
-          pointer[predicate.value]._pointers.push(groupPointer)
+          pointer[predicate.value]._shaclPointers.push(groupPointer)
         }
 
         // Set the pointer for the next round.

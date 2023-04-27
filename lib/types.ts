@@ -1,6 +1,6 @@
 import type { NamedNode, Quad, Term } from '@rdfjs/types'
 import { ShaclFormWidget } from './core/ShaclFormWidget'
-export type { BlankNode, Literal, Quad, Variable, NamedNode } from '@rdfjs/types'
+export type { BlankNode, Literal, Quad, Variable, NamedNode, Term } from '@rdfjs/types'
 
 export type ShaclProperties = {
   description?: { [key: string]: string },
@@ -29,6 +29,7 @@ export type GrapoiPointer = {
   list: () => Array<GrapoiPointer>
   ptrs: Array<any>
   node: (pointers: Array<any>) => GrapoiPointer
+  execute: (paths: Array<any>) => GrapoiPointer
   term: Term
   terms: Array<Term>
   [Symbol.iterator]: () => Iterator<any>
@@ -45,11 +46,10 @@ export type Alternative = {
 }
 
 export type Widget = {
-  _pointer: GrapoiPointer,
+  _shaclPointer: GrapoiPointer,
   _score: number,
   _alternative: Alternative,
   _widget: any,
-  _dataPointer: GrapoiPointer,
   _predicate: NamedNode,
   _path: Array<any>,
   _messages: {
@@ -61,7 +61,7 @@ export type Widget = {
 }
 
 export type TreeItem = {
-  _pointers: Array<GrapoiPointer>,
+  _shaclPointers: Array<GrapoiPointer>,
   _messages: {
     errors: Array<string>,
     infos: Array<string>,
