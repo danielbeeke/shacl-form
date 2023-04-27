@@ -1,4 +1,4 @@
-import './lib/index'
+import '../lib/index'
 
 document.body.innerHTML = `
   <shacl-form 
