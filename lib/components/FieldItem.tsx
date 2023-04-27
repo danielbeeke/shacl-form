@@ -12,7 +12,8 @@ type FieldItemProps = {
 }
 
 const removeItem = (element: ShaclFormWidget<any>) => {
-  element.dataPointer.deleteOut(element.predicate, element.value)
+  element.parentData.deleteOut(element.predicate, element.value)
+  // TODO remove also the children.
   ;(element.closest('.shacl-form') as any).render()
 }
 
