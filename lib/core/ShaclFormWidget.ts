@@ -1,7 +1,6 @@
-import { NamedNode, Quad } from 'n3'
-import type { GrapoiPointer } from './types'
-import { DataFactory } from 'n3';
-import type { NamedNode as NamedNodeType } from '@rdfjs/types'
+import type { GrapoiPointer } from '../types'
+import type { NamedNode, Quad } from '@rdfjs/types'
+import factory from 'rdf-ext'
 
 /**
  * At the moment we need:
@@ -15,7 +14,7 @@ import type { NamedNode as NamedNodeType } from '@rdfjs/types'
  * Please add a comment there so that TypeScript knows more people would want this feature.
  * 
  */
-export interface IShaclFormFieldConstructor {
+export interface IShaclFormWidgetConstructor {
   new(): IShaclFormField;
   elementName: string
   score (shaclPointer: GrapoiPointer): number
@@ -52,8 +51,8 @@ export type StaticImplements<I extends new (...args: any[]) => any, C extends I>
  * 
  * The TypeScript class 'ShaclFormField' has been made to make this easier to the developer.
  */
-export abstract class ShaclFormField<T extends IShaclFormFieldConstructor> 
-extends HTMLElement implements StaticImplements<IShaclFormFieldConstructor, T> {
+export abstract class ShaclFormWidget<T extends IShaclFormWidgetConstructor> 
+extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> {
 
   public messages: {
     errors: Array<string>,
@@ -66,12 +65,12 @@ extends HTMLElement implements StaticImplements<IShaclFormFieldConstructor, T> {
   }
 
   public path: any
-  public predicate: NamedNodeType = new NamedNode('')
+  public predicate: NamedNode = factory.namedNode('')
   public index: number = 0
   public shaclPointer: GrapoiPointer = {} as GrapoiPointer
   public dataPointer: GrapoiPointer = {} as GrapoiPointer
 
-  public df = DataFactory
+  public df = factory
 
   get value (): Quad {
     const quads = [...this.dataPointer.out([this.predicate]).quads() ?? []]

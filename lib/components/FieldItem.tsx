@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react'
-import { ShaclFormField } from '../ShaclFormField'
+import { ShaclFormWidget } from '../core/ShaclFormWidget'
 import { Widget } from '../types'
 
 type FieldItemProps = {
   structure: Widget, 
   Widget: any, 
-  index: number 
+  index: number,
+  children: () => Array<any>
 }
 
-const removeItem = (element: ShaclFormField<any>) => {
+const removeItem = (element: ShaclFormWidget<any>) => {
   const { predicate, object } = element.value
   element.dataPointer.deleteOut(predicate, object)
   ;(element.closest('.shacl-form') as any).render()
 }
 
-export function FieldItem ({ structure, Widget, index }: FieldItemProps) {
-  const [widgetInstance, setWidgetInstance] = useState<ShaclFormField<any>>()
+export function FieldItem ({ structure, Widget, index, children }: FieldItemProps) {
+  const [widgetInstance, setWidgetInstance] = useState<ShaclFormWidget<any>>()
   const { _pointer, _messages, _dataPointer, _path, _predicate } = structure
 
   useEffect(() => {
@@ -23,7 +24,7 @@ export function FieldItem ({ structure, Widget, index }: FieldItemProps) {
       const widgetHtmlName = 'sf-' + Widget.elementName
       if (!customElements.get(widgetHtmlName)) customElements.define(widgetHtmlName, Widget)
 
-      const element = document.createElement(widgetHtmlName) as ShaclFormField<any>
+      const element = document.createElement(widgetHtmlName) as ShaclFormWidget<any>
       element.shaclPointer = _pointer
       element.messages = _messages
       element.dataPointer = _dataPointer
@@ -41,6 +42,9 @@ export function FieldItem ({ structure, Widget, index }: FieldItemProps) {
   return (
     <>
       <div className='item' ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div>
+      <div>
+        {children()}
+      </div>
       <button onClick={() => removeItem(widgetInstance!)}>Remove</button>
     </>
   )

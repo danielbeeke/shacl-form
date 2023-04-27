@@ -1,17 +1,17 @@
 import { Validator } from 'shacl-engine'
-import { Parser, Store, DataFactory as df } from 'n3'
+import { Parser, Store } from 'n3'
 import rdfDataset from '@rdfjs/dataset'
-import { NamedNode } from 'n3'
+import factory from 'rdf-ext'
 import DatasetCore from '@rdfjs/dataset/DatasetCore'
-import { sh, rdf } from './namespaces'
+import { sh, rdf } from '../helpers/namespaces'
 import { createRoot } from 'react-dom/client'
-import type { Root } from 'react-dom/client'
 import { createElement, StrictMode } from 'react'
-import { FormLevelBase } from './components/FormLevel'
-import { shaclTree } from './helpers/shaclTree'
-import { Options } from './types'
+import { FormLevelBase } from '../components/FormLevel'
+import { shaclTree } from './shaclTree'
 import { LocalizationProvider } from '@fluent/react';
-import { l10n } from './Localization'
+import { l10n } from './l10n'
+import type { Root } from 'react-dom/client'
+import type { Options, NamedNode } from '../types'
 
 export const init = (options: Options) => {
 
@@ -25,7 +25,7 @@ export const init = (options: Options) => {
   class ShaclForm extends HTMLElement {
 
     #validator: typeof Validator
-    #subject: NamedNode = new NamedNode('')
+    #subject: NamedNode = factory.namedNode('')
     #store: Store = new Store()
     #shaclDataset: DatasetCore = rdfDataset.dataset()
     shapeUris: Array<NamedNode> = []
@@ -46,7 +46,7 @@ export const init = (options: Options) => {
       const shaclText = await fetch(shaclUrl).then(response => response.text())
       const shaclQuads = await parser.parse(shaclText)
       this.#shaclDataset = rdfDataset.dataset(shaclQuads)
-      this.#validator = new Validator(this.#shaclDataset, { coverage: true, factory: df, details: true })
+      this.#validator = new Validator(this.#shaclDataset, { coverage: true, factory, details: true })
 
       const nodeShapeQuads = this.#shaclDataset.match(null, rdf('type'), sh('NodeShape'))
       for (const nodeShapeQuad of nodeShapeQuads) {
@@ -61,10 +61,10 @@ export const init = (options: Options) => {
         this.#subject = dataQuads[0].subject as NamedNode
       }
       else {
-        this.#subject = df.namedNode(this.attributes.getNamedItem('data-iri')?.value ?? 'urn:default-shacl-form-subject')
+        this.#subject = factory.namedNode(this.attributes.getNamedItem('data-iri')?.value ?? 'urn:default-shacl-form-subject')
         // Set the fallback subject.
         // TODO change to the target class.
-        this.#store.add(df.quad(this.subject, rdf('type'), this.shapeUri))
+        this.#store.add(factory.quad(this.subject, rdf('type'), this.shapeUri))
       }
 
       this.#uiLanguagePriorities = this.attributes.getNamedItem('ui-language-priorities')?.value?.split(',') ?? ['*']
@@ -80,6 +80,8 @@ export const init = (options: Options) => {
       const report = await this.validate()
       const tree = shaclTree(report, this.#shaclDataset, options, this.#store, this.#subject)
 
+      console.log(tree)
+
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [
         createElement(StrictMode, {
           key: 'strictmode',
@@ -94,7 +96,7 @@ export const init = (options: Options) => {
       const quadsToChange = this.#store.getQuads(this.subject, null, null, null)
       this.#store.removeQuads(quadsToChange)
       this.#subject = newValue
-      this.#store.addQuads(quadsToChange.map((quad) => df.quad(this.subject, quad.predicate, quad.object, quad.graph)))
+      this.#store.addQuads(quadsToChange.map((quad) => factory.quad(this.subject, quad.predicate, quad.object, quad.graph)))
     }
 
     validate () {

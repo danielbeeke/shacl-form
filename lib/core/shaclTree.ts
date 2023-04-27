@@ -1,14 +1,17 @@
 import DatasetCore from '@rdfjs/dataset/DatasetCore'
 import grapoi from 'grapoi'
-import { rdf, sh } from '../namespaces'
+import { rdf, sh } from '../helpers/namespaces'
 import factory from 'rdf-ext'
 import parsePath from 'shacl-engine/lib/parsePath.js'
 import * as _ from 'lodash-es'
+import { rdfTermValueToTypedVariable } from '../helpers/rdfTermValueToTypedVariable'
 import { GrapoiPointer, Options, TreeItem } from '../types'
-import { rdfTermValueToTypedVariable } from './rdfTermValueToTypedVariable'
 import type { NamedNode } from '@rdfjs/types'
 
 /**
+ * This method creates the backbone for the form.
+ * It is the structure containing all the various widgets that might apply for a given SHACL tree.
+ * 
  * One predicate
  * Some predicates from the current level
  * Nested sh:node with BlankNode or IRI
@@ -39,10 +42,7 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
     // Levels
     for (const [index, pathPart] of path.entries()) {
       const pathPartsTillNow = path.slice(0, index + 1)
-
-      // TODO why does this happen? I felt like I could just execute the path parts and then do a trim()
-      const tempDataPointer = data.execute(pathPartsTillNow).trim().terms.pop()
-      const _dataPointer = grapoi({ dataset: contentDataset, factory, term: tempDataPointer })
+      const _dataPointer = data.execute(pathPart)
 
       const shaclResults = report.results.filter((result: any) => _.isEqual(result.path, path))
       const messages = extractMessages(shaclResults)

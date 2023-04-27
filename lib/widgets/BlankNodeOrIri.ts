@@ -1,9 +1,10 @@
-import { ShaclFormField } from '../ShaclFormField'
+import { ShaclFormWidget } from '../core/ShaclFormWidget'
 import { GrapoiPointer } from '../types'
-import { scorer } from '../Scorer'
-import { sh } from '../namespaces'
+import { scorer } from '../core/Scorer'
+import { sh } from '../helpers/namespaces'
+import factory from 'rdf-ext'
 
-export default class BlankNodeOrIri extends ShaclFormField<typeof BlankNodeOrIri> {
+export default class BlankNodeOrIri extends ShaclFormWidget<typeof BlankNodeOrIri> {
 
   static elementName = 'blank-node'
 
@@ -13,13 +14,18 @@ export default class BlankNodeOrIri extends ShaclFormField<typeof BlankNodeOrIri
       .toNumber()
   }
 
+  static createNewObject () {
+    return factory.blankNode()
+  }
+
   async connectedCallback () {
     this.render()
   }
 
   render () {
+    console.log(this.value)
     // TODO make it possible to give the blankNode a name so that we are able to not use blankNodes.
-    this.innerHTML = '<em>Blank Nodes</em>'
+    this.innerHTML = '<em>Blank Node</em>'
   }
 
 }

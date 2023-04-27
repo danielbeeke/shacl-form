@@ -10,7 +10,7 @@ export function FormLevel ({ tree, depth = 0, languagePriorities }: { tree: any,
     <>
       {Object.entries(tree).flatMap(([predicate, field]: [any, any], outerIndex: number) => {
         const childrenObject = Object.fromEntries(Object.entries(field as any).filter(([name]) => name[0] !== '_'))
-        const children = Object.keys(childrenObject).length ? 
+        const children = () => Object.keys(childrenObject).length ? 
           (<FormLevel languagePriorities={languagePriorities} key={hash(cid + predicate + outerIndex + 'children')} depth={depth} tree={childrenObject} />)
         : null
 

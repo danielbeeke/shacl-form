@@ -1,13 +1,4 @@
-import { init } from './lib/ShaclForm'
-import String from './lib/widgets/String'
-import BlankNodeOrIri from './lib/widgets/BlankNodeOrIri'
-
-init({
-  widgets: {
-    String,
-    BlankNodeOrIri
-  }
-})
+import './lib/index'
 
 document.body.innerHTML = `
   <shacl-form 

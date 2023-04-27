@@ -11,7 +11,7 @@ ex:NameShape
 	sh:property [
 		sh:path (schema:knows schema:name);
 		sh:order 1 ;
-		sh:name "given name"@en ;
+		sh:name "Given name"@en ;
 		sh:name "Gegeven naam"@nl ;
 		sh:description "How do people call you?"@en ;
 		sh:maxCount 3 ;

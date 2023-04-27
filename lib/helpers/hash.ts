@@ -1,3 +1,6 @@
+/**
+ * A hasher
+ */
 export const hash = function(str: string, seed: number = 0) {
   let h1 = 0xdeadbeef ^ seed,
     h2 = 0x41c6ce57 ^ seed;

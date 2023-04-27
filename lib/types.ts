@@ -1,7 +1,6 @@
-import type { NamedNode } from '@rdfjs/types'
-import { Quad, Term } from 'n3'
-import { ShaclFormField } from './ShaclFormField'
-export { BlankNode, Literal, Quad, Variable } from 'n3'
+import type { NamedNode, Quad, Term } from '@rdfjs/types'
+import { ShaclFormWidget } from './core/ShaclFormWidget'
+export type { BlankNode, Literal, Quad, Variable, NamedNode } from '@rdfjs/types'
 
 export type ShaclProperties = {
   description?: { [key: string]: string },
@@ -58,7 +57,7 @@ export type Widget = {
     infos: Array<string>,
     warnings: Array<string>
   },
-  _element: ShaclFormField<any>
+  _element: ShaclFormWidget<any>
 }
 
 export type TreeItem = {
