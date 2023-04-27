@@ -69,11 +69,11 @@ extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> 
   public index: number = 0
   public shaclPointer: GrapoiPointer = {} as GrapoiPointer
   public dataPointer: () => GrapoiPointer = () => ({} as GrapoiPointer)
-
   public df = factory
 
   get value (): Term {
-    return this.dataPointer().out([this.predicate]).terms[this.index]
+    return this.dataPointer()
+      .out([this.predicate]).terms[this.index]
   }
 
   set value (newValue: Term) {

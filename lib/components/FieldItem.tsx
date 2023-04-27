@@ -43,7 +43,13 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer }: 
   let resolvedChildren
 
   if (children) {
-    resolvedChildren = children(dataPointer().out([_predicate]))
+    const pointer = dataPointer().out([_predicate])
+
+    const childPointer = pointer.clone({
+      ptrs: [pointer.ptrs[index]].filter(Boolean)
+    })
+
+    resolvedChildren = children(childPointer)
   }
 
   return (
