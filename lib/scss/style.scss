@@ -1,4 +1,33 @@
 .item {
   padding: 10px;
-  border: 1px solid red;
+  margin-block: 5px;
+  border-radius: 4px;
+  background-color: rgba(0, 53, 70, 0.15);
+
+  &::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+}
+
+.widget {
+  float: left;
+  width: auto;
+  margin-right: 10px;
+}
+
+.field {
+  clear: both;
+}
+
+input {
+  padding: 5px;
+  border-radius: 4px;
+  border: none;
+}
+
+.btn-remove-item,
+.btn-add-item {
+  float: right;
 }

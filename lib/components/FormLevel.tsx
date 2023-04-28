@@ -51,6 +51,8 @@ export function FormLevelBase ({ tree, uiLanguagePriorities, dataPointer }: { tr
     <>
       <FormLevel uiLanguagePriorities={uiLanguagePriorities} key="main" depth={0} tree={tree} dataPointer={dataPointer}></FormLevel>
 
+      <br />
+
       <button onClick={() => {
         const store = dataPointer.ptrs[0].dataset
         const lists = store.extractLists({ remove: true });

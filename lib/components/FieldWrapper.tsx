@@ -64,7 +64,7 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
       </div>
       
       {!maxCount || fieldData.terms.length < maxCount ? (
-        <button onClick={() => addItem(dataPointer(), _predicate, element, Widget, _pathPart)}>
+        <button className='btn-add-item' onClick={() => addItem(dataPointer(), _predicate, element, Widget, _pathPart)}>
           Add item
         </button>
       ) : null} 

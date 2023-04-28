@@ -66,8 +66,6 @@ export const init = (options: Options) => {
       }
       else {
         this.#subject = factory.namedNode(this.attributes.getNamedItem('data-iri')?.value ?? 'urn:default-shacl-form-subject')
-        // Set the fallback subject.
-        // TODO change to the target class.
         this.#store.add(factory.quad(this.subject, rdf('type'), this.shapeUri))
       }
 

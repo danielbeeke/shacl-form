@@ -67,12 +67,12 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer, ui
 
   return (
     <div className="item">
-      <div ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div>
+      <div className='widget' ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div>
       {resolvedChildren ? (<div>
         {resolvedChildren}
       </div>) : null}
       {showRemove ? (
-        <button onClick={() => removeItem(widgetInstance!)}>Remove</button>
+        <button className='btn-remove-item' onClick={() => removeItem(widgetInstance!)}>Remove</button>
       ) : null}
     </div>
   )
