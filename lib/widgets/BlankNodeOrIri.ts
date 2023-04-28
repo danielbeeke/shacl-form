@@ -49,8 +49,12 @@ export default class BlankNodeOrIri extends ShaclFormWidget<typeof BlankNodeOrIr
           const newSubject = factory.namedNode(this.identifierSuggestion)
           swapSubject(store, namesPointer.term as BlankNode, newSubject)
           this.showIdentifier = false
-          this.render()
+          this.renderAll()
         }}>Save identifier</button>
+        <button onClick=${() => {
+          this.showIdentifier = false
+          this.render()
+        }}>Cancel</button>
       ` : null}
 
       ${this.value?.termType === 'BlankNode' && !this.showIdentifier ? html`
@@ -67,7 +71,7 @@ export default class BlankNodeOrIri extends ShaclFormWidget<typeof BlankNodeOrIr
         const newSubject = factory.blankNode()
         swapSubject(store, namesPointer.term as BlankNode, newSubject)
 
-        this.render()
+        this.renderAll()
       }}>Remove identifier</button>
       ` : null}
 

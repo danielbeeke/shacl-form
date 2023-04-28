@@ -82,6 +82,10 @@ extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> 
       .deleteOut(this.predicate, this.value)
       .addOut(this.predicate, newValue)
 
+    this.renderAll()
+  }
+
+  renderAll () {
     const form = this.closest('.shacl-form') as any
     form.render()
   }
