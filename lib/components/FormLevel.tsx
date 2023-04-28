@@ -49,7 +49,11 @@ export function FormLevelBase ({ tree, uiLanguagePriorities: languagePriorities,
       <button onClick={() => {
         const store = dataPointer.ptrs[0].dataset
         const writer = new Writer()
-        for (const quad of store) writer.addQuad(quad)
+        for (const quad of store) {
+          // We simply skip empty items.
+          // if (quad.object.value) 
+          writer.addQuad(quad)
+        }
         writer.end((error, result) => console.log(result))
       }}>Save</button>
     </>

@@ -24,9 +24,7 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
   const name = bestLanguage(_shaclPointer.out([sh('name')]), uiLanguagePriorities)
   const description = bestLanguage(_shaclPointer.out([sh('description')]), uiLanguagePriorities)
 
-  // This should be a getter
   const fieldData = dataPointer().execute(_pathPart).trim()
-  const indices = [...[...fieldData.terms].keys()]
 
   const element = useRef<HTMLDivElement>(null)
 
@@ -37,10 +35,13 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
       {description ? (<p>{description}</p>) : null}
 
       <div className='items'>
-        {indices.map(index => {
+        {fieldData.terms.map((term, index) => {
+
+          const cid = JSON.stringify([_pathPart, term]) + index
+
           return (
             <FieldItem 
-              key={index} 
+              key={cid} 
               index={index} 
               structure={structure} 
               dataPointer={dataPointer}

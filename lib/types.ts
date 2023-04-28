@@ -29,7 +29,7 @@ export type GrapoiPointer = {
   list: () => Array<GrapoiPointer>
   ptrs: Array<any>
   clone: (data: any) => GrapoiPointer  
-  node: (pointers: Array<any>) => GrapoiPointer
+  node: (pointers?: Array<any>) => GrapoiPointer
   execute: (paths: Array<any>) => GrapoiPointer
   replace: (replacement: any) => GrapoiPointer
   term: Term
