@@ -30,8 +30,9 @@ export const shaclTree = (report: any, shaclDataset: DatasetCore, options: Optio
 export const processLevel = (shaclProperties: GrapoiPointer, report: any, options: Options) => {
   const level: any = {}
 
-  for (const shaclProperty of shaclProperties) {
-    const shaclPropertyInner = shaclProperty.out().trim()
+  for (const shaclProperty of shaclProperties.out([sh('property')])) {
+    const shaclPropertyInner = shaclProperty.trim()
+
     const path = parsePath(shaclPropertyInner.out([sh('path')]))
 
     let pointer = level
@@ -67,11 +68,12 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
                     _shaclPointer: alternative.pointer,
                     _score: widget.score(alternative.pointer, item._types),
                     _alternative: alternative,
+                    _order: alternative.pointer.out(sh('order')) ? parseInt(alternative.pointer.out(sh('order')).value) : 0,
                     _widget: widget,
                     _predicate: predicate,
                     _path: pathPartsTillNow,
                     _pathPart: pathPart
-                  }))  
+                  }))
                 })
               })()
             }

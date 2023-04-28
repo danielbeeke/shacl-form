@@ -8,35 +8,40 @@ export function FormLevel ({ tree, depth = 0, languagePriorities, dataPointer }:
 
   const cid = Object.keys(tree).join(',') + depth
 
+  const widgets = Object.entries(tree).flatMap(([predicate, field]: [any, any], outerIndex: number) => {
+    const childrenObject = Object.fromEntries(Object.entries(field as any).filter(([name]) => name[0] !== '_'))
+    const children = (dataPointer: GrapoiPointer) => {
+      return Object.keys(childrenObject).length ? 
+        (<FormLevel dataPointer={dataPointer} languagePriorities={languagePriorities} key={hash(cid + predicate + outerIndex + 'children')} depth={depth} tree={childrenObject} />)
+        : null
+    }
+
+    return field._widgets?.length ? field._widgets
+      .filter((widget: any) => widget._score > 0)
+      .map((widget: any, index: number) => {
+        return (
+          <FieldWrapper 
+            uiLanguagePriorities={languagePriorities} 
+            key={hash(cid + widget._widget.name + outerIndex + index)} 
+            structure={widget} 
+            dataPointer={() => dataPointer}
+            Widget={widget._widget}
+          >
+            {children}
+          </FieldWrapper>
+        )
+      }) : null
+  })
+  .filter(Boolean)
+  .sort((a: any, b: any) => {
+    const aOrder = a.props.structure._order
+    const bOrder = b.props.structure._order
+    return aOrder - bOrder
+  })
+
   return (
     <>
-      {Object.entries(tree).flatMap(([predicate, field]: [any, any], outerIndex: number) => {
-        const childrenObject = Object.fromEntries(Object.entries(field as any).filter(([name]) => name[0] !== '_'))
-        const children = (dataPointer: GrapoiPointer) => {
-          return Object.keys(childrenObject).length ? 
-          (<FormLevel dataPointer={dataPointer} languagePriorities={languagePriorities} key={hash(cid + predicate + outerIndex + 'children')} depth={depth} tree={childrenObject} />)
-        : null
-        }
-
-        return [
-          field._widgets?.length ? field._widgets
-          .filter((widget: any) => widget._score > 0)
-          .map((widget: any, index: number) => {
-
-            return (
-              <FieldWrapper 
-                uiLanguagePriorities={languagePriorities} 
-                key={hash(cid + widget._widget.name + outerIndex + index)} 
-                structure={widget} 
-                dataPointer={() => dataPointer}
-                Widget={widget._widget}
-              >
-                {children}
-              </FieldWrapper>
-            )
-          }) : null,
-        ]
-     })}
+      {widgets}
     </>
   )
 }
@@ -48,14 +53,15 @@ export function FormLevelBase ({ tree, uiLanguagePriorities: languagePriorities,
 
       <button onClick={() => {
         const store = dataPointer.ptrs[0].dataset
-        const writer = new Writer()
+        const lists = store.extractLists({ remove: true });
+        const writer = new Writer({ lists })
         for (const quad of store) {
           // We simply skip empty items.
           // if (quad.object.value) 
           writer.addQuad(quad)
         }
         writer.end((error, result) => console.log(result))
-      }}>Save</button>
+      }}>Print turtle into console</button>
     </>
   )
 }

@@ -9,6 +9,15 @@ ex:NameShape
 	a sh:NodeShape ;
 
 	sh:property [
+		sh:path (schema:knows schema:birthDay);
+		sh:order 2 ;
+		sh:name "Birthday"@en ;
+		sh:description "When was this friend born?"@en ;
+		sh:maxCount 1 ;
+		sh:datatype xsd:date;
+	] ;
+	
+	sh:property [
 		sh:path (schema:knows schema:name);
 		sh:order 1 ;
 		sh:name "Given name"@en ;
@@ -27,4 +36,5 @@ ex:NameShape
 		# 		sh:languageIn ( "en" )
 		# ] ;
 		sh:uniqueLang true ;
-] .
+	] ;
+ .

@@ -5,18 +5,18 @@ import { scorer } from '../core/Scorer'
 import factory from 'rdf-ext'
 import { html, render } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
 
-export default class String extends ShaclFormWidget<typeof String> {
+export default class Date extends ShaclFormWidget<typeof Date> {
 
-  static elementName = 'string'
+  static elementName = 'date'
 
   static score(shaclPointer: GrapoiPointer) {
     return scorer(shaclPointer)
-      .datatypes([xsd('langString'), xsd('string')])
+      .datatypes([xsd('date')])
       .toNumber()
   }
 
   static createNewObject () {
-    return factory.literal('')
+    return factory.literal('', xsd('date'))
   }
 
   async connectedCallback () {
@@ -25,7 +25,7 @@ export default class String extends ShaclFormWidget<typeof String> {
 
   render () {
     render(this, html`
-      <input onChange=${(event: Event) => {
+      <input type="date" onChange=${(event: Event) => {
         const language = (this.value as Literal).language ? (this.value as Literal).language : undefined
         this.value = this.df.literal((event.target as HTMLInputElement).value, language)
       }} type="text" .value=${this.value?.value ?? ''} />
