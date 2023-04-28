@@ -29,7 +29,10 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
   const element = useRef<HTMLDivElement>(null)
 
   if (fieldData.terms.length === 0) {
-    dataPointer().addOut(_predicate, Widget.createNewObject())
+    const newObject = Widget.createNewObject()
+    if (newObject.termType !== 'BlankNode') {
+      dataPointer().addOut(_predicate, Widget.createNewObject())
+    }
   }
 
   const maxCount = _shaclPointer.out([sh('maxCount')]).value

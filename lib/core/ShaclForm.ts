@@ -14,6 +14,7 @@ import type { Root } from 'react-dom/client'
 import type { Options, NamedNode, GrapoiPointer } from '../types'
 import grapoi from 'grapoi'
 import '../scss/style.scss'
+import { swapSubject } from '../helpers/swapSubject'
 
 export const init = (options: Options) => {
 
@@ -100,10 +101,7 @@ export const init = (options: Options) => {
     }
 
     set subject (newValue: NamedNode) {
-      const quadsToChange = this.#store.getQuads(this.subject, null, null, null)
-      this.#store.removeQuads(quadsToChange)
-      this.#subject = newValue
-      this.#store.addQuads(quadsToChange.map((quad) => factory.quad(this.subject, quad.predicate, quad.object, quad.graph)))
+      swapSubject(this.#store, this.subject, newValue)
     }
 
     validate () {

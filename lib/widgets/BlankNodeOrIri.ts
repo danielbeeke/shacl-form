@@ -1,11 +1,16 @@
 import { ShaclFormWidget } from '../core/ShaclFormWidget'
-import { GrapoiPointer } from '../types'
+import { GrapoiPointer, BlankNode } from '../types'
 import { scorer } from '../core/Scorer'
 import { schema, rdfs, sh } from '../helpers/namespaces'
 import factory from 'rdf-ext'
 import { bestLanguage } from '../helpers/bestLanguage'
+import { html, render } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
+import { swapSubject } from '../helpers/swapSubject'
 
 export default class BlankNodeOrIri extends ShaclFormWidget<typeof BlankNodeOrIri> {
+
+  public showIdentifier = false
+  public identifierSuggestion = ''
 
   static elementName = 'blank-node'
 
@@ -32,8 +37,41 @@ export default class BlankNodeOrIri extends ShaclFormWidget<typeof BlankNodeOrIr
 
     const name = bestLanguage(indexSpecificNamesPointer, this.uiLanguagePriorities)
 
-    // TODO make it possible to give the blankNode a name so that we are able to not use blankNodes.
-    this.innerHTML = `<h2>${name ?? this.value?.value} <em>(blank node)</em></h2>`
+    render(this, html`
+      <h2>${name ?? this.value?.value} <em>(${this.value?.termType})</em></h2>
+
+      ${this.showIdentifier ? html`
+        <input type="url" placeholder="https://example.com" onChange=${(event: any) => {
+          this.identifierSuggestion = event.target.value
+        }} />
+        <button onClick=${() => {
+          const store = this.dataPointer().ptrs[0].dataset
+          const newSubject = factory.namedNode(this.identifierSuggestion)
+          swapSubject(store, namesPointer.term as BlankNode, newSubject)
+          this.showIdentifier = false
+          this.render()
+        }}>Save identifier</button>
+      ` : null}
+
+      ${this.value?.termType === 'BlankNode' && !this.showIdentifier ? html`
+      <button onClick=${() => {
+        this.showIdentifier = true
+        this.render()
+      }}>Add identifier</button>
+      ` : null}
+
+
+      ${this.value?.termType === 'NamedNode' && !this.showIdentifier ? html`
+      <button onClick=${() => {
+        const store = this.dataPointer().ptrs[0].dataset
+        const newSubject = factory.blankNode()
+        swapSubject(store, namesPointer.term as BlankNode, newSubject)
+
+        this.render()
+      }}>Remove identifier</button>
+      ` : null}
+
+    `)
   }
 
 }
