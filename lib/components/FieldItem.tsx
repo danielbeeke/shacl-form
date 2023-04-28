@@ -14,8 +14,14 @@ type FieldItemProps = {
 }
 
 const removeItem = (element: ShaclFormWidget<any>) => {
-  element.dataPointer().deleteOut(element.predicate, element.value)
-  // TODO remove also the children.
+  let resolvedPointer = element.dataPointer().out([element.predicate])
+  const quadsToRemove = new Set()
+  while ([...resolvedPointer.quads()].length) {
+    for (const quad of resolvedPointer.quads()) quadsToRemove.add(quad)
+    resolvedPointer = resolvedPointer.out()
+  }
+
+  element.dataPointer().ptrs[0].dataset.removeQuads([...quadsToRemove.values()])
   ;(element.closest('.shacl-form') as any).render()
 }
 
