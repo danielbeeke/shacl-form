@@ -28,6 +28,12 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
 
   const element = useRef<HTMLDivElement>(null)
 
+  if (fieldData.terms.length === 0) {
+    dataPointer().addOut(_predicate, Widget.createNewObject())
+  }
+
+  const maxCount = _shaclPointer.out([sh('maxCount')]).value
+
   return (
     <div ref={element} className={`field`} data-predicate={_predicate.value}>
       {name ? (<h3>{name}</h3>) : null}
@@ -43,7 +49,8 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
             <FieldItem 
               key={cid} 
               index={index} 
-              structure={structure} 
+              structure={structure}
+              uiLanguagePriorities={uiLanguagePriorities}
               dataPointer={dataPointer}
               Widget={Widget}
             >
@@ -53,9 +60,11 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
         })}
       </div>
       
-      <button onClick={() => addItem(dataPointer(), _predicate, element, Widget, _pathPart)}>
-        Add item
-      </button>
+      {!maxCount || fieldData.terms.length < maxCount ? (
+        <button onClick={() => addItem(dataPointer(), _predicate, element, Widget, _pathPart)}>
+          Add item
+        </button>
+      ) : null} 
     </div>
   )
 }

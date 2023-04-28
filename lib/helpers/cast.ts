@@ -1,4 +1,5 @@
-export const rdfTermValueToTypedVariable = (value: any) => {
+export const cast = (value: any) => {
+  if (!value) return undefined
   if (value.datatypeString === 'http://www.w3.org/2001/XMLSchema#boolean') return value.value === 'true'
   if (value.datatypeString === 'http://www.w3.org/2001/XMLSchema#date') return new Date(value.value)
   if (value.datatypeString === 'http://www.w3.org/2001/XMLSchema#integer') return parseInt(value.value)

@@ -4,7 +4,7 @@ import { rdf, sh } from '../helpers/namespaces'
 import factory from 'rdf-ext'
 import parsePath from 'shacl-engine/lib/parsePath.js'
 import * as _ from 'lodash-es'
-import { rdfTermValueToTypedVariable } from '../helpers/rdfTermValueToTypedVariable'
+import { cast } from '../helpers/cast'
 import { GrapoiPointer, Options, TreeItem } from '../types'
 
 /**
@@ -141,7 +141,7 @@ export const pointersToAlternatives = (pointers: Array<GrapoiPointer>) => {
   const qualifiedAlternative = baseAlternatives.out([sh('qualifiedValueShape')]).trim().out()
 
   const qualifiedValueShapesDisjointValue = baseAlternatives.out([sh('qualifiedValueShapesDisjoint')]).term
-  const qualifiedValueShapesDisjoint = qualifiedValueShapesDisjointValue ? rdfTermValueToTypedVariable(qualifiedValueShapesDisjointValue) : false
+  const qualifiedValueShapesDisjoint = qualifiedValueShapesDisjointValue ? cast(qualifiedValueShapesDisjointValue) : false
 
   // I could not find in the spec that sh:or would merge with the base properties 
   // but I think it might, because it works that way when using qualifiedValueShapesDisjoint.

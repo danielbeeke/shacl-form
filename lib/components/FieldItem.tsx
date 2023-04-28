@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { ShaclFormWidget } from '../core/ShaclFormWidget'
 import { GrapoiPointer, Widget } from '../types'
+import { sh } from '../helpers/namespaces'
+import { cast } from '../helpers/cast'
 
 type FieldItemProps = {
   structure: Widget, 
@@ -8,6 +10,7 @@ type FieldItemProps = {
   index: number,
   children: (values: GrapoiPointer) => Array<any>,
   dataPointer: () => GrapoiPointer
+  uiLanguagePriorities: Array<string>
 }
 
 const removeItem = (element: ShaclFormWidget<any>) => {
@@ -16,7 +19,7 @@ const removeItem = (element: ShaclFormWidget<any>) => {
   ;(element.closest('.shacl-form') as any).render()
 }
 
-export function FieldItem ({ structure, Widget, index, children, dataPointer }: FieldItemProps) {
+export function FieldItem ({ structure, Widget, index, children, dataPointer, uiLanguagePriorities }: FieldItemProps) {
   const [widgetInstance, setWidgetInstance] = useState<ShaclFormWidget<any>>()
   const { _shaclPointer: _shaclPointer, _messages, _path, _predicate } = structure
 
@@ -31,6 +34,7 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer }: 
       element.dataPointer = dataPointer
       element.index = index
       element.path = _path
+      element.uiLanguagePriorities = uiLanguagePriorities
       element.predicate = _predicate
       
       structure._element = element
@@ -41,10 +45,9 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer }: 
   }, [])
 
   let resolvedChildren
+  const pointer = dataPointer().out([_predicate])
 
   if (children) {
-    const pointer = dataPointer().out([_predicate])
-
     const childPointer = pointer.clone({
       ptrs: [pointer.ptrs[index]].filter(Boolean)
     })
@@ -52,13 +55,19 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer }: 
     resolvedChildren = children(childPointer)
   }
 
+  const minCount = cast(_shaclPointer.out([sh('minCount')]))
+  const value = dataPointer().out([_predicate]).terms[index]
+  const showRemove = value.value && (minCount === undefined || minCount < pointer.ptrs.length)
+
   return (
     <div className="item">
       <div ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div>
       {resolvedChildren ? (<div>
         {resolvedChildren}
       </div>) : null}
-      <button onClick={() => removeItem(widgetInstance!)}>Remove</button>
+      {showRemove ? (
+        <button onClick={() => removeItem(widgetInstance!)}>Remove</button>
+      ) : null}
     </div>
   )
 }

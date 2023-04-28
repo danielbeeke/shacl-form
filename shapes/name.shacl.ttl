@@ -8,6 +8,14 @@
 ex:NameShape
 	a sh:NodeShape ;
 
+
+	sh:property [
+		sh:path schema:knows;
+		sh:name "Friends"@en ;
+		sh:description "Who are your friends?"@en ;
+		sh:datatype sh:BlankNodeOrIRI;
+	] ;
+
 	sh:property [
 		sh:path (schema:knows schema:birthDay);
 		sh:order 2 ;
@@ -22,8 +30,9 @@ ex:NameShape
 		sh:order 1 ;
 		sh:name "Given name"@en ;
 		sh:name "Gegeven naam"@nl ;
-		sh:description "How do people call you?"@en ;
+		sh:description "How do you call this friend?"@en ;
 		sh:maxCount 3 ;
+		sh:minCount 1 ;
 		sh:datatype xsd:langString;
 		# sh:or (
 		# 	[ sh:datatype xsd:langString;]
