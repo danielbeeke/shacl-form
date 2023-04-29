@@ -1,8 +1,12 @@
 @prefix schema: <https://schema.org/>.
 @prefix ex: <http://example.com/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
 
 ex:name 
-  # schema:name "Pieter"@nl ;
   schema:knows [
     schema:name "John", "Johnny" ;
+    schema:birthDay "1992-04-22"^^xsd:date ;
+  ], [
+    schema:name "Frank" ;
+    schema:birthDay "1990-03-12"^^xsd:date ;
   ] .
