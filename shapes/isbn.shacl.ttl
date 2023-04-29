@@ -8,18 +8,18 @@
 ex:RootShape
 	a sh:NodeShape ;
 
+
+	sh:property [
+		sh:path schema:isbn;
+		sh:name "ISBN"@en ;
+		sh:description """Try to fill <strong>9780001939776</strong>""" ;
+		sh:datatype xsd:string;
+		sh:maxCount 1;
+	] ;
+
 	sh:property [
 		sh:path schema:name;
 		sh:name "Name"@en ;
 		sh:datatype xsd:string;
 	] ;
-
-	sh:property [
-		sh:path schema:isbn;
-		sh:name "ISBN"@en ;
-		sh:description """Try <strong>9780001939776</strong>""" ;
-		sh:datatype xsd:string;
-		sh:maxCount 1;
-	] ;
-
   .
