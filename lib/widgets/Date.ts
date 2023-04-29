@@ -1,6 +1,6 @@
 import { ShaclFormWidget } from '../core/ShaclFormWidget'
 import { xsd } from '../helpers/namespaces'
-import { GrapoiPointer, Literal } from '../types'
+import { GrapoiPointer } from '../types'
 import { scorer } from '../core/Scorer'
 import factory from 'rdf-ext'
 import { html, render } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
@@ -26,8 +26,7 @@ export default class Date extends ShaclFormWidget<typeof Date> {
   render () {
     render(this, html`
       <input type="date" onChange=${(event: Event) => {
-        const language = (this.value as Literal).language ? (this.value as Literal).language : undefined
-        this.value = this.df.literal((event.target as HTMLInputElement).value, language)
+        this.value = this.df.literal((event.target as HTMLInputElement).value, xsd('date'))
       }} type="text" .value=${this.value?.value ?? ''} />
     `)
   }

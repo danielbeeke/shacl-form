@@ -64,14 +64,15 @@ export const init = (options: Options) => {
         await this.#store.addQuads(dataQuads)
         this.#subject = dataQuads[0].subject as NamedNode
       }
-      else {
+
+      if (this.attributes.getNamedItem('data-iri')?.value) {
         this.#subject = factory.namedNode(this.attributes.getNamedItem('data-iri')?.value ?? 'urn:default-shacl-form-subject')
-        this.#store.add(factory.quad(this.subject, rdf('type'), this.shapeUri))
       }
 
       this.#uiLanguagePriorities = this.attributes.getNamedItem('ui-language-priorities')?.value?.split(',') ?? ['*']
       this.#uiLanguagePriorities.push('*')
       this.render()
+
       this.#data = grapoi({ dataset: this.#store, factory, term: this.#subject })
     }
 

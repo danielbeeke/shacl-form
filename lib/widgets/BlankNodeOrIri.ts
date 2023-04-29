@@ -7,6 +7,9 @@ import { bestLanguage } from '../helpers/bestLanguage'
 import { html, render } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
 import { swapSubject } from '../helpers/swapSubject'
 
+/**
+ * TODO add support for: dash:stem and / or dash:uriStart
+ */
 export default class BlankNodeOrIri extends ShaclFormWidget<typeof BlankNodeOrIri> {
 
   public showIdentifier = false

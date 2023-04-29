@@ -2,7 +2,7 @@
 @prefix ex: <http://example.com/>.
 
 ex:name 
-  schema:name "Pieter"@nl ;
+  # schema:name "Pieter"@nl ;
   schema:knows [
-    schema:name "Daniel"@en, "Daan"@nl ;
+    schema:name "John", "Johnny" ;
   ] .
