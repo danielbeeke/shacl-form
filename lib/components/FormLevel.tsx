@@ -16,8 +16,16 @@ export function FormLevel ({ tree, depth = 0, uiLanguagePriorities, dataPointer 
         : null
     }
 
-    return field._widgets?.length ? field._widgets
+    const widgets = field._widgets
+
+    for (const widget of widgets) {
+      widget._score = widget._widget.score(widget._shaclPointer, dataPointer)
+    }
+
+    return widgets?.length ? widgets
       .filter((widget: any) => widget._score > 0)
+      .sort((a: any, b: any) => b._score - a._score)
+      .slice(0, 1)
       .map((widget: any, index: number) => {
         return (
           <FieldWrapper 

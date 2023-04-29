@@ -27,6 +27,7 @@ HTML attributes on the customElement:
 - Use IRIs as object for sh:group to create a special widget / group such as the language tabs and the subject iri widget.
 - Allow invalid data and a way to recover so invalid data can be reshaped to valid data
 - Allow form buttons (agent has to click to update) or binding to triple change events (instant update)
+- Create a preprocess hook that filters the GrapoiPointer contextually so that we can have language tabs.
 
 ### Questions
 

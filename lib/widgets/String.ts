@@ -11,7 +11,7 @@ export default class String extends ShaclFormWidget<typeof String> {
 
   static score(shaclPointer: GrapoiPointer) {
     return scorer(shaclPointer)
-      .datatypes([xsd('langString'), xsd('string')])
+      .datatype([xsd('langString'), xsd('string')])
       .toNumber()
   }
 

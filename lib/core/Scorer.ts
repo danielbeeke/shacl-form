@@ -11,19 +11,43 @@ import { sh } from '../helpers/namespaces'
  */
 export class Scorer {
 
-  #pointer: GrapoiPointer
+  #shaclPointer: GrapoiPointer
+  #dataPointer: GrapoiPointer
   #scores: Array<number> = []
   #foundIncompatibility = false
 
-  constructor (pointer: GrapoiPointer) {
-    this.#pointer = pointer
+  constructor (shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
+    this.#shaclPointer = shaclPointer
+    this.#dataPointer = dataPointer
   }
 
-  datatypes (acceptedTypes: Array<NamedNode>, score: number = 1) {
-    const datatypes = this.#pointer.out([sh('datatype')]).terms
+  datatype (acceptedTypes: Array<NamedNode>, score: number = 1) {
+    const datatypes = this.#shaclPointer.out([sh('datatype')]).terms
     const isAllowed = datatypes.every(datatype => acceptedTypes.some(acceptedType => acceptedType.equals(datatype)))
+
+    if (!datatypes.length && acceptedTypes.length) this.#foundIncompatibility = true
+
+    // sh:node and sh:datatype are incompatible
+    const node = this.#shaclPointer.out([sh('node')]).term
+    if (node) this.#foundIncompatibility = true
+
     if (isAllowed) this.#scores.push(score)
     else this.#foundIncompatibility = true
+    return this
+  }
+
+  nodeKind (accepedKinds: Array<NamedNode>, score: number = 1) {
+    const kinds = this.#shaclPointer.out([sh('nodeKind')]).terms
+    const isAllowed = kinds.every(kind => accepedKinds.some(acceptedKind => acceptedKind.equals(kind)))
+    if (isAllowed) this.#scores.push(score)
+    else this.#foundIncompatibility = true
+    return this
+  }
+
+  node (score: number = 1) {
+    const node = this.#shaclPointer.out([sh('node')]).term
+    const isAllowed = !!node
+    if (isAllowed) this.#scores.push(score)
     return this
   }
 
@@ -33,4 +57,4 @@ export class Scorer {
   }
 }
 
-export const scorer = (pointer: GrapoiPointer) => new Scorer(pointer)
+export const scorer = (shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) => new Scorer(shaclPointer, dataPointer)

@@ -5,7 +5,7 @@ import factory from 'rdf-ext'
 import parsePath from 'shacl-engine/lib/parsePath.js'
 import * as _ from 'lodash-es'
 import { cast } from '../helpers/cast'
-import { GrapoiPointer, Options, TreeItem } from '../types'
+import { GrapoiPointer, NamedNode, Options, TreeItem } from '../types'
 
 /**
  * This method creates the backbone for the form.
@@ -19,15 +19,14 @@ import { GrapoiPointer, Options, TreeItem } from '../types'
  * TODO make recursive
  * Grab the required languages and think about language tabs in a recursive situation.
  */
-export const shaclTree = (report: any, shaclDataset: DatasetCore, options: Options) => {
-  const shacl = grapoi({ dataset: shaclDataset, factory })
+export const shaclTree = (report: any, shaclDataset: DatasetCore, options: Options, rootShaclIri: NamedNode) => {
+  const shacl = grapoi({ dataset: shaclDataset, factory, term: rootShaclIri })
   const shaclShapes = shacl.hasOut([rdf('type')], [sh('NodeShape')])
   const shaclProperties = shaclShapes.hasOut([sh('property')])
-  const tree = processLevel(shaclProperties, report, options)
-  return tree
+  return processLevel(shaclProperties, report, options, shacl, shaclDataset)
 }
 
-export const processLevel = (shaclProperties: GrapoiPointer, report: any, options: Options) => {
+export const processLevel = (shaclProperties: GrapoiPointer, report: any, options: Options, rootPointer: GrapoiPointer, shaclDataset: DatasetCore) => {
   const level: any = {}
 
   for (const shaclProperty of shaclProperties.out([sh('property')])) {
@@ -66,9 +65,8 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
                 return item._alternatives.flatMap(alternative => {
                   return Object.values(widgets).map(widget => ({
                     _shaclPointer: alternative.pointer,
-                    _score: widget.score(alternative.pointer, item._types),
                     _alternative: alternative,
-                    _order: alternative.pointer.out(sh('order')) ? parseInt(alternative.pointer.out(sh('order')).value) : 0,
+                    _order: alternative.pointer.out(sh('order')).value ? parseInt(alternative.pointer.out(sh('order')).value) : 0,
                     _widget: widget,
                     _predicate: predicate,
                     _path: pathPartsTillNow,
@@ -97,8 +95,17 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
           // Creates a pointer for a group that otherwise does not have a definition.
           const dataset = factory.dataset()
           const groupPointer = grapoi({ dataset, factory, term: factory.blankNode() })
-          groupPointer.addOut(sh('datatype'), sh('BlankNodeOrIRI'))
+          groupPointer.addOut(sh('nodeKind'), sh('BlankNodeOrIRI'))
           pointer[predicate.value]._shaclPointers.push(groupPointer)
+        }
+
+        const nestedShape = shaclPropertyInner.out(sh('node')).term
+
+        if (nestedShape?.termType === 'NamedNode') {
+          const shacl = grapoi({ dataset: shaclDataset, factory, term: nestedShape })
+          const shaclProperties = shacl.hasOut([sh('property')]).trim()
+          const nestedTree = processLevel(shaclProperties, report, options, shacl, shaclDataset)
+          Object.assign(pointer[predicate.value], nestedTree)
         }
 
         // Set the pointer for the next round.

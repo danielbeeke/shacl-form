@@ -11,7 +11,7 @@ export default class Date extends ShaclFormWidget<typeof Date> {
 
   static score(shaclPointer: GrapoiPointer) {
     return scorer(shaclPointer)
-      .datatypes([xsd('date')])
+      .datatype([xsd('date')], 2)
       .toNumber()
   }
 

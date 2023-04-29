@@ -5,15 +5,14 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-ex:NameShape
+ex:RootShape
 	a sh:NodeShape ;
-
 
 	sh:property [
 		sh:path schema:knows;
 		sh:name "Friends"@en ;
 		sh:description "Who are your friends?"@en ;
-		sh:datatype sh:BlankNodeOrIRI;
+		sh:nodeKind sh:BlankNodeOrIRI;
 	] ;
 
 	sh:property [
@@ -34,16 +33,7 @@ ex:NameShape
 		sh:maxCount 3 ;
 		sh:minCount 1 ;
 		sh:datatype xsd:langString;
-		# sh:or (
-		# 	[ sh:datatype xsd:langString;]
-		# 	[ sh:datatype xsd:string;]
-		# ) ;
-		sh:qualifiedMinCount 1 ;
-		sh:qualifiedMaxCount 1 ;
-		# sh:qualifiedValueShapesDisjoint true ;
-		# sh:qualifiedValueShape [
-		# 		sh:languageIn ( "en" )
-		# ] ;
 		sh:uniqueLang true ;
 	] ;
- .
+
+  .

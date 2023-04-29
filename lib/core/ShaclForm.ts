@@ -32,6 +32,7 @@ export const init = (options: Options) => {
     #store: Store = new Store()
     #shaclDataset: DatasetCore = rdfDataset.dataset()
     shapeUris: Array<NamedNode> = []
+    #rootShaclIri: NamedNode = factory.namedNode('')
     #root: Root
     #uiLanguagePriorities: Array<string> = ['*']
     #data: GrapoiPointer = {} as GrapoiPointer
@@ -57,12 +58,20 @@ export const init = (options: Options) => {
         this.shapeUris.push(nodeShapeQuad.subject as NamedNode)
       }
 
+      if (this.shapeUris.length === 1) this.#rootShaclIri = this.shapeUris[0]
+      const shaclIri = this.attributes.getNamedItem('shacl-iri')?.value
+
+      if (shaclIri) this.#rootShaclIri = factory.namedNode(shaclIri)
+
       const dataUrl = this.attributes.getNamedItem('data-url')?.value
       if (dataUrl) {
+        console.log(dataUrl)
         const dataText = await fetch(dataUrl).then(response => response.text())
-        const dataQuads = await parser.parse(dataText)
-        await this.#store.addQuads(dataQuads)
-        this.#subject = dataQuads[0].subject as NamedNode
+        if (dataText) {
+          const dataQuads = await parser.parse(dataText)
+          await this.#store.addQuads(dataQuads)
+          if (dataQuads?.[0]?.subject) this.#subject = dataQuads[0].subject as NamedNode  
+        }
       }
 
       if (this.attributes.getNamedItem('data-iri')?.value) {
@@ -82,7 +91,7 @@ export const init = (options: Options) => {
 
     async render () {
       const report = await this.validate()
-      const tree = shaclTree(report, this.#shaclDataset, options)
+      const tree = shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
 
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [
         createElement(StrictMode, {

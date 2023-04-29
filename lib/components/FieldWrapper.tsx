@@ -41,7 +41,7 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
     <div ref={element} className={`field`} data-predicate={_predicate.value}>
       {name ? (<h3>{name}</h3>) : null}
 
-      {description ? (<p>{description}</p>) : null}
+      {description ? (<p dangerouslySetInnerHTML={{__html: description}}></p>) : null}
 
       <div className='items'>
         {fieldData.terms.map((term, index) => {

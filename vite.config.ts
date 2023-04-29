@@ -1,5 +1,6 @@
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
+import { watchExtensions } from './vite/watchExtensions'
 
 export default defineConfig({
   build: {
@@ -9,4 +10,7 @@ export default defineConfig({
       fileName: 'ShaclForm',
     }
   },
+  plugins: [
+    watchExtensions(['ttl'])
+  ]
 })

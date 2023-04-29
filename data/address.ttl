@@ -1,0 +1,13 @@
+@prefix schema: <https://schema.org/>.
+@prefix ex: <http://example.com/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+ex:name 
+  schema:address ex:address .
+
+ex:address 
+  schema:streetAddress "Ganzenstraat 3882" ;
+  schema:addressRegion "Utrecht" ;
+  schema:addressLocality "Amersfoort" ;
+  schema:postalCode "3815 JK" ;
+  schema:addressCountry "NL" .

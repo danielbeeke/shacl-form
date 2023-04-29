@@ -16,7 +16,7 @@ import factory from 'rdf-ext'
 export interface IShaclFormWidgetConstructor {
   new(): IShaclFormField;
   elementName: string
-  score (shaclPointer: GrapoiPointer): number
+  score (shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer): number
 }
 
 export interface IShaclFormField extends HTMLElement {
@@ -78,15 +78,34 @@ extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> 
   }
 
   set value (newValue: Term) {
-    this.dataPointer()
-      .deleteOut(this.predicate, this.value)
-      .addOut(this.predicate, newValue)
+    (async () => {
+      this.dataPointer()
+        .deleteOut(this.predicate, this.value)
+        .addOut(this.predicate, newValue)
 
-    this.renderAll()
+      const event = new CustomEvent('value.set', {
+        detail: {
+          predicate: this.predicate,
+          object: newValue,
+          dataPointer: this.dataPointer(),
+          shaclPointer: this.shaclPointer,
+          element: this,
+          wait: false
+        }
+      })
+      this.form.dispatchEvent(event)
+
+      if (event.detail.wait) await event.detail.wait
+
+      this.renderAll()
+    })()
   }
 
   renderAll () {
-    const form = this.closest('.shacl-form') as any
-    form.render()
+    this.form.render()
+  }
+
+  get form () {
+    return this.closest('.shacl-form') as HTMLDivElement & { render: () => null }
   }
 }

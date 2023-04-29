@@ -17,9 +17,10 @@ export default class BlankNodeOrIri extends ShaclFormWidget<typeof BlankNodeOrIr
 
   static elementName = 'blank-node'
 
-  static score(shaclPointer: GrapoiPointer) {
-    return scorer(shaclPointer)
-      .datatypes([sh('BlankNodeOrIRI')])
+  static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
+    return scorer(shaclPointer, dataPointer)
+      .node()
+      .nodeKind([sh('IRI'), sh('BlankNode'), sh('BlankNodeOrIRI')])
       .toNumber()
   }
 
@@ -33,30 +34,36 @@ export default class BlankNodeOrIri extends ShaclFormWidget<typeof BlankNodeOrIr
 
   render () {
     const namesPointer = this.dataPointer().out([this.predicate])
-
     const indexSpecificNamesPointer = namesPointer.clone({
       ptrs: [namesPointer.ptrs[this.index]].filter(Boolean)
     }).trim().out([schema('name'), rdfs('label')])
 
     const name = bestLanguage(indexSpecificNamesPointer, this.uiLanguagePriorities)
+    const nodeKind = this.shaclPointer.out([sh('nodeKind')]).term
+
+    const enforceIri = nodeKind?.equals(sh('IRI'))
+    // const enforceBlankNode = nodeKind?.equals(sh('BlankNode'))
+    // const iriAndBlankNodeAllowed = !nodeKind || nodeKind.equals(sh('BlankNodeOrIRI'))
+
+    // console.log({ enforceIri, enforceBlankNode, iriAndBlankNodeAllowed})
 
     render(this, html`
       <h2>
         ${name ?? this.value?.value} 
         <em>(${this.value?.termType})</em>
 
-        ${this.value?.termType === 'BlankNode' && !this.showIdentifier ? html`
+        ${this.value?.termType === 'BlankNode' && !this.showIdentifier && !enforceIri ? html`
         <button onClick=${() => {
           this.showIdentifier = true
           this.render()
         }}>Add identifier</button>
         ` : null}
         
-        ${this.value?.termType === 'NamedNode' && !this.showIdentifier ? html`
+        ${this.value?.termType === 'NamedNode' && !this.showIdentifier && !enforceIri ? html`
         <button onClick=${() => {
           const store = this.dataPointer().ptrs[0].dataset
           const newSubject = factory.blankNode()
-          swapSubject(store, namesPointer.term as BlankNode, newSubject)
+          swapSubject(store, namesPointer.terms[this.index] as BlankNode, newSubject)
   
           this.renderAll()
         }}>Remove identifier</button>
@@ -64,7 +71,7 @@ export default class BlankNodeOrIri extends ShaclFormWidget<typeof BlankNodeOrIr
 
       </h2>
 
-      ${this.showIdentifier ? html`
+      ${this.showIdentifier || enforceIri && this.value?.termType === 'BlankNode' ? html`
         <input type="url" required placeholder="https://example.com" onChange=${(event: any) => {
           this.identifierSuggestion = event.target.value
         }} />
@@ -73,14 +80,17 @@ export default class BlankNodeOrIri extends ShaclFormWidget<typeof BlankNodeOrIr
           
           const store = this.dataPointer().ptrs[0].dataset
           const newSubject = factory.namedNode(this.identifierSuggestion)
-          swapSubject(store, namesPointer.term as BlankNode, newSubject)
+          swapSubject(store, namesPointer.terms[this.index] as BlankNode, newSubject)
           this.showIdentifier = false
           this.renderAll()
         }}>Save identifier</button>
+        ${!enforceIri ? html`
         <button onClick=${() => {
           this.showIdentifier = false
           this.render()
         }}>Cancel</button>
+        ` : null}
+
       ` : null}
     `)
   }
