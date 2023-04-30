@@ -11,7 +11,7 @@ import { shaclTree } from './shaclTree'
 import { LocalizationProvider } from '@fluent/react';
 import { l10n } from './l10n'
 import type { Root } from 'react-dom/client'
-import type { Options, NamedNode, GrapoiPointer } from '../types'
+import type { Options, NamedNode, GrapoiPointer, Literal } from '../types'
 import grapoi from 'grapoi'
 import '../scss/style.scss'
 import { swapSubject } from '../helpers/swapSubject'
@@ -65,7 +65,6 @@ export const init = (options: Options) => {
 
       const dataUrl = this.attributes.getNamedItem('data-url')?.value
       if (dataUrl) {
-        console.log(dataUrl)
         const dataText = await fetch(dataUrl).then(response => response.text())
         if (dataText) {
           const dataQuads = await parser.parse(dataText)
@@ -74,15 +73,26 @@ export const init = (options: Options) => {
         }
       }
 
-      if (this.attributes.getNamedItem('data-iri')?.value) {
-        this.#subject = factory.namedNode(this.attributes.getNamedItem('data-iri')?.value ?? 'urn:default-shacl-form-subject')
+      if (this.getAttribute('data-iri')) {
+        this.#subject = factory.namedNode(this.getAttribute('data-iri') ?? 'urn:default-shacl-form-subject')
       }
 
-      this.#uiLanguagePriorities = this.attributes.getNamedItem('ui-language-priorities')?.value?.split(',') ?? ['*']
+      this.#uiLanguagePriorities = this.getAttribute('ui-language-priorities')?.split(',') ?? ['*']
       this.#uiLanguagePriorities.push('*')
       this.render()
 
       this.#data = grapoi({ dataset: this.#store, factory, term: this.#subject })
+
+      if (!this.attributes.getNamedItem('content-languages')) {
+        const contentLanguages = new Set()
+        for (const quad of this.#store) {
+          if ((quad.object as Literal).language) {
+            contentLanguages.add((quad.object as Literal).language)
+          }
+        }
+        
+        this.setAttribute('content-languages', [...contentLanguages.values()].join(','))
+      }
     }
 
     get subject () {
@@ -98,6 +108,7 @@ export const init = (options: Options) => {
           key: 'strictmode',
           children: [
             createElement(FormLevelBase, { 
+              form: this,
               tree, 
               dataPointer: this.#data,
               key: 'form', 
@@ -125,6 +136,18 @@ export const init = (options: Options) => {
 
       throw new Error('Could not find the shape uri')
     }
+
+    get contentLanguages () {
+      return (this.closest(`[content-languages]`) as HTMLDivElement)?.getAttribute('content-languages')?.split(',') ?? []
+    }
+  
+    get activeContentLanguages () {
+      const activeContentLanguages = (this.closest(`[active-content-languages]`) as HTMLDivElement)?.getAttribute('active-content-languages')?.split(',') ?? []
+      if (!activeContentLanguages.every(activeContentLanguage => this.contentLanguages.includes(activeContentLanguage))) throw new Error(`An active language was set that is not included in the available languages.`)
+      if (activeContentLanguages.length === 0) return this.contentLanguages
+      return activeContentLanguages
+    }
+
   }
 
   customElements.define('shacl-form', ShaclForm)

@@ -1,7 +1,7 @@
 import { sh } from '../helpers/namespaces'
 import { bestLanguage } from '../helpers/bestLanguage'
 import { FieldItem } from './FieldItem'
-import { GrapoiPointer, Widget, NamedNode } from '../types'
+import { GrapoiPointer, Widget, NamedNode, Literal } from '../types'
 import { useRef } from 'react'
 
 type FieldWrapperProps = { 
@@ -9,7 +9,8 @@ type FieldWrapperProps = {
   children: any, 
   structure: Widget, 
   uiLanguagePriorities: Array<string>,
-  dataPointer: () => GrapoiPointer
+  dataPointer: () => GrapoiPointer,
+  form: any
 }
 
 const addItem = (pointer: GrapoiPointer, predicate: NamedNode, elementRef: any, Widget: any, _pathPart: any) => {
@@ -18,7 +19,7 @@ const addItem = (pointer: GrapoiPointer, predicate: NamedNode, elementRef: any, 
   form.render()
 }
 
-export function FieldWrapper ({ Widget, children, structure, uiLanguagePriorities, dataPointer }: FieldWrapperProps) {
+export function FieldWrapper ({ Widget, children, structure, uiLanguagePriorities, dataPointer, form }: FieldWrapperProps) {
   const { _shaclPointer, _predicate, _pathPart } = structure
 
   const name = bestLanguage(_shaclPointer.out([sh('name')]), uiLanguagePriorities)
@@ -37,6 +38,25 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
 
   const maxCount = _shaclPointer.out([sh('maxCount')]).value
 
+  const items = fieldData.terms.map((term, index) => {
+    const cid = JSON.stringify([_pathPart, term]) + index
+
+    return [(
+      <FieldItem 
+        key={cid} 
+        index={index} 
+        structure={structure}
+        uiLanguagePriorities={uiLanguagePriorities}
+        dataPointer={dataPointer}
+        Widget={Widget}
+      >
+        {children}
+      </FieldItem>
+    ), term]
+  }).filter(([_field, term]) => {
+    return !(term as Literal).language || form.activeContentLanguages.includes((term as Literal).language)
+  }).map(([field]) => field as JSX.Element)
+
   return (
     <div ref={element} className={`field`} data-predicate={_predicate.value}>
       {name ? (<h3>{name}</h3>) : null}
@@ -44,23 +64,7 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
       {description ? (<p dangerouslySetInnerHTML={{__html: description}}></p>) : null}
 
       <div className='items'>
-        {fieldData.terms.map((term, index) => {
-
-          const cid = JSON.stringify([_pathPart, term]) + index
-
-          return (
-            <FieldItem 
-              key={cid} 
-              index={index} 
-              structure={structure}
-              uiLanguagePriorities={uiLanguagePriorities}
-              dataPointer={dataPointer}
-              Widget={Widget}
-            >
-              {children}
-            </FieldItem>
-          )
-        })}
+        {items}
       </div>
       
       {!maxCount || fieldData.terms.length < maxCount ? (

@@ -13,7 +13,7 @@ export class Scorer {
 
   #shaclPointer: GrapoiPointer
   #dataPointer: GrapoiPointer
-  #scores: Array<number> = []
+  #scores: Array<{ type: string, score: number}> = []
   #foundIncompatibility = false
 
   constructor (shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
@@ -25,21 +25,21 @@ export class Scorer {
     const datatypes = this.#shaclPointer.out([sh('datatype')]).terms
     const isAllowed = datatypes.every(datatype => acceptedTypes.some(acceptedType => acceptedType.equals(datatype)))
 
-    if (!datatypes.length && acceptedTypes.length) this.#foundIncompatibility = true
+    // if (!datatypes.length && acceptedTypes.length) this.#foundIncompatibility = true
 
     // sh:node and sh:datatype are incompatible
     const node = this.#shaclPointer.out([sh('node')]).term
     if (node) this.#foundIncompatibility = true
 
-    if (isAllowed) this.#scores.push(score)
+    if (isAllowed) this.#scores.push({ type: 'datatype', score })
     else this.#foundIncompatibility = true
     return this
   }
 
   nodeKind (accepedKinds: Array<NamedNode>, score: number = 1) {
     const kinds = this.#shaclPointer.out([sh('nodeKind')]).terms
-    const isAllowed = kinds.every(kind => accepedKinds.some(acceptedKind => acceptedKind.equals(kind)))
-    if (isAllowed) this.#scores.push(score)
+    const isAllowed = kinds.length && kinds.every(kind => accepedKinds.some(acceptedKind => acceptedKind.equals(kind)))
+    if (isAllowed) this.#scores.push({ type: 'nodeKind', score })
     else this.#foundIncompatibility = true
     return this
   }
@@ -47,13 +47,13 @@ export class Scorer {
   node (score: number = 1) {
     const node = this.#shaclPointer.out([sh('node')]).term
     const isAllowed = !!node
-    if (isAllowed) this.#scores.push(score)
+    if (isAllowed) this.#scores.push({ type: 'node', score })
     return this
   }
 
   toNumber () {
     if (this.#foundIncompatibility) return -1
-    return this.#scores.reduce((sum, single) => sum + single, 0)
+    return this.#scores.reduce((sum, scoreElemen) => sum + scoreElemen.score, 0)
   }
 }
 

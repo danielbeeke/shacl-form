@@ -89,14 +89,10 @@ extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> 
           object: newValue,
           dataPointer: this.dataPointer(),
           shaclPointer: this.shaclPointer,
-          element: this,
-          wait: false
+          element: this
         }
       })
       this.form.dispatchEvent(event)
-
-      if (event.detail.wait) await event.detail.wait
-
       this.renderAll()
     })()
   }
@@ -106,6 +102,10 @@ extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> 
   }
 
   get form () {
-    return this.closest('.shacl-form') as HTMLDivElement & { render: () => null }
+    return this.closest('.shacl-form') as HTMLDivElement & { 
+      render: () => null,
+      contentLanguages: Array<string>,
+      activeContentLanguages: Array<string>
+    }
   }
 }

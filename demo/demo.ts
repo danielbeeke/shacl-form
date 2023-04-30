@@ -9,7 +9,8 @@ const demos = [
     shaclIri: 'http://example.com/RootShape',
     dataUrl: '../data/name.ttl?raw',
     dataIri: 'http://example.com/name',
-    uiLanguagePriorities: 'nl'
+    uiLanguagePriorities: 'nl',
+    contentLanguage: 'en'
   },
   {
     title: 'Address',
@@ -17,12 +18,23 @@ const demos = [
     shaclIri: 'http://example.com/RootShape',
     dataUrl: '../data/address.ttl?raw',
     dataIri: 'http://example.com/name',
-    uiLanguagePriorities: 'nl'
+    uiLanguagePriorities: 'nl',
+    contentLanguage: 'en'
   },
   {
     title: 'ISBN API intregration',
     shaclUrl: '../shapes/isbn.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
+    contentLanguage: 'en'
+  },
+  {
+    title: 'Multilingual Product Name',
+    shaclUrl: '../shapes/multilingual.shacl.ttl?raw',
+    shaclIri: 'http://example.com/RootShape',
+    dataUrl: '../data/multilingual.ttl?raw',
+    dataIri: 'http://example.com/name',
+    // contentLanguage: 'en,fr,de',
+    activeContentLanguage: 'en'
   },
 ]
 
@@ -51,7 +63,9 @@ else {
       shacl-iri="${demo.shaclIri ?? ''}" 
       data-url="${demo.dataUrl ?? ''}" 
       data-iri="${demo.dataIri ?? ''}"
-      ui-language-priorities="${demo.uiLanguagePriorities}"
+      ${demo.contentLanguage ? `content-languages="${demo.contentLanguage}"` : ''}
+      ${demo.activeContentLanguage ? `active-content-languages="${demo.activeContentLanguage}"` : ''}
+      ui-language-priorities="${demo.uiLanguagePriorities ?? ''}"
     ></shacl-form>
   `
 

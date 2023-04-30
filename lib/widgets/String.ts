@@ -9,9 +9,9 @@ export default class String extends ShaclFormWidget<typeof String> {
 
   static elementName = 'string'
 
-  static score(shaclPointer: GrapoiPointer) {
-    return scorer(shaclPointer)
-      .datatype([xsd('langString'), xsd('string')])
+  static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
+    return scorer(shaclPointer, dataPointer)
+      .datatype([xsd('string')], 2)
       .toNumber()
   }
 
