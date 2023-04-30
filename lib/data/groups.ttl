@@ -1,0 +1,5 @@
+@prefix shfrm: <https://github.com/danielbeeke/shacl-form/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+
+shfrm:LanguageTabs
+	a sh:PropertyGroup .

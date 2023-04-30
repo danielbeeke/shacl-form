@@ -17,7 +17,7 @@ export type ShaclProperties = {
 
 export type GrapoiPointer = {
   in: (predicates?: Array<NamedNode>, objects?: Array<NamedNode>) => GrapoiPointer
-  out: (predicates?: Array<NamedNode>, subjects?: Array<NamedNode>) => GrapoiPointer
+  out: (predicates?: Array<NamedNode | null>, subjects?: Array<NamedNode>) => GrapoiPointer
   deleteOut: (predicates?: Array<any> | any, objects?: Array<any> | any) => GrapoiPointer,
   addOut: (predicates?: Array<any> | any, objects?: Array<any> | any) => GrapoiPointer,
   quads: () => Array<Quad>

@@ -1,7 +1,7 @@
-import { sh } from '../helpers/namespaces'
-import { bestLanguage } from '../helpers/bestLanguage'
+import { sh } from '../../helpers/namespaces'
+import { bestLanguage } from '../../helpers/bestLanguage'
 import { FieldItem } from './FieldItem'
-import { GrapoiPointer, Widget, NamedNode, Literal } from '../types'
+import { GrapoiPointer, Widget, NamedNode, Literal } from '../../types'
 import { useRef } from 'react'
 
 type FieldWrapperProps = { 
@@ -14,8 +14,8 @@ type FieldWrapperProps = {
 }
 
 const addItem = (pointer: GrapoiPointer, predicate: NamedNode, elementRef: any, Widget: any, _pathPart: any) => {
-  pointer.addOut(predicate, Widget.createNewObject())
   const form = elementRef.current.closest('.shacl-form')
+  pointer.addOut(predicate, Widget.createNewObject(form))
   form.render()
 }
 
@@ -30,9 +30,9 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
   const element = useRef<HTMLDivElement>(null)
 
   if (fieldData.terms.length === 0) {
-    const newObject = Widget.createNewObject()
+    const newObject = Widget.createNewObject(form)
     if (newObject.termType !== 'BlankNode') {
-      dataPointer().addOut(_predicate, Widget.createNewObject())
+      dataPointer().addOut(_predicate, Widget.createNewObject(form))
     }
   }
 

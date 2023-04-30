@@ -15,6 +15,7 @@ import type { Options, NamedNode, GrapoiPointer, Literal } from '../types'
 import grapoi from 'grapoi'
 import '../scss/style.scss'
 import { swapSubject } from '../helpers/swapSubject'
+import GroupsTtl from '../data/groups.ttl?raw'
 
 export const init = (options: Options) => {
 
@@ -50,7 +51,11 @@ export const init = (options: Options) => {
       if (!shaclUrl) throw new Error('A shacl-url property is required. It should link to a SHACL turtle file')
       const shaclText = await fetch(shaclUrl).then(response => response.text())
       const shaclQuads = await parser.parse(shaclText)
-      this.#shaclDataset = rdfDataset.dataset(shaclQuads)
+      const groupsQuads = await parser.parse(GroupsTtl)
+      this.#shaclDataset = rdfDataset.dataset([
+        ...shaclQuads,
+        ...groupsQuads
+      ])
       this.#validator = new Validator(this.#shaclDataset, { coverage: true, factory, details: true })
 
       const nodeShapeQuads = this.#shaclDataset.match(null, rdf('type'), sh('NodeShape'))
@@ -77,7 +82,7 @@ export const init = (options: Options) => {
         this.#subject = factory.namedNode(this.getAttribute('data-iri') ?? 'urn:default-shacl-form-subject')
       }
 
-      this.#uiLanguagePriorities = this.getAttribute('ui-language-priorities')?.split(',') ?? ['*']
+      this.#uiLanguagePriorities = this.uiLanguagePriorities
       this.#uiLanguagePriorities.push('*')
       this.render()
 
@@ -102,6 +107,7 @@ export const init = (options: Options) => {
     async render () {
       const report = await this.validate()
       const tree = shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
+      const shacl = grapoi({ dataset: this.#shaclDataset, factory })
 
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [
         createElement(StrictMode, {
@@ -110,6 +116,7 @@ export const init = (options: Options) => {
             createElement(FormLevelBase, { 
               form: this,
               tree, 
+              shaclPointer: shacl,
               dataPointer: this.#data,
               key: 'form', 
               uiLanguagePriorities: this.#uiLanguagePriorities 
@@ -138,14 +145,32 @@ export const init = (options: Options) => {
     }
 
     get contentLanguages () {
-      return (this.closest(`[content-languages]`) as HTMLDivElement)?.getAttribute('content-languages')?.split(',') ?? []
+      return this.getAttribute('content-languages')?.split(',') ?? []
+    }
+
+    set contentLanguages (languages: Array<string>) {
+      this.setAttribute('content-languages', languages.join(','))
     }
   
     get activeContentLanguages () {
-      const activeContentLanguages = (this.closest(`[active-content-languages]`) as HTMLDivElement)?.getAttribute('active-content-languages')?.split(',') ?? []
+      const activeContentLanguages = this.getAttribute('active-content-languages')?.split(',') ?? []
       if (!activeContentLanguages.every(activeContentLanguage => this.contentLanguages.includes(activeContentLanguage))) throw new Error(`An active language was set that is not included in the available languages.`)
       if (activeContentLanguages.length === 0) return this.contentLanguages
       return activeContentLanguages
+    }
+
+    get activeContentLanguage () {
+      return this.activeContentLanguages[0]
+    }
+
+    set activeContentLanguages (languages: Array<string>) {
+      if (languages.length === 0) languages = this.contentLanguages
+      this.setAttribute('active-content-languages', languages.join(','))
+      this.render()
+    }
+
+    get uiLanguagePriorities () {
+      return this.getAttribute('ui-language-priorities')?.split(',') ?? ['*']
     }
 
   }

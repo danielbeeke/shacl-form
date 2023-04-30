@@ -20,7 +20,7 @@ export default class BlankNodeOrIri extends ShaclFormWidget<typeof BlankNodeOrIr
   static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
     return scorer(shaclPointer, dataPointer)
       .node()
-      .nodeKind([sh('IRI'), sh('BlankNode'), sh('BlankNodeOrIRI')])
+      .nodeKind([sh('IRI'), sh('BlankNode'), sh('BlankNodeOrIRI')], 3)
       .toNumber()
   }
 

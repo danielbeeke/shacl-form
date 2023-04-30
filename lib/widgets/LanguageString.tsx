@@ -14,12 +14,12 @@ export default class LanguageString extends ShaclFormWidgetReact<typeof Language
       .toNumber()
   }
 
-  static createNewObject () {
-    return factory.literal('', 'en')
+  static createNewObject (form: any) {
+    return factory.literal('', form.activeContentLanguage)
   }
 
   template () {
-    const language = (this.value as Literal).language ? (this.value as Literal).language : undefined
+    const language = this.form.activeContentLanguage
 
     return (
     <>
@@ -32,7 +32,7 @@ export default class LanguageString extends ShaclFormWidgetReact<typeof Language
         }}>
           {this.form.activeContentLanguages.map(languageCode => (<option key={languageCode} value={languageCode}>{languageCode}</option>))}
         </select>
-      ) : (this.form.activeContentLanguages[0])}
+      ) : null}
     </>
     )
   }

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { ShaclFormWidget } from '../core/ShaclFormWidget'
-import { GrapoiPointer, Widget } from '../types'
-import { sh } from '../helpers/namespaces'
-import { cast } from '../helpers/cast'
+import { ShaclFormWidget } from '../../core/ShaclFormWidget'
+import { GrapoiPointer, Widget } from '../../types'
+import { sh } from '../../helpers/namespaces'
+import { cast } from '../../helpers/cast'
 
 type FieldItemProps = {
   structure: Widget, 

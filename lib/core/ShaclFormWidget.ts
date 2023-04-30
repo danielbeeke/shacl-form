@@ -106,6 +106,7 @@ extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> 
       render: () => null,
       contentLanguages: Array<string>,
       activeContentLanguages: Array<string>
+      activeContentLanguage: string
     }
   }
 }
