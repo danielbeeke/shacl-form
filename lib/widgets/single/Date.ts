@@ -1,16 +1,14 @@
-import { ShaclFormWidget } from '../core/ShaclFormWidget'
-import { xsd } from '../helpers/namespaces'
-import { GrapoiPointer } from '../types'
-import { scorer } from '../core/Scorer'
+import { ShaclFormWidgetSingle } from '../../core/ShaclFormWidgetSingle'
+import { xsd } from '../../helpers/namespaces'
+import { GrapoiPointer } from '../../types'
+import { scorer } from '../../core/Scorer'
 import factory from 'rdf-ext'
 import { html, render } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
 
-export default class Date extends ShaclFormWidget<typeof Date> {
+export default class Date extends ShaclFormWidgetSingle<typeof Date> {
 
-  static elementName = 'date'
-
-  static score(shaclPointer: GrapoiPointer) {
-    return scorer(shaclPointer)
+  static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
+    return scorer(shaclPointer, dataPointer)
       .datatype([xsd('date')], 2)
       .toNumber()
   }

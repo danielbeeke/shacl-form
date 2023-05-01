@@ -15,7 +15,7 @@ import type { Options, NamedNode, GrapoiPointer, Literal } from '../types'
 import grapoi from 'grapoi'
 import '../scss/style.scss'
 import { swapSubject } from '../helpers/swapSubject'
-import GroupsTtl from '../data/groups.ttl?raw'
+import { Enhancer } from './Enhancer'
 
 export const init = (options: Options) => {
 
@@ -53,11 +53,15 @@ export const init = (options: Options) => {
       if (!shaclUrl) throw new Error('A shacl-url property is required. It should link to a SHACL turtle file')
       const shaclText = await fetch(shaclUrl).then(response => response.text())
       const shaclQuads = await parser.parse(shaclText)
-      const groupsQuads = await parser.parse(GroupsTtl)
-      this.#shaclDataset = rdfDataset.dataset([
-        ...shaclQuads,
-        ...groupsQuads
-      ])
+      this.#shaclDataset = rdfDataset.dataset(shaclQuads)
+
+      const mustEnhance = this.getAttribute('enhance') !== null
+
+      if (mustEnhance) {
+        const enhancer = new Enhancer()
+        await enhancer.execute(this.#shaclDataset)  
+      }
+      
       this.#validator = new Validator(this.#shaclDataset, { coverage: true, factory, details: true })
 
       const nodeShapeQuads = this.#shaclDataset.match(null, rdf('type'), sh('NodeShape'))

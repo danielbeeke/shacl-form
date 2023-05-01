@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ShaclFormWidget } from '../../core/ShaclFormWidget'
+import { ShaclFormWidgetSingle } from '../../core/ShaclFormWidgetSingle'
 import { GrapoiPointer, Widget } from '../../types'
 import { sh } from '../../helpers/namespaces'
 import { cast } from '../../helpers/cast'
@@ -13,7 +13,7 @@ type FieldItemProps = {
   uiLanguagePriorities: Array<string>
 }
 
-const removeItem = (element: ShaclFormWidget<any>) => {
+const removeItem = (element: ShaclFormWidgetSingle<any>) => {
   let resolvedPointer = element.dataPointer().trim().out([element.predicate], [element.value as any])
   const quadsToRemove = new Set()
   while ([...resolvedPointer.quads()].length) {
@@ -26,15 +26,15 @@ const removeItem = (element: ShaclFormWidget<any>) => {
 }
 
 export function FieldItem ({ structure, Widget, index, children, dataPointer, uiLanguagePriorities }: FieldItemProps) {
-  const [widgetInstance, setWidgetInstance] = useState<ShaclFormWidget<any>>()
+  const [widgetInstance, setWidgetInstance] = useState<ShaclFormWidgetSingle<any>>()
   const { _shaclPointer: _shaclPointer, _messages, _path, _predicate } = structure
 
   useEffect(() => {
     if (!widgetInstance) {
-      const widgetHtmlName = 'sf-' + Widget.elementName
+      const widgetHtmlName = 'sf-' + Widget.name.toLowerCase()
       if (!customElements.get(widgetHtmlName)) customElements.define(widgetHtmlName, Widget)
 
-      const element = document.createElement(widgetHtmlName) as ShaclFormWidget<any>
+      const element = document.createElement(widgetHtmlName) as ShaclFormWidgetSingle<any>
       element.shaclPointer = _shaclPointer
       element.messages = _messages
       element.dataPointer = dataPointer

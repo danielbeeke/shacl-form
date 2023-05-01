@@ -26,6 +26,7 @@
     "vite": "^4.2.0"
   },
   "dependencies": {
+    "@comunica/query-sparql": "^2.6.9",
     "@fluent/langneg": "^0.7.0",
     "@fluent/react": "^0.15.0",
     "@rdfjs/dataset": "^2.0.1",

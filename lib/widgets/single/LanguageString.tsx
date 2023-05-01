@@ -1,12 +1,10 @@
-import { ShaclFormWidgetReact } from '../core/ShaclFormWidgetReact'
-import { xsd } from '../helpers/namespaces'
-import { GrapoiPointer, Literal } from '../types'
-import { scorer } from '../core/Scorer'
+import { ShaclFormWidgetSingleReact } from '../../core/ShaclFormWidgetSingleReact'
+import { xsd } from '../../helpers/namespaces'
+import { GrapoiPointer } from '../../types'
+import { scorer } from '../../core/Scorer'
 import factory from 'rdf-ext'
 
-export default class LanguageString extends ShaclFormWidgetReact<typeof LanguageString> {
-
-  static elementName = 'language-string'
+export default class LanguageString extends ShaclFormWidgetSingleReact<typeof LanguageString> {
 
   static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
     return scorer(shaclPointer, dataPointer)

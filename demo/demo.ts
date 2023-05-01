@@ -36,6 +36,14 @@ const demos = [
     // contentLanguage: 'en,fr,de',
     activeContentLanguage: 'en'
   },
+  {
+    title: 'Incomplete labels, enhance by fetching ontology',
+    shaclUrl: '../shapes/incomplete.shacl.ttl?raw',
+    shaclIri: 'http://example.com/RootShape',
+    // contentLanguage: 'en,fr,de',
+    activeContentLanguage: 'en',
+    enhance: true
+  },
 ]
 
 const index = location.pathname.substring(1) ? parseInt(location.pathname.substring(1)) : null
@@ -66,6 +74,7 @@ else {
       ${demo.contentLanguage ? `content-languages="${demo.contentLanguage}"` : ''}
       ${demo.activeContentLanguage ? `active-content-languages="${demo.activeContentLanguage}"` : ''}
       ui-language-priorities="${demo.uiLanguagePriorities ?? ''}"
+      ${demo.enhance ? `enhance` : ''}
     ></shacl-form>
   `
 

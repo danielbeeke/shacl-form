@@ -1,10 +1,10 @@
 import { init } from './core/ShaclForm'
 
 // Widgets
-import String from './widgets/String'
-import BlankNodeOrIri from './widgets/BlankNodeOrIri'
-import Date from './widgets/Date'
-import LanguageString from './widgets/LanguageString'
+import String from './widgets/single/String'
+import BlankNodeOrIri from './widgets/single/BlankNodeOrIri'
+import Date from './widgets/single/Date'
+import LanguageString from './widgets/single/LanguageString'
 
 // Groups
 import Buttons, { iri as buttonsIri } from './components/groups/Buttons'

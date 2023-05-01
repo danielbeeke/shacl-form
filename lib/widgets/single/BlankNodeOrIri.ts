@@ -1,21 +1,19 @@
-import { ShaclFormWidget } from '../core/ShaclFormWidget'
-import { GrapoiPointer, BlankNode } from '../types'
-import { scorer } from '../core/Scorer'
-import { schema, rdfs, sh } from '../helpers/namespaces'
+import { ShaclFormWidgetSingle } from '../../core/ShaclFormWidgetSingle'
+import { GrapoiPointer, BlankNode } from '../../types'
+import { scorer } from '../../core/Scorer'
+import { schema, rdfs, sh } from '../../helpers/namespaces'
 import factory from 'rdf-ext'
-import { bestLanguage } from '../helpers/bestLanguage'
+import { bestLanguage } from '../../helpers/bestLanguage'
 import { html, render } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
-import { swapSubject } from '../helpers/swapSubject'
+import { swapSubject } from '../../helpers/swapSubject'
 
 /**
  * TODO add support for: dash:stem and / or dash:uriStart
  */
-export default class BlankNodeOrIri extends ShaclFormWidget<typeof BlankNodeOrIri> {
+export default class BlankNodeOrIri extends ShaclFormWidgetSingle<typeof BlankNodeOrIri> {
 
   public showIdentifier = false
   public identifierSuggestion = ''
-
-  static elementName = 'blank-node'
 
   static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
     return scorer(shaclPointer, dataPointer)
