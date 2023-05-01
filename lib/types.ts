@@ -44,7 +44,8 @@ export type Options = {
   },
   groups: {
     [key: string]: any
-  }
+  },
+  enhancer: any
 }
 
 export type Alternative = {

@@ -40,11 +40,10 @@ export class Enhancer {
               ?s ?p2 ?o2 .
             }
           `, {
-            sources: [predicate.value]
+            sources: [predicate.value],
           })
 
           const receivedQuads = (await response.toArray())
-
           const quads = receivedQuads.map(quad => factory.quad(shaclProperty.term, quad.predicate, quad.object))
           for (const quad of quads) dataset.add(quad)
         }

@@ -57,8 +57,8 @@ export const init = (options: Options) => {
 
       const mustEnhance = this.getAttribute('enhance') !== null
 
-      if (mustEnhance) {
-        const enhancer = new Enhancer()
+      if (mustEnhance && this.options.enhancer) {
+        const enhancer = new this.options.enhancer()
         await enhancer.execute(this.#shaclDataset)  
       }
       

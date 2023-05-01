@@ -1,4 +1,5 @@
 import { init } from './core/ShaclForm'
+import { Enhancer } from './core/Enhancer'
 
 // Widgets
 import String from './widgets/single/String'
@@ -27,5 +28,6 @@ init({
     default: DefaultGroup,
     [buttonsIri.value]: Buttons,
     [languageTabsIri.value]: LanguageTabs
-  }
+  },
+  enhancer: Enhancer
 })
