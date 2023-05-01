@@ -15,7 +15,15 @@ ex:RootShape
 		sh:datatype xsd:langString ;
 		sh:group ex:NameGroup ;
 	] ;
+
+	sh:property [
+		sh:group ex:ButtonGroup ;
+		sh:order 10 ;
+	] ;
 .
 
 ex:NameGroup
 	a sh:PropertyGroup, shfrm:LanguageTabs .
+
+ex:ButtonGroup
+	a sh:PropertyGroup, shfrm:Buttons .

@@ -36,11 +36,13 @@ export const init = (options: Options) => {
     #rootShaclIri: NamedNode = factory.namedNode('')
     #root: Root
     #uiLanguagePriorities: Array<string> = ['*']
+    public options: Options
     #data: GrapoiPointer = {} as GrapoiPointer
 
     constructor () {
       super()
       this.init()
+      this.options = options
       this.#root = createRoot(this)
     }
 
@@ -171,6 +173,10 @@ export const init = (options: Options) => {
 
     get uiLanguagePriorities () {
       return this.getAttribute('ui-language-priorities')?.split(',') ?? ['*']
+    }
+
+    get store () {
+      return this.#store
     }
 
   }

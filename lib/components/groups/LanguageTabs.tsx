@@ -1,11 +1,7 @@
 import { bestLanguage } from '../../helpers/bestLanguage'
 import { rdfs, shFrm } from '../../helpers/namespaces'
 import { GrapoiPointer } from '../../types'
-/** @ts-ignore */
-import { init } from 'bcp47-picker/init'
 import { useState } from 'react'
-
-init({ sources: ['https://bcp47.danielbeeke.nl/data/lmt.json']})
 
 export const iri = shFrm('LanguageTabs')
 
@@ -15,7 +11,7 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
   const [showLanguagePicker, setShowLanguagePicker] = useState(false)
 
   return (
-    <div>
+    <div className='group group-language-tabs'>
       {name ? (<h1 className='group-header'>{name}</h1>) : null}
 
       <div className='languages'>

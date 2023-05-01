@@ -1,13 +1,8 @@
 import { FieldWrapper } from './field/FieldWrapper'
 import { hash } from '../helpers/hash'
 import { GrapoiPointer } from '../types'
-import { Writer } from 'n3'
 import { sh, rdf } from '../helpers/namespaces'
-import { DefaultGroup } from './groups/DefaultGroup'
 import { createElement } from 'react'
-
-/** @ts-ignore */
-const groupComponents = import.meta.glob('./groups/*', { eager: true })
 
 type FormLevelProps = { 
   tree: any, 
@@ -31,6 +26,8 @@ export function FormLevel ({
   const cid = Object.keys(tree).join(',') + depth
 
   const widgets = Object.entries(tree).flatMap(([predicate, field]: [any, any], outerIndex: number) => {
+    if (predicate[0] === '_') return
+
     const childrenObject = Object.fromEntries(Object.entries(field as any).filter(([name]) => name[0] !== '_'))
     const children = (dataPointer: GrapoiPointer) => {
       return Object.keys(childrenObject).length ? 
@@ -84,13 +81,19 @@ export function FormLevel ({
    */
   const groups = new Map()
 
-  for (const widget of widgets) {
-    const group = widget.props.structure._shaclPointer.out([sh('group')]).term ?? 'none'
+  const groupedWidgets = [
+    ...widgets.map(widget => [widget.props.structure._shaclPointer.out([sh('group')]).term ?? 'none', widget]), 
+    ...Object.values(tree._groups ?? {}).map((group: any) => [group.group]) ?? []
+  ].filter(Boolean)
+
+  for (const [group, widget] of groupedWidgets) {
     if (!groups.has(group)) {
       const groupPointer = shaclPointer.out([null], group)
       const groupTypes = groupPointer.out([rdf('type')]).terms
-      const element = (Object.values(groupComponents).find((groupComponent: any) => groupTypes.find(groupType => groupComponent.iri?.equals(groupType))) as any)?.default ?? DefaultGroup
-      groups.set(group, { element, props: { groupPointer }, children: [] })
+      const order = groupPointer.out([sh('order')]).value ? parseInt(groupPointer.out([sh('order')]).value) : 0
+      let [element] = groupTypes.map(groupType => form.options.groups[groupType.value]).filter(Boolean)
+      if (!element) element = form.options.groups.default
+      groups.set(group, { element, props: { groupPointer }, children: [], order })
     }
     const groupObject = groups.get(group)
     groupObject.children.push(widget)
@@ -98,11 +101,13 @@ export function FormLevel ({
 
   return (
     <>
-      {[...groups.entries()].map(([index, groupObject]) => createElement(groupObject.element, { 
-        ...groupObject.props,
-        key: 'index:' + index,
-        form
-      }, ...groupObject.children))}
+      {[...groups.entries()].map(([group, groupObject]) => {
+        return createElement(groupObject.element, { 
+          ...groupObject.props,
+          key: 'index:' + (typeof group === 'string' ? group : group.value),
+          form
+        }, ...groupObject.children)
+      })}
     </>
   )
 }
@@ -117,27 +122,13 @@ type FormLevelBaseProps = {
 
 export function FormLevelBase ({ tree, uiLanguagePriorities, dataPointer, form, shaclPointer }: FormLevelBaseProps) {
   return (
-    <>
-      <FormLevel 
-        uiLanguagePriorities={uiLanguagePriorities} 
-        key="main" depth={0} 
-        tree={tree} 
-        shaclPointer={shaclPointer} 
-        dataPointer={dataPointer} 
-        form={form} 
-      />
-      <br />
-
-      <button onClick={() => {
-        const store = dataPointer.ptrs[0].dataset
-        const lists = store.extractLists({ remove: true });
-        const writer = new Writer({ lists })
-        for (const quad of store) {
-          // We simply skip empty items.
-          if (quad.object.value) writer.addQuad(quad)
-        }
-        writer.end((error, result) => console.log(result))
-      }}>Print turtle into console</button>
-    </>
+    <FormLevel 
+      uiLanguagePriorities={uiLanguagePriorities} 
+      key="main" depth={0} 
+      tree={tree} 
+      shaclPointer={shaclPointer} 
+      dataPointer={dataPointer} 
+      form={form} 
+    />
   )
 }

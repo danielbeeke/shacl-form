@@ -36,6 +36,14 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
 
     let pointer = level
 
+    if (!path) {
+      const group = shaclPropertyInner.out([sh('group')]).term
+      const groupPointer = rootPointer.node().trim().out([null], [group])
+      if (!pointer._groups) pointer._groups = {}
+      pointer._groups[shaclPropertyInner.term.value] = { groupPointer, group }
+      continue
+    }
+
     // Levels
     for (const [index, pathPart] of path.entries()) {
       const pathPartsTillNow = path.slice(0, index + 1)

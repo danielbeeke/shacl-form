@@ -40,6 +40,9 @@ export type GrapoiPointer = {
 export type Options = {
   widgets: {
     [key: string]: any
+  },
+  groups: {
+    [key: string]: any
   }
 }
 
