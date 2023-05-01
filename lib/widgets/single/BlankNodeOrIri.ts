@@ -9,6 +9,7 @@ import { swapSubject } from '../../helpers/swapSubject'
 
 /**
  * TODO add support for: dash:stem and / or dash:uriStart
+ * TODO Add edit mode
  */
 export default class BlankNodeOrIri extends ShaclFormWidgetSingle<typeof BlankNodeOrIri> {
 

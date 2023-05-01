@@ -13,14 +13,18 @@ export default function Buttons ({ children, groupPointer, form }: { children: a
     {children ? (<div>{children}</div>) : null}
 
     <button onClick={() => {
-        const store = form.store
-        const lists = store.extractLists({ remove: true });
+        const dataset = form.store
+        const lists = dataset.extractLists({ remove: true });
         const writer = new Writer({ lists })
-        for (const quad of store) {
+        for (const quad of dataset) {
           // We simply skip empty items.
           if (quad.object.value) writer.addQuad(quad)
         }
-        writer.end((error, result) => console.log(result))
+        writer.end((error, turtle) => {
+          form.dispatchEvent(new CustomEvent('save', {
+            detail: { turtle, dataset }
+          }))
+        })
       }}>Print turtle into console</button>
 
   </div>)

@@ -4,7 +4,7 @@ import { schema } from '../lib/helpers/namespaces'
 
 const demos = [
   {
-    title: 'Name',
+    title: 'Name (blank nodes with a SHACL property path)',
     shaclUrl: '../shapes/name.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     dataUrl: '../data/name.ttl?raw',
@@ -40,6 +40,7 @@ const demos = [
     title: 'Incomplete labels, enhance by fetching ontology',
     shaclUrl: '../shapes/incomplete.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
+    dataIri: 'http://example.com/name',
     // contentLanguage: 'en,fr,de',
     activeContentLanguage: 'en',
     enhance: true
@@ -78,11 +79,16 @@ else {
     ></shacl-form>
   `
 
+  const form = document.querySelector('shacl-form')! as any
+
+  form.addEventListener('save', (event) => {
+    console.log(event.detail.turtle)
+  })
+
   /**
    * Demonstration of data intregration on API call.
    */
   if (demo.title.includes('ISBN')) {
-    const form = document.querySelector('shacl-form')! as any
   
     form.addEventListener('value.set', (event: any) => {
       if (!event.detail.predicate.equals(schema('isbn'))) return

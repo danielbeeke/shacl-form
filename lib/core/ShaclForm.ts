@@ -3,7 +3,7 @@ import { Parser, Store } from 'n3'
 import rdfDataset from '@rdfjs/dataset'
 import factory from 'rdf-ext'
 import DatasetCore from '@rdfjs/dataset/DatasetCore'
-import { sh, rdf } from '../helpers/namespaces'
+import { sh, rdf, shFrm } from '../helpers/namespaces'
 import { createRoot } from 'react-dom/client'
 import { createElement, StrictMode } from 'react'
 import { FormLevelBase } from '../components/FormLevel'
@@ -15,7 +15,6 @@ import type { Options, NamedNode, GrapoiPointer, Literal } from '../types'
 import grapoi from 'grapoi'
 import '../scss/style.scss'
 import { swapSubject } from '../helpers/swapSubject'
-import { Enhancer } from './Enhancer'
 
 export const init = (options: Options) => {
 
@@ -61,7 +60,7 @@ export const init = (options: Options) => {
         const enhancer = new this.options.enhancer()
         await enhancer.execute(this.#shaclDataset)  
       }
-      
+
       this.#validator = new Validator(this.#shaclDataset, { coverage: true, factory, details: true })
 
       const nodeShapeQuads = this.#shaclDataset.match(null, rdf('type'), sh('NodeShape'))
@@ -73,6 +72,30 @@ export const init = (options: Options) => {
       const shaclIri = this.attributes.getNamedItem('shacl-iri')?.value
 
       if (shaclIri) this.#rootShaclIri = factory.namedNode(shaclIri)
+
+      // If we can not find the buttons we must add this group ourselves to the SHACL.
+      const shacl = grapoi({ dataset: this.#shaclDataset, factory }) as GrapoiPointer
+      const hasButtonGroup = shacl.out([rdf('type')], [shFrm('Buttons')]).terms.length > 0
+
+      if (!hasButtonGroup) {
+        const extraQuads = await parser.parse(`
+          @prefix sh: <http://www.w3.org/ns/shacl#>.
+          @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+          @prefix shfrm: <https://github.com/danielbeeke/shacl-form/ontology#> .
+
+          shfrm:ButtonGroup
+            a sh:PropertyGroup, shfrm:Buttons .
+
+          <${this.#rootShaclIri}> 
+            sh:property [
+              sh:group shfrm:ButtonGroup ;
+              sh:order 1000 ;
+            ] .
+        `)
+        
+        for (const quad of extraQuads) this.#shaclDataset.add(quad)
+      }
 
       const dataUrl = this.attributes.getNamedItem('data-url')?.value
       if (dataUrl) {
