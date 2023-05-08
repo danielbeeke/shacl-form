@@ -1,26 +1,6 @@
-import type { GrapoiPointer, Term, NamedNode, Quad } from '../types'
+import type { GrapoiPointer, Term, NamedNode, ShaclFormType } from '../types'
 import factory from 'rdf-ext'
-
-
-export interface IShaclFormWidgetConstructor {
-  new(): IShaclFormField;
-  score (shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer): number
-}
-
-export interface IShaclFormField extends HTMLElement {
-  messages: {
-    errors: Array<string>,
-    infos: Array<string>,
-    warnings: Array<string>
-  }
-  shaclPointer: GrapoiPointer,
-  dataPointer: () => GrapoiPointer,
-  value: Term
-  index: number
-  uiLanguagePriorities: Array<string>
-}
-
-export type StaticImplements<I extends new (...args: any[]) => any, C extends I> = InstanceType<I>
+import { IShaclFormWidgetConstructor, StaticImplements } from './ShaclFormWidget'
 
 export abstract class ShaclFormWidgetSingle<T extends IShaclFormWidgetConstructor> 
 extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> {
@@ -73,11 +53,12 @@ extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> 
   }
 
   get form () {
-    return this.closest('.shacl-form') as HTMLDivElement & { 
-      render: () => null,
-      contentLanguages: Array<string>,
-      activeContentLanguages: Array<string>
-      activeContentLanguage: string
-    }
+    return this.closest('.shacl-form') as ShaclFormType
   }
+
+  async connectedCallback () {
+    this.render()
+  }
+
+  render () {}
 }

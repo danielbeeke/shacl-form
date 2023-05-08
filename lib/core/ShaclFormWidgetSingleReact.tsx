@@ -1,6 +1,7 @@
-import { ShaclFormWidgetSingle, IShaclFormWidgetConstructor, StaticImplements } from './ShaclFormWidgetSingle';
+import { IShaclFormWidgetConstructor, StaticImplements } from './ShaclFormWidget'
+import { ShaclFormWidgetSingle } from './ShaclFormWidgetSingle'
 import { createRoot, Root } from 'react-dom/client'
-import { createElement } from 'react';
+import { createElement } from 'react'
 
 /**
  * Use <input defaultValue={this.value.value ?? ''} onBlur={} /> instead of <input value={this.value.value ?? ''} onChange={} />
@@ -16,10 +17,6 @@ extends ShaclFormWidgetSingle<T> implements StaticImplements<IShaclFormWidgetCon
     super()
     this.#root = createRoot(this)
     this.#boundTemplate = this.template.bind(this)
-  }
-
-  async connectedCallback () {
-    this.render()
   }
 
   render () {

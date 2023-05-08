@@ -12,5 +12,8 @@ export default defineConfig({
   },
   plugins: [
     watchExtensions(['ttl'])
-  ]
+  ],
+  define: {
+    'import.meta.env.POSITIONSTACK': JSON.stringify(process.env.POSITIONSTACK)
+  }  
 })

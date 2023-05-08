@@ -17,10 +17,6 @@ export default class String extends ShaclFormWidgetSingle<typeof String> {
     return factory.literal('')
   }
 
-  async connectedCallback () {
-    this.render()
-  }
-
   render () {
     render(this, html`
       <input onChange=${(event: Event) => {

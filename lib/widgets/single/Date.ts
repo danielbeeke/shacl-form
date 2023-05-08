@@ -17,10 +17,6 @@ export default class Date extends ShaclFormWidgetSingle<typeof Date> {
     return factory.literal('', xsd('date'))
   }
 
-  async connectedCallback () {
-    this.render()
-  }
-
   render () {
     render(this, html`
       <input type="date" onChange=${(event: Event) => {

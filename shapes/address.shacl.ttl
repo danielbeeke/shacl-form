@@ -11,6 +11,7 @@ ex:RootShape
     sh:property [
         sh:name "Address"@en ;
         sh:path schema:address;
+        sh:description "One Apple Park Way; Cupertino, CA 95014, U.S.A." ;
         sh:node ex:AddressShape ;
         sh:nodeKind sh:IRI ;
     ] ;
@@ -21,13 +22,13 @@ ex:AddressShape
     sh:targetClass schema:PostalAddress ;
     sh:closed true ;
 
-    sh:property [
-        sh:path rdf:type ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-        sh:nodeKind sh:IRI ;
-        sh:hasValue schema:PostalAddress ;
-    ] ;
+    # sh:property [
+    #     sh:path rdf:type ;
+    #     sh:minCount 1 ;
+    #     sh:maxCount 1 ;
+    #     sh:nodeKind sh:IRI ;
+    #     sh:hasValue schema:PostalAddress ;
+    # ] ;
 
     sh:property [
         sh:path schema:streetAddress ;

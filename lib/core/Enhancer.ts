@@ -19,6 +19,7 @@ export class Enhancer {
     const shaclShapes = shacl.hasOut([rdf('type')], [sh('NodeShape')]).trim()
     const shaclProperties = shaclShapes.hasOut([sh('property')])
 
+    // TODO run all these promises at the same time.
     for (const shaclProperty of shaclProperties.out([sh('property')])) {
       const labels = shaclProperty.out([sh('name'), rdfs('label')]).terms.length
       

@@ -1,5 +1,6 @@
 import type { NamedNode, Quad, Term } from '@rdfjs/types'
 import { ShaclFormWidgetSingle } from './core/ShaclFormWidgetSingle'
+import { GeocoderBase } from './plugins/GeoCoder/GeoCoderBase'
 export type { BlankNode, Literal, Quad, Variable, NamedNode, Term } from '@rdfjs/types'
 
 export type ShaclProperties = {
@@ -17,8 +18,8 @@ export type ShaclProperties = {
 
 export type GrapoiPointer = {
   in: (predicates?: Array<NamedNode>, objects?: Array<NamedNode>) => GrapoiPointer
-  out: (predicates?: Array<NamedNode | null>, subjects?: Array<NamedNode>) => GrapoiPointer
-  hasOut(predicates?: Array<NamedNode | null>, subjects?: Array<NamedNode>) => GrapoiPointer
+  out: (predicates?: Array<NamedNode | null>, subjects?: Array<NamedNode>) => GrapoiPointer,
+  hasOut: (predicates?: Array<NamedNode | null>, subjects?: Array<NamedNode>) => GrapoiPointer
   deleteOut: (predicates?: Array<any> | any, objects?: Array<any> | any) => GrapoiPointer,
   addOut: (predicates?: Array<any> | any, objects?: Array<any> | any) => GrapoiPointer,
   quads: () => Array<Quad>
@@ -40,12 +41,20 @@ export type GrapoiPointer = {
 
 export type Options = {
   widgets: {
-    [key: string]: any
+    single: {
+      [key: string]: any
+    }
+    merged: {
+      [key: string]: any
+    }
   },
   groups: {
     [key: string]: any
   },
-  enhancer: any
+  enhancer: any,
+  plugins: {
+    geocoder: GeocoderBase
+  }
 }
 
 export type Alternative = {
@@ -79,4 +88,23 @@ export type TreeItem = {
   _types: Array<string>,
   _alternatives: Array<any>
   _widgets: Array<any>
+}
+
+export type UnifiedGeoSearch = {
+  locality: string,
+  number: string,
+  region: string,
+  country: string,
+  street: string,
+  postalCode: string
+  latitude?: number,
+  longitude?: number,
+}
+
+export type ShaclFormType = HTMLDivElement & { 
+  render: () => null,
+  contentLanguages: Array<string>,
+  activeContentLanguages: Array<string>
+  activeContentLanguage: string,
+  options: Options
 }

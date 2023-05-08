@@ -27,13 +27,12 @@ const removeItem = (element: ShaclFormWidgetSingle<any>) => {
 
 export function FieldItem ({ structure, Widget, index, children, dataPointer, uiLanguagePriorities }: FieldItemProps) {
   const [widgetInstance, setWidgetInstance] = useState<ShaclFormWidgetSingle<any>>()
-  const { _shaclPointer: _shaclPointer, _messages, _path, _predicate } = structure
+  const { _shaclPointer: _shaclPointer, _messages, _path, _predicate, _fields, _mapping } = structure
 
   useEffect(() => {
     if (!widgetInstance) {
       const widgetHtmlName = 'sf-' + Widget.name.toLowerCase()
       if (!customElements.get(widgetHtmlName)) customElements.define(widgetHtmlName, Widget)
-
       const element = document.createElement(widgetHtmlName) as ShaclFormWidgetSingle<any>
       element.shaclPointer = _shaclPointer
       element.messages = _messages
@@ -42,7 +41,10 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer, ui
       element.path = _path
       element.uiLanguagePriorities = uiLanguagePriorities
       element.predicate = _predicate
-      
+
+      element.fields = _fields
+      element.mapping = _mapping
+
       structure._element = element
       setWidgetInstance(element)
     }

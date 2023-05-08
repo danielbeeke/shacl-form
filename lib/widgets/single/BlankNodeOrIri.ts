@@ -27,10 +27,6 @@ export default class BlankNodeOrIri extends ShaclFormWidgetSingle<typeof BlankNo
     return factory.blankNode()
   }
 
-  async connectedCallback () {
-    this.render()
-  }
-
   render () {
     const namesPointer = this.dataPointer().out([this.predicate])
     const indexSpecificNamesPointer = namesPointer.clone({

@@ -11,5 +11,5 @@ export const bestLanguage = (pointer: any, languagePriorities: Array<string>) =>
   const score = languageScorer(pointer)
   
   /** @ts-ignore */
-  return score[0].term?.value 
+  return score?.[0]?.term?.value 
 }

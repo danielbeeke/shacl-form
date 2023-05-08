@@ -68,10 +68,10 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
             },
             get _widgets () {
               return _.once(() => {
-                const { widgets } = options
+                const { single: singleWidgets } = options.widgets
 
                 return item._alternatives.flatMap(alternative => {
-                  return Object.values(widgets).map(widget => ({
+                  return Object.values(singleWidgets).map(widget => ({
                     _shaclPointer: alternative.pointer,
                     _alternative: alternative,
                     _order: alternative.pointer.out(sh('order')).value ? parseInt(alternative.pointer.out(sh('order')).value) : 0,
@@ -118,6 +118,40 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
 
         // Set the pointer for the next round.
         pointer = pointer[predicate.value]
+      }
+    }
+  }
+
+  for (const mergedWidget of Object.values(options.widgets.merged)) {
+    const supportedCombinations: Array<{
+      [key: string]: NamedNode
+    }> = mergedWidget.supportedCombinations
+    for (const supportedCombination of supportedCombinations) {
+      let foundIncompatibility = false
+      const mapping: any = {}
+      const fields: any = {}
+      for (const [key, predicate] of Object.entries(supportedCombination)) {
+        if (!key.endsWith('?') && !level[predicate.value]) {
+          foundIncompatibility = true
+          break
+        }
+
+        if (level[predicate.value]) {
+          mapping[key.replaceAll('?', '')] = predicate
+          fields[predicate.value] = level[predicate.value]
+        }
+      }
+
+      if (!foundIncompatibility) {
+
+        level[mergedWidget.name] = { 
+          _widgets: [{
+            _mapping: mapping, 
+            _fields: fields,
+            _widget: mergedWidget,
+            _shaclPointer: shaclProperties
+          }]
+        }
       }
     }
   }

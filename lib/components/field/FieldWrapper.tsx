@@ -25,7 +25,7 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
   const name = bestLanguage(_shaclPointer.out([sh('name')]), uiLanguagePriorities)
   const description = bestLanguage(_shaclPointer.out([sh('description')]), uiLanguagePriorities)
 
-  const fieldData = dataPointer().execute(_pathPart).trim()
+  const fieldData = _pathPart ? dataPointer().execute(_pathPart).trim() : dataPointer()
 
   const element = useRef<HTMLDivElement>(null)
 
@@ -58,7 +58,7 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
   }).map(([field]) => field as JSX.Element)
 
   return (
-    <div ref={element} className={`field`} data-predicate={_predicate.value}>
+    <div ref={element} className={`field`} data-predicate={_predicate?.value}>
       {name ? (<h3>{name}</h3>) : null}
 
       {description ? (<p dangerouslySetInnerHTML={{__html: description}}></p>) : null}
