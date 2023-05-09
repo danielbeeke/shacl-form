@@ -112,7 +112,7 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
         if (nestedShape?.termType === 'NamedNode') {
           const shacl = grapoi({ dataset: shaclDataset, factory, term: nestedShape })
           const shaclProperties = shacl.hasOut([sh('property')]).trim()
-          const nestedTree = processLevel(shaclProperties, report, options, shacl, shaclDataset)
+          const nestedTree = processLevel(shaclProperties.distinct(), report, options, shacl, shaclDataset)
           Object.assign(pointer[predicate.value], nestedTree)
         }
 
@@ -129,7 +129,7 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
     for (const supportedCombination of supportedCombinations) {
       let foundIncompatibility = false
       const mapping: any = {}
-      const fields: any = {}
+      const fields: { [key: string]: any } = {}
       for (const [key, predicate] of Object.entries(supportedCombination)) {
         if (!key.endsWith('?') && !level[predicate.value]) {
           foundIncompatibility = true
@@ -144,12 +144,16 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
 
       if (!foundIncompatibility) {
 
+        for (const [_predicate, field] of Object.entries(fields)) {
+          field._usedInGroup = true
+        }
+
         level[mergedWidget.name] = { 
           _widgets: [{
             _mapping: mapping, 
             _fields: fields,
             _widget: mergedWidget,
-            _shaclPointer: shaclProperties
+            _shaclPointer: shaclProperties.distinct()
           }]
         }
       }

@@ -31,6 +31,8 @@ extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> 
     return this.dataPointer().terms[this.index]
   }
 
+  public static type = 'merged'
+
   async connectedCallback () {
     this.combinedFields = document.createElement('div')
     this.reactRoot = createRoot(this.combinedFields!)
@@ -41,7 +43,8 @@ extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> 
       uiLanguagePriorities: form.uiLanguagePriorities,
       shaclPointer: this.shaclPointer,
       dataPointer: this.dataPointer(),
-      form: form
+      form: form,
+      ignoreGroups: true
     }))
 
     this.render()

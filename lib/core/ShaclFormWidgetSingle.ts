@@ -23,6 +23,8 @@ extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> 
   public df = factory
   public uiLanguagePriorities: Array<string> = []
 
+  public static type = 'single'
+
   get value (): Term {
     return this.dataPointer()
       .out([this.predicate]).terms[this.index]

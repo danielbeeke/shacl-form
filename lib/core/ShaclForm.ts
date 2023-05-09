@@ -145,6 +145,7 @@ export const init = (options: Options) => {
             createElement(FormLevelBase, { 
               form: this,
               tree, 
+              ignoreGroups: false,
               shaclPointer: shacl,
               dataPointer: this.#data,
               key: 'form', 
@@ -199,7 +200,9 @@ export const init = (options: Options) => {
     }
 
     get uiLanguagePriorities () {
-      return this.getAttribute('ui-language-priorities')?.split(',') ?? ['*']
+      const priorities = this.getAttribute('ui-language-priorities')?.split(',') ?? ['*']
+      if (priorities.at(-1) !== '*') priorities.push('*')
+      return priorities
     }
 
     get store () {

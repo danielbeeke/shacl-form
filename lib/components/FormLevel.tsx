@@ -11,6 +11,7 @@ type FormLevelProps = {
   dataPointer: GrapoiPointer, 
   form: any, 
   shaclPointer: GrapoiPointer 
+  ignoreGroups: boolean
 }
 
 export function FormLevel ({ 
@@ -19,7 +20,8 @@ export function FormLevel ({
   uiLanguagePriorities, 
   dataPointer, 
   form, 
-  shaclPointer 
+  shaclPointer,
+  ignoreGroups = false
 }: FormLevelProps) {
   depth++
 
@@ -27,6 +29,7 @@ export function FormLevel ({
 
   const widgets = Object.entries(tree).flatMap(([predicate, field]: [any, any], outerIndex: number) => {
     if (predicate[0] === '_') return
+    if (!ignoreGroups && field._usedInGroup) return
 
     const childrenObject = Object.fromEntries(Object.entries(field as any).filter(([name]) => name[0] !== '_'))
     const children = (dataPointer: GrapoiPointer) => {
@@ -35,6 +38,7 @@ export function FormLevel ({
           dataPointer={dataPointer} 
           uiLanguagePriorities={uiLanguagePriorities} 
           form={form} 
+          ignoreGroups={ignoreGroups}
           key={hash(cid + predicate + outerIndex + 'children')} 
           shaclPointer={shaclPointer} 
           depth={depth} 
@@ -78,6 +82,8 @@ export function FormLevel ({
   /**
    * Put items from this level into groups.
    * Groups only function for one level.
+   * 
+   * TODO Should this move to shaclTree?
    */
   const groups = new Map()
 
@@ -117,10 +123,11 @@ type FormLevelBaseProps = {
   uiLanguagePriorities: Array<string>, 
   dataPointer: GrapoiPointer, 
   form: any, 
-  shaclPointer: GrapoiPointer
+  shaclPointer: GrapoiPointer,
+  ignoreGroups: boolean
 }
 
-export function FormLevelBase ({ tree, uiLanguagePriorities, dataPointer, form, shaclPointer }: FormLevelBaseProps) {
+export function FormLevelBase ({ tree, uiLanguagePriorities, dataPointer, form, shaclPointer, ignoreGroups = false }: FormLevelBaseProps) {
   return (
     <FormLevel 
       uiLanguagePriorities={uiLanguagePriorities} 
@@ -129,6 +136,7 @@ export function FormLevelBase ({ tree, uiLanguagePriorities, dataPointer, form, 
       shaclPointer={shaclPointer} 
       dataPointer={dataPointer} 
       form={form} 
+      ignoreGroups={ignoreGroups}
     />
   )
 }

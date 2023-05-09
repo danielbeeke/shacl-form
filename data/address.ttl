@@ -3,11 +3,18 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
 
 ex:name 
-  schema:address ex:address .
+  schema:address ex:address1, ex:address2 .
 
-ex:address 
-  schema:streetAddress "Ganzenstraat 3882" ;
-  schema:addressRegion "Utrecht" ;
-  schema:addressLocality "Amersfoort" ;
-  schema:postalCode "3815 JK" ;
+ex:address1
+  schema:streetAddress "Oosterdokskade 67" ;
+  schema:addressRegion "Noord Holland" ;
+  schema:addressLocality "Amsterdam" ;
+  schema:postalCode "1011 DL" ;
   schema:addressCountry "NL" .
+
+ex:address2
+  schema:streetAddress "Hauptplatz 12 Rosenarcade" ;
+  schema:addressRegion "Tulln an der Donau" ;
+  schema:addressLocality "Lower Austria" ;
+  schema:postalCode "3430" ;
+  schema:addressCountry "AT" .

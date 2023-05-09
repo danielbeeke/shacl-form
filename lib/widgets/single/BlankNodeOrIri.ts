@@ -43,9 +43,9 @@ export default class BlankNodeOrIri extends ShaclFormWidgetSingle<typeof BlankNo
     // console.log({ enforceIri, enforceBlankNode, iriAndBlankNodeAllowed})
 
     render(this, html`
-      <h2>
+      <span>
         ${name ?? this.value?.value} 
-        <em>(${this.value?.termType})</em>
+        <em>${this.value?.value} (${this.value?.termType})</em>
 
         ${this.value?.termType === 'BlankNode' && !this.showIdentifier && !enforceIri ? html`
         <button onClick=${() => {
@@ -64,7 +64,7 @@ export default class BlankNodeOrIri extends ShaclFormWidgetSingle<typeof BlankNo
         }}>Remove identifier</button>
         ` : null}
 
-      </h2>
+      </span>
 
       ${this.showIdentifier || enforceIri && this.value?.termType === 'BlankNode' ? html`
         <input type="url" required placeholder="https://example.com" onChange=${(event: any) => {

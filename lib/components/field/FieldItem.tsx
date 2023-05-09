@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { ShaclFormWidgetSingle } from '../../core/ShaclFormWidgetSingle'
 import { GrapoiPointer, Widget } from '../../types'
-import { sh } from '../../helpers/namespaces'
+import { sh, schema } from '../../helpers/namespaces'
 import { cast } from '../../helpers/cast'
+import { ShaclFormWidgetMerged } from '../../core/ShaclFormWidgetMerged'
 
 type FieldItemProps = {
   structure: Widget, 
@@ -42,8 +43,8 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer, ui
       element.uiLanguagePriorities = uiLanguagePriorities
       element.predicate = _predicate
 
-      element.fields = _fields
-      element.mapping = _mapping
+      ;(element as unknown as ShaclFormWidgetMerged<any>).fields = _fields
+      ;(element as unknown as ShaclFormWidgetMerged<any>).mapping = _mapping
 
       structure._element = element
       setWidgetInstance(element)
@@ -65,7 +66,9 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer, ui
 
   const minCount = cast(_shaclPointer.out([sh('minCount')]))
   const value = dataPointer().out([_predicate]).terms[index]
-  const showRemove = value.value && (minCount === undefined || minCount < pointer.ptrs.length)
+  let showRemove = value?.value && (minCount === undefined || minCount < pointer.ptrs.length)
+
+  if (Widget.type === 'merged') showRemove = false
 
   return (
     <div className="item">

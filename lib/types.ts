@@ -24,6 +24,7 @@ export type GrapoiPointer = {
   addOut: (predicates?: Array<any> | any, objects?: Array<any> | any) => GrapoiPointer,
   quads: () => Array<Quad>
   trim(): GrapoiPointer
+  distinct(): GrapoiPointer
   values: Array<any>
   filter: (item: any) => boolean
   value: any
@@ -75,6 +76,10 @@ export type Widget = {
     warnings: Array<string>
   },
   _element: ShaclFormWidgetSingle<any>
+  _fields: Array<any>,
+  _mapping: {
+    [key: string]: NamedNode
+  }
 }
 
 export type TreeItem = {

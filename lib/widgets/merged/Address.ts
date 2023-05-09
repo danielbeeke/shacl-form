@@ -22,35 +22,43 @@ export default class Address extends ShaclFormWidgetMerged<typeof Address> {
 
   public showAdvanced = false
 
-  render () {
+  static createNewObject () {
+    return factory.blankNode()
+  }
 
+  render () {
     const labelsAndValues = this.getValuesWithLabels()
 
     render(this, html`
-
-      <p>
-        ${labelsAndValues.map(({ label, value, key }) => {
-          let valueText = value.value
-
-          // Display ISO country codes as labels.
-          if (key === 'country') {
-            const valueTextReplacement = iso31661.find(item => valueText.length === 2 ? item.alpha2 === valueText : item.alpha3 === valueText)
-            if (valueTextReplacement) valueText = valueTextReplacement.name
-          }
-
-          return html`<label>${label}</label>: ${valueText}<br />`
-        })}
-      </p>
-
       ${this.showAdvanced ? this.combinedFields : html`
-        <input type="search" onChange=${async (event: InputEvent) => {
+        <p>
+          ${labelsAndValues.map(({ label, value, key }) => {
+            let valueText = value.value
+
+            // Display ISO country codes as labels.
+            if (key === 'country') {
+              const valueTextReplacement = iso31661.find(item => valueText.length === 2 ? item.alpha2 === valueText : item.alpha3 === valueText)
+              if (valueTextReplacement) valueText = valueTextReplacement.name
+            }
+
+            return html`<label>${label}</label>: ${valueText}<br />`
+          })}
+        </p>
+
+        <input type="search" placeholder="Search" onChange=${async (event: InputEvent) => {
           const results = await this.form.options.plugins.geocoder.search((event.target as HTMLInputElement).value)
           if (results) {
             const street = `${results.street ?? ''} ${results.number ?? ''}`.trim()
 
+            const postalCode = results.postalCode ? (
+              typeof results.postalCode === 'number' || parseInt(results.postalCode).toString() === results.postalCode ? 
+                factory.literal(results.postalCode, xsd('number')) : 
+                factory.literal(results.postalCode)
+            ) : undefined
+
             this.setValues({
               street: street ? factory.literal(street) : undefined,
-              postalCode: results.postalCode ? factory.literal(results.postalCode) : undefined,
+              postalCode: postalCode ? postalCode : undefined,
               locality: results.locality ? factory.literal(results.locality) : undefined,
               region: results.region ? factory.literal(results.region) : undefined,
               country: results.country ? factory.literal(results.country) : undefined,
@@ -60,6 +68,8 @@ export default class Address extends ShaclFormWidgetMerged<typeof Address> {
           }
         }} />      
       `}
+
+      <br />
 
       <button onClick=${() => {
         this.showAdvanced = !this.showAdvanced
