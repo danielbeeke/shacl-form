@@ -1,6 +1,7 @@
 import type { NamedNode, Quad, Term } from '@rdfjs/types'
 import { ShaclFormWidgetSingle } from './core/ShaclFormWidgetSingle'
 import { GeocoderBase } from './plugins/GeoCoder/GeoCoderBase'
+import { FileUploaderBase } from './plugins/FileUploader/FileUploaderBase'
 export type { BlankNode, Literal, Quad, Variable, NamedNode, Term } from '@rdfjs/types'
 
 export type ShaclProperties = {
@@ -54,7 +55,8 @@ export type Options = {
   },
   enhancer: any,
   plugins: {
-    geocoder: GeocoderBase
+    geocoder: GeocoderBase,
+    fileuploader: FileUploaderBase
   }
 }
 

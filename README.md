@@ -42,3 +42,9 @@ HTML attributes on the customElement:
 
 - https://docs.google.com/document/d/1hOTMH9mhzSjVzCK0HL5f_B8GHie9PcsXqYAFxr-nPNM/edit#heading=h.4ikvkr55u1o1
 - https://docs.google.com/document/d/1U1fHwFZUKjjIRG7gxsJrBNMHXkEs7pR2e3IkeK7qh5U/edit#heading=h.4ikvkr55u1o1
+
+
+## Development mode for file upload
+
+npm install -g companion
+companion --config companion.json

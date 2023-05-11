@@ -1,0 +1,19 @@
+export default {
+  "filePath": "../tmp",
+  "secret": "YOUR-SECRET",
+  "server": {
+    "protocol": "http",
+    "path": "",
+    "host": "localhost"
+  },
+  "s3": {
+      "endpoint": "ENDPOINT",
+      "region": "REGION",
+      "bucket": "BUCKET",
+      "key": "KEY",
+      "secret": "SECRET",
+      getKey: (req, filename, metadata) => {
+        return filename
+      },
+  }
+}

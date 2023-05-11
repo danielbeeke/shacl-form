@@ -50,7 +50,7 @@ export function FormLevel ({
     const widgets = field._widgets
 
     for (const widget of widgets) {
-      widget._score = widget._widget.score(widget._shaclPointer, dataPointer)
+      widget._score = widget._widget.score(widget._shaclPointer, dataPointer, form.options)
     }
 
     return widgets?.length ? widgets

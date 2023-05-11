@@ -20,6 +20,7 @@
     "@types/rdfjs__namespace": "^2.0.3",
     "@types/rdfjs__score": "^0.1.1",
     "@types/react-dom": "^18.0.11",
+    "@uppy/companion": "^4.5.0",
     "patch-package": "^6.5.1",
     "sass": "^1.62.1",
     "typescript": "^5.0.3",
@@ -42,5 +43,10 @@
     "react-dom": "^18.2.0",
     "shacl-engine": "^0.1.0",
     "uhtml": "^3.1.0"
+  },
+  "peerDependencies": {
+    "@uppy/aws-s3-multipart": "^3.3.0",
+    "@uppy/core": "^3.2.0",
+    "@uppy/dashboard": "^3.4.0"
   }
 }

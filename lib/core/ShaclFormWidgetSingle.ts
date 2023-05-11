@@ -58,6 +58,8 @@ extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> 
     return this.closest('.shacl-form') as ShaclFormType
   }
 
+  async beforeRemove () {}
+
   async connectedCallback () {
     this.render()
   }

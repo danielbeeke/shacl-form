@@ -1,6 +1,9 @@
-import '../lib/index'
+import defaultOptions from '../lib/defaultOptions'
+import { init } from '../lib/core/ShaclForm'
 import factory from 'rdf-ext'
 import { schema } from '../lib/helpers/namespaces'
+
+init(defaultOptions)
 
 const demos = [
   {
@@ -44,6 +47,14 @@ const demos = [
     // contentLanguage: 'en,fr,de',
     activeContentLanguage: 'en',
     enhance: true
+  },
+  {
+    title: 'BackBlaze storage, needs ENV variables',
+    shaclUrl: '../shapes/storage.shacl.ttl?raw',
+    shaclIri: 'http://example.com/RootShape',
+    dataIri: 'http://example.com/name',
+    // contentLanguage: 'en,fr,de',
+    activeContentLanguage: 'en',
   },
 ]
 

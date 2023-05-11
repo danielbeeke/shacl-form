@@ -14,6 +14,9 @@ export default defineConfig({
     watchExtensions(['ttl'])
   ],
   define: {
-    'import.meta.env.POSITIONSTACK': JSON.stringify(process.env.POSITIONSTACK)
+    'import.meta.env.POSITIONSTACK': JSON.stringify(process.env.POSITIONSTACK),
+    'import.meta.env.S3DOMAIN': JSON.stringify(process.env.S3DOMAIN),
+    'import.meta.env.COMPANION': JSON.stringify(process.env.COMPANION),
+    '__dirname': '"/"'
   }  
 })

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ShaclFormWidgetSingle } from '../../core/ShaclFormWidgetSingle'
 import { GrapoiPointer, Widget } from '../../types'
-import { sh, schema } from '../../helpers/namespaces'
+import { sh } from '../../helpers/namespaces'
 import { cast } from '../../helpers/cast'
 import { ShaclFormWidgetMerged } from '../../core/ShaclFormWidgetMerged'
 
@@ -14,7 +14,9 @@ type FieldItemProps = {
   uiLanguagePriorities: Array<string>
 }
 
-const removeItem = (element: ShaclFormWidgetSingle<any>) => {
+const removeItem = async (element: ShaclFormWidgetSingle<any>) => {
+  await element.beforeRemove()
+
   let resolvedPointer = element.dataPointer().trim().out([element.predicate], [element.value as any])
   const quadsToRemove = new Set()
   while ([...resolvedPointer.quads()].length) {
