@@ -34,6 +34,9 @@
     "@rdfjs/namespace": "^2.0.0",
     "@rdfjs/score": "^0.1.1",
     "bcp47-picker": "^1.0.14",
+    "filepond": "^4.30.4",
+    "filepond-plugin-image-exif-orientation": "^1.0.11",
+    "filepond-plugin-image-preview": "^4.6.11",
     "grapoi": "^1.0.0",
     "intl-polyfill": "^0.0.3",
     "lodash-es": "^4.17.21",
@@ -41,12 +44,8 @@
     "rdf-ext": "^2.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-filepond": "^7.1.2",
     "shacl-engine": "^0.1.0",
     "uhtml": "^3.1.0"
-  },
-  "peerDependencies": {
-    "@uppy/aws-s3-multipart": "^3.3.0",
-    "@uppy/core": "^3.2.0",
-    "@uppy/dashboard": "^3.4.0"
   }
 }

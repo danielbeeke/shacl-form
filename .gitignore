@@ -24,4 +24,4 @@ tmp
 *.sln
 *.sw?
 
-companion-options.js
+storage.env.ts

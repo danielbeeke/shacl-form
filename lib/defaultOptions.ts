@@ -31,7 +31,7 @@ export default {
       BlankNodeOrIri,
       Date,
       FileUpload: createFileUpload({
-        companionUrl: import.meta.env.COMPANION ?? 'http://localhost:3020'
+        backend: import.meta.env.STORAGE_BACKEND ?? 'http://localhost:8000'
       })
     },
     merged: {
