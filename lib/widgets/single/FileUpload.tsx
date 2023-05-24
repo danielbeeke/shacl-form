@@ -1,13 +1,13 @@
 import factory from 'rdf-ext'
 import { ShaclFormWidgetSingleReact } from '../../core/ShaclFormWidgetSingleReact'
-import { useState } from 'react'
+import { useRef } from 'react'
 import { FilePond, registerPlugin } from 'react-filepond'
 import 'filepond/dist/filepond.min.css'
 import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
-import { FilePondFile } from 'filepond'
-import { dash } from '../../helpers/namespaces'
+import { dash, shFrm } from '../../helpers/namespaces'
+import { FilePondInitialFile } from 'filepond'
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview)
 
 type FileUploadOptions = {
@@ -30,25 +30,61 @@ export class FileUpload extends ShaclFormWidgetSingleReact<typeof FileUpload> {
     this.render()
   }
 
-  async beforeRemove () {
-
-  }
-
   template () {
-    const [files, setFiles] = useState<Array<FilePondFile>>([])
+    const filePond = useRef<FilePond>(null)
+
+    const initialFiles: Array<FilePondInitialFile> = this.dataPointer().out([this.predicate]).values.map(value => ({ 
+      source: value,
+      options: { 
+        type: 'local',
+      }
+    }))
+
     const uriStart = this.shaclPointer.out([dash('uriStart')]).value
-    const server = `${FileUpload.options.backend}/${uriStart}/`
+    const prefix = uriStart.split(/\/|#/g).pop()
+
+    const server = {
+      url: `${FileUpload.options.backend}/${prefix}/`, 
+      load: (source: string, load: Function, error: Function, progress: Function, abort: Function, headers: Function) => {
+        fetch(source)
+          .then(response => response.blob())
+          .then(blob => {
+            progress(false, blob.size, blob.size);
+            load(blob)
+          })
+          .catch(() => error('Something went wrong fetching the file'))
+
+        return { abort }
+      },
+      remove: async (source: string, load: Function, error: Function) => {
+        this.dataPointer().deleteOut([this.predicate], [factory.namedNode(source)])
+
+        fetch(source, { method: 'DELETE' })
+       .catch(() => error())
+       .finally(() => load())
+      }
+    }
 
     return (
+      <>
+      <span>{this.value?.value}</span>
       <FilePond
-        files={files}
+        ref={filePond}
+        onprocessfile={(error, file) => {
+          if (!error) {
+            this.dataPointer().addOut([this.predicate], [factory.namedNode(uriStart + '/' + file.serverId)])
+          }
+        }}
+        files={initialFiles}
+        instantUpload={false}
         credits={false}
-        onupdatefiles={(files) => setFiles(files)}
+        // onupdatefiles={files => console.log(files[0])}
         allowMultiple={true}
         server={server}
         name="files"
-        labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
+        labelIdle='Drag & Drop your files or <span>Browse</span>'
       />
+      </>
     )
   }
 

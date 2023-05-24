@@ -2,7 +2,11 @@ import { Storage } from 'npm:@tweedegolf/storage-abstraction'
 import { Application, Context } from "https://deno.land/x/oak/mod.ts";
 import { env } from './storage.env.ts'
 import { Readable } from 'node:stream'
-
+import { mime } from "https://deno.land/x/mimetypes@v1.0.0/src/mime.ts"
+/**
+ * Here is a development storage connection.
+ * You can use this implementation to make something similar but then ofcourse with access control.
+ */
 const app = new Application();
 const buckets: { [key: string]: Storage } = {}
 
@@ -31,16 +35,20 @@ app.use(async (ctx: Context) => {
 
     if (method === 'GET') {
       const reader = await bucket.getFileAsReadable(path)
+      /** @ts-ignore */
+      ctx.response.headers.set('Content-type', mime.getType(path))
       ctx.response.body = Readable.toWeb(reader)
     }
     else if (method === 'DELETE') {
-      const filePath = await ctx.request.body({ type: 'text' }).value
-      await bucket.removeFile(filePath)
+      const bodyFilePath = await ctx.request.body({ type: 'text' }).value
+      const filePath = bodyFilePath.trim() ? bodyFilePath : path
+      await bucket.removeFile(filePath.trim() ? filePath : path)
       ctx.response.body = { success: true } 
     }
     else if (method === 'POST') {
       const formValues = await ctx.request.body({ type: 'form-data' }).value
       const requestData = await formValues.read()
+      /** @ts-ignore */
       const [file] = requestData.files
 
       const filePath = file.filename
@@ -56,7 +64,6 @@ app.use(async (ctx: Context) => {
     }
   }
   catch (exception) {
-    console.log(exception)
     ctx.response.status = exception.statusCode ?? 404
     ctx.response.body = {
       error: exception.message ?? exception
@@ -64,4 +71,5 @@ app.use(async (ctx: Context) => {
   }
 })
 
+console.log('Running storage demo on localhost:8000')
 await app.listen({ port: 8000 })

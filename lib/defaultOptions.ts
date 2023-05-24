@@ -31,7 +31,7 @@ export default {
       BlankNodeOrIri,
       Date,
       FileUpload: createFileUpload({
-        backend: import.meta.env.STORAGE_BACKEND ?? 'http://localhost:8000'
+        backend: import.meta.env.STORAGE_BACKEND ?? 'http://localhost:8000/local'
       })
     },
     merged: {
