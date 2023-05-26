@@ -84,6 +84,7 @@ export function FormLevel ({
    * Groups only function for one level.
    * 
    * TODO Should this move to shaclTree?
+   * TODO Should these be framework agnostic?
    */
   const groups = new Map()
 

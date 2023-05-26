@@ -1,6 +1,6 @@
 import type { GrapoiPointer, Term, NamedNode, ShaclFormType } from '../types'
 import factory from 'rdf-ext'
-import { IShaclFormWidgetConstructor, StaticImplements } from './ShaclFormWidget'
+import { IShaclFormEditorConstructor, StaticImplements } from './ShaclFormEditor'
 import { createRoot, Root } from 'react-dom/client'
 import { FormLevelBase } from '../components/FormLevel'
 import { createElement } from 'react'
@@ -8,8 +8,8 @@ import { rdfs, sh } from '../helpers/namespaces'
 import { bestLanguage } from '../helpers/bestLanguage'
 import parsePath from 'shacl-engine/lib/parsePath.js'
 
-export abstract class ShaclFormWidgetMerged<T extends IShaclFormWidgetConstructor> 
-extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> {
+export abstract class ShaclFormEditorMerged<T extends IShaclFormEditorConstructor> 
+extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> {
 
   public path: any
   public predicate: NamedNode = factory.namedNode('')

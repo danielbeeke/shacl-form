@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ShaclFormWidgetSingle } from '../../core/ShaclFormWidgetSingle'
+import { ShaclFormEditorSingle } from '../../core/ShaclFormEditorSingle'
 import { GrapoiPointer, Widget } from '../../types'
 import { sh } from '../../helpers/namespaces'
 import { cast } from '../../helpers/cast'
-import { ShaclFormWidgetMerged } from '../../core/ShaclFormWidgetMerged'
+import { ShaclFormEditorMerged } from '../../core/ShaclFormEditorMerged'
 
 type FieldItemProps = {
   structure: Widget, 
@@ -14,7 +14,8 @@ type FieldItemProps = {
   uiLanguagePriorities: Array<string>
 }
 
-const removeItem = async (element: ShaclFormWidgetSingle<any>) => {
+// TODO move to the element?
+const removeItem = async (element: ShaclFormEditorSingle<any>) => {
   await element.beforeRemove()
 
   let resolvedPointer = element.dataPointer().trim().out([element.predicate], [element.value as any])
@@ -29,14 +30,14 @@ const removeItem = async (element: ShaclFormWidgetSingle<any>) => {
 }
 
 export function FieldItem ({ structure, Widget, index, children, dataPointer, uiLanguagePriorities }: FieldItemProps) {
-  const [widgetInstance, setWidgetInstance] = useState<ShaclFormWidgetSingle<any>>()
+  const [widgetInstance, setWidgetInstance] = useState<ShaclFormEditorSingle<any>>()
   const { _shaclPointer: _shaclPointer, _messages, _path, _predicate, _fields, _mapping } = structure
 
   useEffect(() => {
     if (!widgetInstance) {
       const widgetHtmlName = 'sf-' + Widget.name.toLowerCase()
       if (!customElements.get(widgetHtmlName)) customElements.define(widgetHtmlName, Widget)
-      const element = document.createElement(widgetHtmlName) as ShaclFormWidgetSingle<any>
+      const element = document.createElement(widgetHtmlName) as ShaclFormEditorSingle<any>
       element.shaclPointer = _shaclPointer
       element.messages = _messages
       element.dataPointer = dataPointer
@@ -45,8 +46,8 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer, ui
       element.uiLanguagePriorities = uiLanguagePriorities
       element.predicate = _predicate
 
-      ;(element as unknown as ShaclFormWidgetMerged<any>).fields = _fields
-      ;(element as unknown as ShaclFormWidgetMerged<any>).mapping = _mapping
+      ;(element as unknown as ShaclFormEditorMerged<any>).fields = _fields
+      ;(element as unknown as ShaclFormEditorMerged<any>).mapping = _mapping
 
       structure._element = element
       setWidgetInstance(element)

@@ -1,12 +1,14 @@
 import factory from 'rdf-ext'
-import { ShaclFormWidgetSingleReact } from '../../core/ShaclFormWidgetSingleReact'
+import { ShaclFormEditorSingleReact } from '../../core/ShaclFormEditorSingleReact'
 import { useRef } from 'react'
+import { GrapoiPointer } from '../../types'
 import { FilePond, registerPlugin } from 'react-filepond'
 import 'filepond/dist/filepond.min.css'
 import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
-import { dash, shFrm } from '../../helpers/namespaces'
+import { dash, xsd } from '../../helpers/namespaces'
+import { scorer } from '../../core/Scorer'
 import { FilePondInitialFile } from 'filepond'
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview)
 
@@ -14,12 +16,14 @@ type FileUploadOptions = {
   backend: string
 }
 
-export class FileUpload extends ShaclFormWidgetSingleReact<typeof FileUpload> {
+export class FileUpload extends ShaclFormEditorSingleReact<typeof FileUpload> {
 
   public static options: FileUploadOptions
 
-  static score() {
-    return 200
+  static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
+    return scorer(shaclPointer, dataPointer)
+      .has(dash('uriStart'))
+      .toNumber()
   }
 
   static createNewObject (form: any) {

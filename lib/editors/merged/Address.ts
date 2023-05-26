@@ -4,9 +4,9 @@ import { html, render } from 'uhtml' // You could use React, Vue, Angular, basic
 import factory from 'rdf-ext'
 import { iso31661 } from 'iso-3166'
 
-import { ShaclFormWidgetMerged } from '../../core/ShaclFormWidgetMerged'
+import { ShaclFormEditorMerged } from '../../core/ShaclFormEditorMerged'
 
-export default class Address extends ShaclFormWidgetMerged<typeof Address> {
+export default class Address extends ShaclFormEditorMerged<typeof Address> {
 
   static supportedCombinations: Array<{ [key: string]: NamedNode }> = [
     {
@@ -46,7 +46,7 @@ export default class Address extends ShaclFormWidgetMerged<typeof Address> {
         </p>
 
         <input type="search" placeholder="Search" onChange=${async (event: InputEvent) => {
-          const results = await this.form.options.plugins.geocoder.search((event.target as HTMLInputElement).value)
+          const results = await this.form.options.plugins.geocoder!.search((event.target as HTMLInputElement).value)
           if (results) {
             const street = `${results.street ?? ''} ${results.number ?? ''}`.trim()
 

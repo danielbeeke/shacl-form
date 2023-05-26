@@ -1,14 +1,14 @@
 import { Enhancer } from './core/Enhancer'
 
 // Single Widgets
-import String from './widgets/single/String'
-import BlankNodeOrIri from './widgets/single/BlankNodeOrIri'
-import Date from './widgets/single/Date'
-import LanguageString from './widgets/single/LanguageString'
-import createFileUpload from './widgets/single/FileUpload'
+import String from './editors/single/String'
+import BlankNodeOrIri from './editors/single/BlankNodeOrIri'
+import Date from './editors/single/Date'
+import LanguageString from './editors/single/LanguageString'
+import createFileUpload from './editors/single/FileUpload'
 
 // Merged Widgets
-import Address from './widgets/merged/Address'
+import Address from './editors/merged/Address'
 
 // Groups
 import Buttons, { iri as buttonsIri } from './components/groups/Buttons'

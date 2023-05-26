@@ -1,5 +1,5 @@
-import { IShaclFormWidgetConstructor, StaticImplements } from './ShaclFormWidget'
-import { ShaclFormWidgetSingle } from './ShaclFormWidgetSingle'
+import { IShaclFormEditorConstructor, StaticImplements } from './ShaclFormEditor'
+import { ShaclFormEditorSingle } from './ShaclFormEditorSingle'
 import { createRoot, Root } from 'react-dom/client'
 import { createElement } from 'react'
 
@@ -7,8 +7,8 @@ import { createElement } from 'react'
  * Use <input defaultValue={this.value.value ?? ''} onBlur={} /> instead of <input value={this.value.value ?? ''} onChange={} />
  * Because React's onChange is not really an onChange event but an keyUp event.
  */
-export abstract class ShaclFormWidgetSingleReact<T extends IShaclFormWidgetConstructor> 
-extends ShaclFormWidgetSingle<T> implements StaticImplements<IShaclFormWidgetConstructor, T> {
+export abstract class ShaclFormEditorSingleReact<T extends IShaclFormEditorConstructor> 
+extends ShaclFormEditorSingle<T> implements StaticImplements<IShaclFormEditorConstructor, T> {
 
   #root: Root | undefined
   #boundTemplate: any

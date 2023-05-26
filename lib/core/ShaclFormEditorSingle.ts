@@ -1,9 +1,9 @@
 import type { GrapoiPointer, Term, NamedNode, ShaclFormType } from '../types'
 import factory from 'rdf-ext'
-import { IShaclFormWidgetConstructor, StaticImplements } from './ShaclFormWidget'
+import { IShaclFormEditorConstructor, StaticImplements } from './ShaclFormEditor'
 
-export abstract class ShaclFormWidgetSingle<T extends IShaclFormWidgetConstructor> 
-extends HTMLElement implements StaticImplements<IShaclFormWidgetConstructor, T> {
+export abstract class ShaclFormEditorSingle<T extends IShaclFormEditorConstructor> 
+extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> {
 
   public messages: {
     errors: Array<string>,

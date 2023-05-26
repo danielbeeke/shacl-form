@@ -13,6 +13,7 @@ type FieldWrapperProps = {
   form: any
 }
 
+// TODO move to element?
 const addItem = (pointer: GrapoiPointer, predicate: NamedNode, elementRef: any, Widget: any, _pathPart: any) => {
   const form = elementRef.current.closest('.shacl-form')
   pointer.addOut(predicate, Widget.createNewObject(form))

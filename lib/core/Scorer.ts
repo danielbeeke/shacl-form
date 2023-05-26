@@ -36,6 +36,17 @@ export class Scorer {
     return this
   }
 
+  has (predicates: Array<NamedNode>, score?: number): this
+  has (predicate: NamedNode, score?: number): this
+  has (input: Array<NamedNode> | NamedNode, score: number = 10) {
+    const predicates = Array.isArray(input) ? input : [input]
+    const hasMatch = this.#shaclPointer.out(predicates).terms.length > 0
+
+    if (hasMatch) this.#scores.push({ type: 'hash', score })
+    else this.#foundIncompatibility = true
+    return this
+  }
+
   nodeKind (accepedKinds: Array<NamedNode>, score: number = 1) {
     const kinds = this.#shaclPointer.out([sh('nodeKind')]).terms
     const isAllowed = kinds.length && kinds.every(kind => accepedKinds.some(acceptedKind => acceptedKind.equals(kind)))

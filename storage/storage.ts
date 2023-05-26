@@ -3,6 +3,24 @@ import { Application, Context } from "https://deno.land/x/oak/mod.ts";
 import { env } from './storage.env.ts'
 import { Readable } from 'node:stream'
 import { mime } from "https://deno.land/x/mimetypes@v1.0.0/src/mime.ts"
+
+const files =  Deno.readDir('./tmp/test')
+
+const filePaths: Array<string> = []
+for await (const file of files) {
+  if (file.isFile) filePaths.push(file.name)
+}
+
+const  newFileContents = `
+@prefix schema: <https://schema.org/>.
+@prefix ex: <http://example.com/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+ex:name 
+  schema:url ${filePaths.map(filePath => `<http://localhost:8000/local/test/${encodeURIComponent(filePath)}>`)} .
+`
+await Deno.writeTextFile('../data/storage.ttl', newFileContents)
+
 /**
  * Here is a development storage connection.
  * You can use this implementation to make something similar but then ofcourse with access control.
@@ -34,7 +52,7 @@ app.use(async (ctx: Context) => {
     })
 
     if (method === 'GET') {
-      const reader = await bucket.getFileAsReadable(path)
+      const reader = await bucket.getFileAsReadable(decodeURIComponent(path))
       /** @ts-ignore */
       ctx.response.headers.set('Content-type', mime.getType(path))
       ctx.response.body = Readable.toWeb(reader)

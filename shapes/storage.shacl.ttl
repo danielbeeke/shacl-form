@@ -15,6 +15,5 @@ ex:RootShape
 		sh:name "File upload"@en ;
 		sh:datatype xsd:string;
 		dash:uriStart "http://localhost:8000/test" ;
-		sh:maxCount 1;
 	] ;
   .

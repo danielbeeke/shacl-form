@@ -1,11 +1,11 @@
 import type { GrapoiPointer, Term, Options } from '../types'
 
-export interface IShaclFormWidgetConstructor {
-  new(): IShaclFormField;
+export interface IShaclFormEditorConstructor {
+  new(): IShaclFormEditor;
   score (shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer, options: Options): number
 }
 
-export interface IShaclFormField extends HTMLElement {
+export interface IShaclFormEditor extends HTMLElement {
   shaclPointer: GrapoiPointer,
   dataPointer: () => GrapoiPointer,
   value: Term

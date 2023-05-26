@@ -1,4 +1,4 @@
-import { ShaclFormWidgetSingle } from '../../core/ShaclFormWidgetSingle'
+import { ShaclFormEditorSingle } from '../../core/ShaclFormEditorSingle'
 import { GrapoiPointer, BlankNode } from '../../types'
 import { scorer } from '../../core/Scorer'
 import { schema, rdfs, sh } from '../../helpers/namespaces'
@@ -11,7 +11,7 @@ import { swapSubject } from '../../helpers/swapSubject'
  * TODO add support for: dash:stem and / or dash:uriStart
  * TODO Add edit mode
  */
-export default class BlankNodeOrIri extends ShaclFormWidgetSingle<typeof BlankNodeOrIri> {
+export default class BlankNodeOrIri extends ShaclFormEditorSingle<typeof BlankNodeOrIri> {
 
   public showIdentifier = false
   public identifierSuggestion = ''
