@@ -1,22 +1,15 @@
-import factory from 'rdf-ext'
-import { ShaclFormEditorSingleReact } from '../../core/ShaclFormEditorSingleReact'
-import { useRef } from 'react'
+import { ShaclFormSingleEditorReact } from '../../core/ShaclFormSingleEditorReact'
 import { GrapoiPointer } from '../../types'
-import { FilePond, registerPlugin } from 'react-filepond'
-import 'filepond/dist/filepond.min.css'
-import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
-import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
-import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
 import { dash, xsd } from '../../helpers/namespaces'
 import { scorer } from '../../core/Scorer'
-import { FilePondInitialFile } from 'filepond'
-registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview)
+import Dropzone from 'react-dropzone'
+import factory from 'rdf-ext'
 
 type FileUploadOptions = {
   backend: string
 }
 
-export class FileUpload extends ShaclFormEditorSingleReact<typeof FileUpload> {
+export class FileUpload extends ShaclFormSingleEditorReact<typeof FileUpload> {
 
   public static options: FileUploadOptions
 
@@ -26,72 +19,51 @@ export class FileUpload extends ShaclFormEditorSingleReact<typeof FileUpload> {
       .toNumber()
   }
 
-  static createNewObject (form: any) {
-    return factory.namedNode('')
-  }
-
-  async connectedCallback () {
-    this.render()
-  }
-
   template () {
-    const filePond = useRef<FilePond>(null)
+    return (<img className='file-upload-image' src={this.value.value} />)
+  }
 
-    const initialFiles: Array<FilePondInitialFile> = this.dataPointer().out([this.predicate]).values.map(value => ({ 
-      source: value,
-      options: { 
-        type: 'local',
-      }
-    }))
-
-    const uriStart = this.shaclPointer.out([dash('uriStart')]).value
-    const prefix = uriStart.split(/\/|#/g).pop()
-
-    const server = {
-      url: `${FileUpload.options.backend}/${prefix}/`, 
-      load: (source: string, load: Function, error: Function, progress: Function, abort: Function, headers: Function) => {
-        fetch(source)
-          .then(response => response.blob())
-          .then(blob => {
-            progress(false, blob.size, blob.size);
-            load(blob)
-          })
-          .catch(() => error('Something went wrong fetching the file'))
-
-        return { abort }
-      },
-      remove: async (source: string, load: Function, error: Function) => {
-        this.dataPointer().deleteOut([this.predicate], [factory.namedNode(source)])
-
-        fetch(source, { method: 'DELETE' })
-       .catch(() => error())
-       .finally(() => load())
-      }
-    }
-
+  header () {
     return (
       <>
-      <span>{this.value?.value}</span>
-      <FilePond
-        ref={filePond}
-        onprocessfile={(error, file) => {
-          if (!error) {
-            this.dataPointer().addOut([this.predicate], [factory.namedNode(uriStart + '/' + file.serverId)])
-          }
-        }}
-        files={initialFiles}
-        instantUpload={false}
-        credits={false}
-        // onupdatefiles={files => console.log(files[0])}
-        allowMultiple={true}
-        server={server}
-        name="files"
-        labelIdle='Drag & Drop your files or <span>Browse</span>'
-      />
+        <Dropzone onDrop={(files) => this.addFiles(files)}>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <p>Drag some files here or click to select files</p>
+            </div>
+          )}
+        </Dropzone>
       </>
     )
   }
 
+  async addFiles (files: Array<File>) {
+    const uriStart = this.shaclPointer.out([dash('uriStart')]).value
+    const prefix = uriStart.split(/\/|#/g).pop()
+    
+    for (const file of files) {
+      const formData = new FormData()
+      formData.append('files', file)
+
+      const response = await fetch(`${FileUpload.options.backend}/${prefix}/`, {
+        body: formData,
+        method: 'POST'
+      })
+
+      const filePath = await response.text()
+
+      this.addValue(factory.namedNode(filePath))
+    }
+
+    this.render()
+  }
+
+  async beforeRemove () {
+    const response = await fetch(this.value.value, { method: 'DELETE' })
+    const output = await response.json()
+    return output.success === true
+  }
 }
 
 export default function createFileUpload (options: FileUploadOptions) {

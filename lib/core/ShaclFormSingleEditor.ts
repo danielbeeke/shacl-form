@@ -2,7 +2,7 @@ import type { GrapoiPointer, Term, NamedNode, ShaclFormType } from '../types'
 import factory from 'rdf-ext'
 import { IShaclFormEditorConstructor, StaticImplements } from './ShaclFormEditor'
 
-export abstract class ShaclFormEditorSingle<T extends IShaclFormEditorConstructor> 
+export abstract class ShaclFormSingleEditor<T extends IShaclFormEditorConstructor> 
 extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> {
 
   public messages: {
@@ -22,6 +22,8 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
   public dataPointer: () => GrapoiPointer = () => ({} as GrapoiPointer)
   public df = factory
   public uiLanguagePriorities: Array<string> = []
+  public isHeader: boolean = false
+  public isFooter: boolean = false
 
   public static type = 'single'
 
@@ -50,6 +52,26 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
     })()
   }
 
+  addValue (newValue: Term) {
+    (async () => {
+      this.dataPointer()
+        .addOut(this.predicate, newValue)
+
+      const event = new CustomEvent('value.set', {
+        detail: {
+          predicate: this.predicate,
+          object: newValue,
+          dataPointer: this.dataPointer(),
+          shaclPointer: this.shaclPointer,
+          element: this
+        }
+      })
+      this.form.dispatchEvent(event)
+      this.renderAll()
+    })()
+  }
+
+
   renderAll () {
     this.form.render()
   }
@@ -58,11 +80,21 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
     return this.closest('.shacl-form') as ShaclFormType
   }
 
-  async beforeRemove () {}
+  async beforeRemove (): Promise<boolean> {
+    return true
+  }
 
   async connectedCallback () {
     this.render()
   }
 
   render () {}
+
+  header (): any {
+    return null
+  }
+
+  footer (): any {
+    return null
+  }
 }

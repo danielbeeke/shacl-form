@@ -1,11 +1,11 @@
-import { ShaclFormEditorSingle } from '../../core/ShaclFormEditorSingle'
+import { ShaclFormSingleEditor } from '../../core/ShaclFormSingleEditor'
 import { xsd } from '../../helpers/namespaces'
 import { GrapoiPointer } from '../../types'
 import { scorer } from '../../core/Scorer'
 import factory from 'rdf-ext'
 import { html, render } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
 
-export default class Date extends ShaclFormEditorSingle<typeof Date> {
+export default class Date extends ShaclFormSingleEditor<typeof Date> {
 
   static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
     return scorer(shaclPointer, dataPointer)

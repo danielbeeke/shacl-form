@@ -8,7 +8,7 @@ import { rdfs, sh } from '../helpers/namespaces'
 import { bestLanguage } from '../helpers/bestLanguage'
 import parsePath from 'shacl-engine/lib/parsePath.js'
 
-export abstract class ShaclFormEditorMerged<T extends IShaclFormEditorConstructor> 
+export abstract class ShaclFormMultiEditor<T extends IShaclFormEditorConstructor> 
 extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> {
 
   public path: any
@@ -31,7 +31,11 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
     return this.dataPointer().terms[this.index]
   }
 
-  public static type = 'merged'
+  public static type = 'multi'
+
+  static createNewObject () {
+    return factory.blankNode()
+  }
 
   async connectedCallback () {
     this.combinedFields = document.createElement('div')

@@ -122,10 +122,10 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
     }
   }
 
-  for (const mergedWidget of Object.values(options.widgets.merged)) {
+  for (const multiWidget of Object.values(options.widgets.multi)) {
     const supportedCombinations: Array<{
       [key: string]: NamedNode
-    }> = mergedWidget.supportedCombinations
+    }> = multiWidget.supportedCombinations
     for (const supportedCombination of supportedCombinations) {
       let foundIncompatibility = false
       const mapping: any = {}
@@ -148,11 +148,11 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
           field._usedInGroup = true
         }
 
-        level[mergedWidget.name] = { 
+        level[multiWidget.name] = { 
           _widgets: [{
             _mapping: mapping, 
             _fields: fields,
-            _widget: mergedWidget,
+            _widget: multiWidget,
             _shaclPointer: shaclProperties.distinct()
           }]
         }

@@ -1,10 +1,10 @@
-import { ShaclFormEditorSingleReact } from '../../core/ShaclFormEditorSingleReact'
+import { ShaclFormSingleEditorReact } from '../../core/ShaclFormSingleEditorReact'
 import { xsd } from '../../helpers/namespaces'
 import { GrapoiPointer } from '../../types'
 import { scorer } from '../../core/Scorer'
 import factory from 'rdf-ext'
 
-export default class LanguageString extends ShaclFormEditorSingleReact<typeof LanguageString> {
+export default class LanguageString extends ShaclFormSingleEditorReact<typeof LanguageString> {
 
   static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
     return scorer(shaclPointer, dataPointer)

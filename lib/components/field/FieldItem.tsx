@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ShaclFormEditorSingle } from '../../core/ShaclFormEditorSingle'
+import { ShaclFormSingleEditor } from '../../core/ShaclFormSingleEditor'
 import { GrapoiPointer, Widget } from '../../types'
 import { sh } from '../../helpers/namespaces'
 import { cast } from '../../helpers/cast'
-import { ShaclFormEditorMerged } from '../../core/ShaclFormEditorMerged'
+import { ShaclFormMultiEditor } from '../../core/ShaclFormMultiEditor'
 
 type FieldItemProps = {
   structure: Widget, 
@@ -11,13 +11,17 @@ type FieldItemProps = {
   index: number,
   children: (values: GrapoiPointer) => Array<any>,
   dataPointer: () => GrapoiPointer
-  uiLanguagePriorities: Array<string>
+  uiLanguagePriorities: Array<string>,
+  isHeader: boolean,
+  isFooter: boolean
 }
 
 // TODO move to the element?
-const removeItem = async (element: ShaclFormEditorSingle<any>) => {
-  await element.beforeRemove()
+const removeItem = async (element: ShaclFormSingleEditor<any>) => {
+  const goAhead = await element.beforeRemove()
 
+  if (!goAhead) return
+  
   let resolvedPointer = element.dataPointer().trim().out([element.predicate], [element.value as any])
   const quadsToRemove = new Set()
   while ([...resolvedPointer.quads()].length) {
@@ -29,25 +33,27 @@ const removeItem = async (element: ShaclFormEditorSingle<any>) => {
   ;(element.closest('.shacl-form') as any).render()
 }
 
-export function FieldItem ({ structure, Widget, index, children, dataPointer, uiLanguagePriorities }: FieldItemProps) {
-  const [widgetInstance, setWidgetInstance] = useState<ShaclFormEditorSingle<any>>()
+export function FieldItem ({ structure, Widget, index, children, dataPointer, uiLanguagePriorities, isHeader, isFooter }: FieldItemProps) {
+  const [widgetInstance, setWidgetInstance] = useState<ShaclFormSingleEditor<any>>()
   const { _shaclPointer: _shaclPointer, _messages, _path, _predicate, _fields, _mapping } = structure
 
   useEffect(() => {
     if (!widgetInstance) {
       const widgetHtmlName = 'sf-' + Widget.name.toLowerCase()
       if (!customElements.get(widgetHtmlName)) customElements.define(widgetHtmlName, Widget)
-      const element = document.createElement(widgetHtmlName) as ShaclFormEditorSingle<any>
+      const element = document.createElement(widgetHtmlName) as ShaclFormSingleEditor<any>
       element.shaclPointer = _shaclPointer
       element.messages = _messages
       element.dataPointer = dataPointer
       element.index = index
       element.path = _path
+      element.isHeader = isHeader
+      element.isFooter = isFooter
       element.uiLanguagePriorities = uiLanguagePriorities
       element.predicate = _predicate
 
-      ;(element as unknown as ShaclFormEditorMerged<any>).fields = _fields
-      ;(element as unknown as ShaclFormEditorMerged<any>).mapping = _mapping
+      ;(element as unknown as ShaclFormMultiEditor<any>).fields = _fields
+      ;(element as unknown as ShaclFormMultiEditor<any>).mapping = _mapping
 
       structure._element = element
       setWidgetInstance(element)
@@ -71,11 +77,11 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer, ui
   const value = dataPointer().out([_predicate]).terms[index]
   let showRemove = value?.value && (minCount === undefined || minCount < pointer.ptrs.length)
 
-  if (Widget.type === 'merged') showRemove = false
+  if (Widget.type === 'multi') showRemove = false
 
   return (
     <div className="item">
-      <div className='widget' ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div>
+      <div className={isHeader ? 'header' : (isFooter ? 'footer' : 'widget')} ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div>
       {resolvedChildren ? (<div>
         {resolvedChildren}
       </div>) : null}

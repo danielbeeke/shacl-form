@@ -60,7 +60,8 @@ app.use(async (ctx: Context) => {
     else if (method === 'DELETE') {
       const bodyFilePath = await ctx.request.body({ type: 'text' }).value
       const filePath = bodyFilePath.trim() ? bodyFilePath : path
-      await bucket.removeFile(filePath.trim() ? filePath : path)
+      const cleanedPath = decodeURI(filePath.trim() ? filePath : path)
+      await bucket.removeFile(cleanedPath)
       ctx.response.body = { success: true } 
     }
     else if (method === 'POST') {
@@ -71,7 +72,7 @@ app.use(async (ctx: Context) => {
 
       const filePath = file.filename
       await bucket.addFileFromPath(filePath, path + file.originalName)
-      ctx.response.body = path + file.originalName
+      ctx.response.body = `http://localhost:8000/${bucketName}/${path + file.originalName}`
     }
     else if (method === 'OPTIONS') {
       ctx.response.status = 200

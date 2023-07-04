@@ -4,9 +4,9 @@ import { html, render } from 'uhtml' // You could use React, Vue, Angular, basic
 import factory from 'rdf-ext'
 import { iso31661 } from 'iso-3166'
 
-import { ShaclFormEditorMerged } from '../../core/ShaclFormEditorMerged'
+import { ShaclFormMultiEditor } from '../../core/ShaclFormMultiEditor'
 
-export default class Address extends ShaclFormEditorMerged<typeof Address> {
+export default class Address extends ShaclFormMultiEditor<typeof Address> {
 
   static supportedCombinations: Array<{ [key: string]: NamedNode }> = [
     {
@@ -21,10 +21,6 @@ export default class Address extends ShaclFormEditorMerged<typeof Address> {
   ]
 
   public showAdvanced = false
-
-  static createNewObject () {
-    return factory.blankNode()
-  }
 
   render () {
     const labelsAndValues = this.getValuesWithLabels()

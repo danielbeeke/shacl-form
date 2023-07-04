@@ -7,8 +7,8 @@ import Date from './editors/single/Date'
 import LanguageString from './editors/single/LanguageString'
 import createFileUpload from './editors/single/FileUpload'
 
-// Merged Widgets
-import Address from './editors/merged/Address'
+// multi Widgets
+import Address from './editors/multi/Address'
 
 // Groups
 import Buttons, { iri as buttonsIri } from './components/groups/Buttons'
@@ -34,7 +34,7 @@ export default {
         backend: import.meta.env.STORAGE_BACKEND ?? 'http://localhost:8000/local'
       })
     },
-    merged: {
+    multi: {
       Address
     }
   },

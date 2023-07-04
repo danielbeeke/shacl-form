@@ -40,7 +40,7 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
   const maxCount = _shaclPointer.out([sh('maxCount')]).value
 
   let showAdd = !maxCount || fieldData.terms.length < maxCount
-  if (Widget.type === 'merged') showAdd = false
+  if (Widget.type === 'multi') showAdd = false
 
   const items = fieldData.terms.map((term, index) => {
     const cid = JSON.stringify([_pathPart, term]) + index
@@ -50,6 +50,8 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
         key={cid} 
         index={index} 
         structure={structure}
+        isHeader={false}
+        isFooter={false}
         uiLanguagePriorities={uiLanguagePriorities}
         dataPointer={dataPointer}
         Widget={Widget}
@@ -67,10 +69,36 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
 
       {description ? (<p dangerouslySetInnerHTML={{__html: description}}></p>) : null}
 
+      <FieldItem 
+        key={'header'} 
+        index={-1} 
+        structure={structure}
+        isHeader={true}
+        isFooter={false}
+        uiLanguagePriorities={uiLanguagePriorities}
+        dataPointer={dataPointer}
+        Widget={Widget}
+      >
+        {children}
+      </FieldItem>
+
       <div className='items'>
         {items}
       </div>
-      
+     
+      <FieldItem 
+        key={'footer'} 
+        index={-2} 
+        structure={structure}
+        isHeader={false}
+        isFooter={true}
+        uiLanguagePriorities={uiLanguagePriorities}
+        dataPointer={dataPointer}
+        Widget={Widget}
+      >
+        {children}
+      </FieldItem>
+
       {showAdd ? (
         <button className='btn-add-item' onClick={() => addItem(dataPointer(), _predicate, element, Widget, _pathPart)}>
           Add item
