@@ -3,5 +3,3 @@
 @prefix ex: <http://example.com/>.
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
 
-ex:name 
-  schema:url <http://localhost:8000/local/test/lightnet.jpg> .

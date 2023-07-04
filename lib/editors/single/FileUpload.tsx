@@ -1,6 +1,6 @@
 import { ShaclFormSingleEditorReact } from '../../core/ShaclFormSingleEditorReact'
 import { GrapoiPointer } from '../../types'
-import { dash, xsd } from '../../helpers/namespaces'
+import { dash } from '../../helpers/namespaces'
 import { scorer } from '../../core/Scorer'
 import Dropzone from 'react-dropzone'
 import factory from 'rdf-ext'
@@ -20,7 +20,9 @@ export class FileUpload extends ShaclFormSingleEditorReact<typeof FileUpload> {
   }
 
   template () {
-    return (<img className='file-upload-image' src={this.value.value} />)
+    return this.value.value ? (
+      <img className='file-upload-image' src={this.value.value} />
+    ) : null
   }
 
   header () {
@@ -52,7 +54,6 @@ export class FileUpload extends ShaclFormSingleEditorReact<typeof FileUpload> {
       })
 
       const filePath = await response.text()
-
       this.addValue(factory.namedNode(filePath))
     }
 

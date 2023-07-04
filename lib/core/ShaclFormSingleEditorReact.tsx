@@ -38,7 +38,7 @@ extends ShaclFormSingleEditor<T> implements StaticImplements<IShaclFormEditorCon
     return null
   }
 
-  template () {
+  template (): any {
     return (<h3>Please implement template()</h3>)
   }
 

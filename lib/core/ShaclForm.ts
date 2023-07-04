@@ -133,6 +133,10 @@ export const init = (options: Options) => {
       return this.#subject
     }
 
+    get dataPointer () {
+      return this.#data
+    }
+
     async render () {
       const report = await this.validate()
       const tree = shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
@@ -147,7 +151,7 @@ export const init = (options: Options) => {
               tree, 
               ignoreGroups: false,
               shaclPointer: shacl,
-              dataPointer: this.#data,
+              dataPointer: this.dataPointer,
               key: 'form', 
               uiLanguagePriorities: this.#uiLanguagePriorities 
             })

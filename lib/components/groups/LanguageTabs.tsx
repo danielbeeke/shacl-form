@@ -16,11 +16,25 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
 
       <div className='languages'>
         {form.contentLanguages.map((languageCode: string) => (
-          <button onClick={() => {
-            form.activeContentLanguages = [languageCode]
-          }} key={languageCode} className={`language-tab ${form.activeContentLanguages.includes(languageCode) ? 'active' : ''}`}>
-            {languageCode}
-          </button>
+          <div key={languageCode} className={`language-tab ${form.activeContentLanguages.includes(languageCode) ? 'active' : ''}`}>
+            <button onClick={() => {
+              form.activeContentLanguages = [languageCode]
+            }}>
+              {languageCode}
+            </button>
+            <button onClick={() => {
+              const dataset = form.dataPointer.ptrs[0].dataset
+              for (const quad of dataset) {
+                if (quad.object.language === languageCode)
+                  dataset.delete(quad)
+              }
+
+              form.contentLanguages = form.contentLanguages.filter((language: string) => language !== languageCode)
+              form.activeContentLanguages = [form.contentLanguages[0]]
+
+              form.render()
+            }}>x</button>
+          </div>
         ))}
 
         {showLanguagePicker ? (<bcp47-picker ref={(element: any) => element?.addEventListener('change', () => {
