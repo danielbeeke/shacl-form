@@ -5,6 +5,9 @@ import { useState } from 'react'
 
 export const iri = shFrm('LanguageTabs')
 
+/**
+ * TODO Improve getting the language label.
+ */
 export default function LanguageTabs ({ children, form, groupPointer }: { children: any, form: any, groupPointer: GrapoiPointer }) {
   const name = bestLanguage(groupPointer.out([rdfs('label')]), form.uiLanguagePriorities)
 
@@ -14,7 +17,9 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
 
   return (
     <div className={`group group-language-tabs ${machineName}`}>
-      <bcp47-picker style={{'display': 'none'}} ref={(languagePicker: any) => setLanguagePicker(languagePicker)} />
+      <bcp47-picker style={{'display': 'none'}} ref={(languagePicker: any) => {
+        setTimeout(() => setLanguagePicker(languagePicker), 200)
+      }} />
 
       {name ? (<h1 className='group-header'>{name}</h1>) : null}
 
@@ -23,9 +28,16 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
           <li key={languageCode} className={`nav-item language-tab`}>
             <span className={`nav-link ${form.activeContentLanguages.includes(languageCode) ? 'active' : ''}`}>
               <span onClick={() => {
+                const previousActiveLanguage = form.activeContentLanguages[0]
+                const dataset = form.dataPointer.ptrs[0].dataset
+                for (const quad of dataset) {
+                  if (quad.object.language === previousActiveLanguage && quad.object.value === '')
+                    dataset.delete(quad)
+                }
+                
                 form.activeContentLanguages = [languageCode]
               }}>
-                {languagePicker.label ? languagePicker.label(languageCode) ?? languageCode : languageCode}
+                {languagePicker?.label ? languagePicker.label(languageCode) ?? languageCode : languageCode}
               </span>
 
               {form.contentLanguages.length > 1 ? <button className='btn-remove-language' onClick={() => {
@@ -34,10 +46,10 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
                   if (quad.object.language === languageCode)
                     dataset.delete(quad)
                 }
-
+                
                 form.contentLanguages = form.contentLanguages.filter((language: string) => language !== languageCode)
                 form.activeContentLanguages = [form.contentLanguages[0]]
-
+                
                 form.render()
               }}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-x" viewBox="0 0 16 16">

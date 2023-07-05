@@ -28,21 +28,6 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
 
   const fieldData = _pathPart ? dataPointer().execute(_pathPart).trim() : dataPointer()
 
-  const element = useRef<HTMLDivElement>(null)
-
-  if (fieldData.terms.length === 0) {
-    const newObject = Widget.createNewObject(form)
-    if (newObject.termType !== 'BlankNode') {
-      dataPointer().addOut(_predicate, Widget.createNewObject(form))
-    }
-  }
-
-  const maxCount = _shaclPointer.out([sh('maxCount')]).value
-
-  let showAdd = !maxCount || fieldData.terms.length < maxCount
-  if (Widget.type === 'multi') showAdd = false
-  if (Widget.hideAddButton) showAdd = false
-
   const items = fieldData.terms.map((term, index) => {
     const cid = JSON.stringify([_pathPart, term]) + index
 
@@ -63,6 +48,21 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
   }).filter(([_field, term]) => {
     return !(term as Literal).language || form.activeContentLanguages.includes((term as Literal).language)
   }).map(([field]) => field as JSX.Element)
+
+  const element = useRef<HTMLDivElement>(null)
+
+  if (items.length === 0) {
+    const newObject = Widget.createNewObject(form)
+    if (newObject.termType !== 'BlankNode') {
+      dataPointer().addOut(_predicate, Widget.createNewObject(form))
+    }
+  }
+
+  const maxCount = _shaclPointer.out([sh('maxCount')]).value
+
+  let showAdd = !maxCount || fieldData.terms.length < maxCount
+  if (Widget.type === 'multi') showAdd = false
+  if (Widget.hideAddButton) showAdd = false
 
   return (
     <div ref={element} className={`field`} data-predicate={_predicate?.value}>
