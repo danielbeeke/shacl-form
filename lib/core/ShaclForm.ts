@@ -140,6 +140,7 @@ export const init = (options: Options) => {
     async render () {
       const report = await this.validate()
       const tree = shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
+
       const shacl = grapoi({ dataset: this.#shaclDataset, factory })
 
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [

@@ -1,9 +1,10 @@
 import { ShaclFormSingleEditorReact } from '../../core/ShaclFormSingleEditorReact'
 import { GrapoiPointer } from '../../types'
-import { dash } from '../../helpers/namespaces'
+import { dash, sh } from '../../helpers/namespaces'
 import { scorer } from '../../core/Scorer'
 import Dropzone from 'react-dropzone'
 import factory from 'rdf-ext'
+import { useState } from 'react'
 
 type FileUploadOptions = {
   backend: string
@@ -13,6 +14,10 @@ export class FileUpload extends ShaclFormSingleEditorReact<typeof FileUpload> {
 
   public static options: FileUploadOptions
 
+  static hideAddButton = true
+  public error: string = ''
+  public isUploading = false
+
   static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
     return scorer(shaclPointer, dataPointer)
       .has(dash('uriStart'))
@@ -20,23 +25,44 @@ export class FileUpload extends ShaclFormSingleEditorReact<typeof FileUpload> {
   }
 
   template () {
+    const [hasError, setHasError] = useState(false)
+
     return this.value.value ? (
-      <img className='file-upload-image' src={this.value.value} />
+      <a title={this.value.value} href={this.value.value} target='_blank'>{
+        hasError ? this.value.value.split('/').pop() : 
+        <img onError={() => {
+          setHasError(true)
+        }} className='file-upload-image' src={this.value.value} />  
+      }</a>
     ) : null
   }
 
   header () {
+    const maxCount = this.shaclPointer.out([sh('maxCount')]).value ?? Infinity
+    const showUpload = maxCount >= this.values.length
+
     return (
-      <>
-        <Dropzone onDrop={(files) => this.addFiles(files)}>
-          {({getRootProps, getInputProps}) => (
-            <div {...getRootProps()}>
-              <input {...getInputProps()} />
-              <p>Drag some files here or click to select files</p>
-            </div>
-          )}
-        </Dropzone>
-      </>
+      <div className='widget'>
+
+        {this.error ? <div className="alert alert-danger mb-3" role="alert">
+          {this.error}
+        </div> : null}
+
+        {this.isUploading ? 
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div> : 
+        
+          showUpload ? <Dropzone onDrop={(files) => this.addFiles(files)}>
+            {({getRootProps, getInputProps}) => (
+              <div className='drop-zone' {...getRootProps()}>
+                <input {...getInputProps()} />
+                <span className='lead'>Drag some files here or click to select files</span>
+              </div>
+            )}
+          </Dropzone> : null
+        }
+      </div>
     )
   }
 
@@ -44,17 +70,27 @@ export class FileUpload extends ShaclFormSingleEditorReact<typeof FileUpload> {
     const uriStart = this.shaclPointer.out([dash('uriStart')]).value
     const prefix = uriStart.split(/\/|#/g).pop()
     
-    for (const file of files) {
-      const formData = new FormData()
-      formData.append('files', file)
+    try {
+      for (const file of files) {
+        const formData = new FormData()
+        formData.append('files', file)
 
-      const response = await fetch(`${FileUpload.options.backend}/${prefix}/`, {
-        body: formData,
-        method: 'POST'
-      })
+        this.isUploading = true
+        this.render()
 
-      const filePath = await response.text()
-      this.addValue(factory.namedNode(filePath))
+        const response = await fetch(`${FileUpload.options.backend}/${prefix}/`, {
+          body: formData,
+          method: 'POST'
+        })
+
+        this.isUploading = false
+  
+        const filePath = await response.text()
+        this.addValue(factory.namedNode(filePath))
+      }  
+    }
+    catch (exception: any) {
+      this.error = exception.message ?? exception
     }
 
     this.render()

@@ -19,6 +19,8 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
   public df = factory
   public uiLanguagePriorities: Array<string> = []
   public fields: any
+  public isHeader: boolean = false
+  public isFooter: boolean = false
 
   public reactRoot: Root | undefined
   public combinedFields: HTMLDivElement | undefined
@@ -63,6 +65,18 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
   }
 
   render () {}
+
+  header (): any {
+    return null
+  }
+
+  template (): any {
+    return null
+  }
+
+  footer (): any {
+    return null
+  }
 
   // Finding the predicates probably is a score of 100 worth.
   static score() { return 100 }

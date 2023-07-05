@@ -1,8 +1,8 @@
 .items .item {
-  padding: 10px;
-  margin: 10px;
   border-radius: 4px;
-  background-color: rgba(0, 53, 70, 0.15);
+  display: flex;
+  margin-bottom: 10px;
+  background-color: rgba(0, 53, 70, 0.05);
 
   &::after {
     content: "";
@@ -14,22 +14,38 @@
 .widget {
   float: left;
   width: 100%;
-  margin-right: 10px;
+
+  > * {
+    padding: 10px;
+    display: block;
+
+    &:empty {
+      display: none;
+    }
+  }
 }
 
 .field {
   clear: both;
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-remove-item {
+  margin: 10px;
+  margin-left: 0;
+  align-self: start;
+}
+
+.group + .group,
+.field + .field {
+  margin-top: 1rem;
 }
 
 input {
   padding: 5px;
   border-radius: 4px;
   border: none;
-}
-
-.btn-remove-item,
-.btn-add-item {
-  float: right;
 }
 
 .language-tab {
@@ -40,4 +56,50 @@ input {
 
 .file-upload-image {
   max-height: 300px;
+}
+
+.languages.nav-tabs {
+  align-items: center;
+}
+
+.group-language-tabs .nav-link {
+  cursor: pointer;
+  display: flex;
+
+  .btn-remove-language {
+    border: none;
+    background-color: transparent;
+    margin-left: 10px;
+    margin-right: -.5rem;
+  }
+}
+
+.shacl-form {
+  display: block;
+}
+
+.nav-add-language {
+  position: relative;
+
+  .bcp47-picker {
+    display: block;
+  }
+
+  .bcp47-value.input-group {
+    position: relative;
+    top: -3px;
+  }
+
+  .bcp47-results {
+    position: absolute;
+  }
+}
+
+.drop-zone {
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  outline: 20px solid rgba(0, 53, 70, 0.05);
+  margin: 20px;
+  border: 1px dashed rgba(0, 53, 70, .3);
 }

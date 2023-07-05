@@ -1,0 +1,71 @@
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+@prefix ex: <http://example.com/>.
+@prefix schema: <https://schema.org/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix shfrm: <https://github.com/danielbeeke/shacl-form/ontology#> .
+@prefix dash: <http://datashapes.org/dash#> .
+
+ex:RootShape
+	a sh:NodeShape ;
+
+	sh:property [
+		sh:group ex:MainGroup ;
+		sh:order 1 ;
+	] ;
+
+	sh:property [
+		sh:path schema:name;
+		sh:name "Product name"@en ;
+		sh:description "Please enter a product name"@en ;
+		sh:datatype xsd:langString ;
+		sh:group ex:LeftGroup ;
+	] ;
+
+	sh:property [
+		sh:path schema:description;
+		sh:name "Product description"@en ;
+		sh:description "Please enter a product description"@en ;
+		sh:datatype xsd:langString ;
+		sh:group ex:LeftGroup ;
+	] ;
+
+	sh:property [
+		sh:path schema:date;
+		sh:name "Date"@en ;
+		sh:datatype xsd:date ;
+		sh:group ex:RightGroup ;
+		sh:maxCount 1 ;
+	] ;
+
+	sh:property [
+		sh:path schema:url;
+		sh:name "File upload"@en ;
+		sh:maxCount 2 ;
+		sh:datatype xsd:string;
+		sh:group ex:LeftGroup ;
+		dash:uriStart "http://localhost:8000/test" ;
+	] ;
+
+	sh:property [
+		sh:group ex:ButtonGroup ;
+		sh:order 10 ;
+	] ;
+.
+
+ex:MainGroup
+	sh:order 1 ;
+	a sh:PropertyGroup, shfrm:LanguageTabs .
+
+ex:LeftGroup
+	sh:order 2 ;
+	a sh:PropertyGroup .
+
+ex:RightGroup
+	sh:order 3 ;
+	a sh:PropertyGroup .
+
+ex:ButtonGroup
+	sh:order 4 ;
+	a sh:PropertyGroup, shfrm:Buttons .

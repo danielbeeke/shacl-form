@@ -79,14 +79,16 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer, ui
 
   if (Widget.type === 'multi') showRemove = false
 
-  return (
-    <div className="item">
+  return isHeader || isFooter ? 
+    <div className={isHeader ? 'header' : (isFooter ? 'footer' : 'widget')} ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div> : 
+  (
+    <div className={`item type-${Widget.name}`}>
       <div className={isHeader ? 'header' : (isFooter ? 'footer' : 'widget')} ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div>
       {resolvedChildren ? (<div>
         {resolvedChildren}
       </div>) : null}
       {showRemove ? (
-        <button className='btn-remove-item' onClick={() => removeItem(widgetInstance!)}>Remove</button>
+        <button className='ms-2 btn btn-danger btn-sm btn-remove-item' onClick={() => removeItem(widgetInstance!)}>Remove</button>
       ) : null}
     </div>
   )

@@ -25,7 +25,7 @@ extends ShaclFormSingleEditor<T> implements StaticImplements<IShaclFormEditorCon
   }
 
   static createNewObject (form: any) {
-    return factory.namedNode('')
+    return factory.namedNode('') as any
   }
 
   render () {

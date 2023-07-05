@@ -94,15 +94,15 @@ export function FormLevel ({
   ].filter(Boolean)
 
   for (const [group, widget] of groupedWidgets) {
-    if (!groups.has(group)) {
+    if (!groups.has(group.value)) {
       const groupPointer = shaclPointer.out([null], group)
       const groupTypes = groupPointer.out([rdf('type')]).terms
       const order = groupPointer.out([sh('order')]).value ? parseInt(groupPointer.out([sh('order')]).value) : 0
       let [element] = groupTypes.map(groupType => form.options.groups[groupType.value]).filter(Boolean)
       if (!element) element = form.options.groups.default
-      groups.set(group, { element, props: { groupPointer }, children: [], order })
+      groups.set(group.value, { element, props: { groupPointer, order }, children: [], order })
     }
-    const groupObject = groups.get(group)
+    const groupObject = groups.get(group.value)
     groupObject.children.push(widget)
   }
 
@@ -111,9 +111,11 @@ export function FormLevel ({
       {[...groups.entries()].map(([group, groupObject]) => {
         return createElement(groupObject.element, { 
           ...groupObject.props,
-          key: 'index:' + (typeof group === 'string' ? group : group.value),
+          key: 'index:' + (typeof group === 'string' ? group : group),
           form
         }, ...groupObject.children)
+      }).sort((a, b) => {
+        return a.props.order - b.props.order
       })}
     </>
   )

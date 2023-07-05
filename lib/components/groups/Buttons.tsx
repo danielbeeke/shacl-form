@@ -12,7 +12,7 @@ export default function Buttons ({ children, groupPointer, form }: { children: a
     {name ? (<h3 className='group-header'>{name}</h3>) : null}
     {children ? (<div>{children}</div>) : null}
 
-    <button onClick={() => {
+    <button className='btn btn-primary' onClick={() => {
         const dataset = form.store
         const lists = dataset.extractLists({ remove: true });
         const writer = new Writer({ lists })
@@ -25,7 +25,7 @@ export default function Buttons ({ children, groupPointer, form }: { children: a
             detail: { turtle, dataset }
           }))
         })
-      }}>Print turtle into console</button>
+      }}>Save</button>
 
   </div>)
 }

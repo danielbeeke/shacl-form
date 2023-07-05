@@ -27,6 +27,11 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
 
   public static type = 'single'
 
+  get values (): Array<Term> {
+    return this.dataPointer()
+      .out([this.predicate]).terms
+  }
+
   get value (): Term {
     return this.dataPointer()
       .out([this.predicate]).terms[this.index]
@@ -91,6 +96,10 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
   render () {}
 
   header (): any {
+    return null
+  }
+
+  template (): any {
     return null
   }
 

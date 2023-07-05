@@ -2,6 +2,7 @@ import defaultOptions from '../lib/defaultOptions'
 import { init } from '../lib/core/ShaclForm'
 import factory from 'rdf-ext'
 import { schema } from '../lib/helpers/namespaces'
+import './demo.scss'
 
 init(defaultOptions)
 
@@ -57,6 +58,15 @@ const demos = [
     // contentLanguage: 'en,fr,de',
     activeContentLanguage: 'en',
   },
+  {
+    title: 'Full with layout',
+    shaclUrl: '../shapes/full.shacl.ttl?raw',
+    shaclIri: 'http://example.com/RootShape',
+    dataIri: 'http://example.com/name',
+    dataUrl: '../data/full.ttl?raw',
+    contentLanguage: 'en,fr,de,nl',
+    activeContentLanguage: 'en',
+  },
 ]
 
 const index = location.pathname.substring(1) ? parseInt(location.pathname.substring(1)) : null
@@ -78,8 +88,12 @@ if (index === null) {
 else {
   const demo = demos[index]
 
+  const formId = demo.shaclUrl.split('/').pop()?.split('.')[0]
+
   document.body.innerHTML = `
     <shacl-form 
+      id=${`demo-${formId}`}
+      class="p-5"
       shacl-url="${demo.shaclUrl ?? ''}" 
       shacl-iri="${demo.shaclIri ?? ''}" 
       data-url="${demo.dataUrl ?? ''}" 

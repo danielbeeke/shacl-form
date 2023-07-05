@@ -1,17 +1,18 @@
-import { ShaclFormSingleEditor } from '../../core/ShaclFormSingleEditor'
+import { ShaclFormSingleEditorUhtml } from '../../core/ShaclFormSingleEditorUhtml'
 import { GrapoiPointer, BlankNode } from '../../types'
 import { scorer } from '../../core/Scorer'
 import { schema, rdfs, sh } from '../../helpers/namespaces'
 import factory from 'rdf-ext'
 import { bestLanguage } from '../../helpers/bestLanguage'
-import { html, render } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
+import { html } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
 import { swapSubject } from '../../helpers/swapSubject'
+
 
 /**
  * TODO add support for: dash:stem and / or dash:uriStart
  * TODO Add edit mode
  */
-export default class BlankNodeOrIri extends ShaclFormSingleEditor<typeof BlankNodeOrIri> {
+export default class BlankNodeOrIri extends ShaclFormSingleEditorUhtml<typeof BlankNodeOrIri> {
 
   public showIdentifier = false
   public identifierSuggestion = ''
@@ -27,7 +28,7 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditor<typeof BlankNo
     return factory.blankNode()
   }
 
-  render () {
+  template () {
     const namesPointer = this.dataPointer().out([this.predicate])
     const indexSpecificNamesPointer = namesPointer.clone({
       ptrs: [namesPointer.ptrs[this.index]].filter(Boolean)
@@ -42,7 +43,7 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditor<typeof BlankNo
 
     // console.log({ enforceIri, enforceBlankNode, iriAndBlankNodeAllowed})
 
-    render(this, html`
+    return html`
       <span>
         ${name ?? this.value?.value} 
         <em>${this.value?.value} (${this.value?.termType})</em>
@@ -87,7 +88,7 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditor<typeof BlankNo
         ` : null}
 
       ` : null}
-    `)
+    `
   }
 
 }

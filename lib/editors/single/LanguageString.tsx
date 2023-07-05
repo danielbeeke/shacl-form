@@ -21,7 +21,7 @@ export default class LanguageString extends ShaclFormSingleEditorReact<typeof La
 
     return (
     <>
-      <input defaultValue={this.value.value ?? ''} onBlur={(event) => {
+      <input className='form-control' defaultValue={this.value.value ?? ''} onBlur={(event) => {
         this.value = this.df.literal((event.target as HTMLInputElement).value, language)
       }} />
       {this.form.activeContentLanguages.length > 1 ? (

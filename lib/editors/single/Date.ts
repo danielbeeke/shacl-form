@@ -1,11 +1,11 @@
-import { ShaclFormSingleEditor } from '../../core/ShaclFormSingleEditor'
+import { ShaclFormSingleEditorUhtml } from '../../core/ShaclFormSingleEditorUhtml'
 import { xsd } from '../../helpers/namespaces'
 import { GrapoiPointer } from '../../types'
 import { scorer } from '../../core/Scorer'
 import factory from 'rdf-ext'
-import { html, render } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
+import { html } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
 
-export default class Date extends ShaclFormSingleEditor<typeof Date> {
+export default class Date extends ShaclFormSingleEditorUhtml<typeof Date> {
 
   static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
     return scorer(shaclPointer, dataPointer)
@@ -17,12 +17,12 @@ export default class Date extends ShaclFormSingleEditor<typeof Date> {
     return factory.literal('', xsd('date'))
   }
 
-  render () {
-    render(this, html`
-      <input type="date" onChange=${(event: Event) => {
+  template () {
+    return html`
+      <input type="date" class="form-control" onChange=${(event: Event) => {
         this.value = this.df.literal((event.target as HTMLInputElement).value, xsd('date'))
       }} type="text" .value=${this.value?.value ?? ''} />
-    `)
+    `
   }
 
 }

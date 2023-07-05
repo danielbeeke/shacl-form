@@ -1,12 +1,12 @@
 import { NamedNode } from '../../types'
 import { schema, xsd } from '../../helpers/namespaces'
-import { html, render } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
+import { html } from 'uhtml'
 import factory from 'rdf-ext'
 import { iso31661 } from 'iso-3166'
 
-import { ShaclFormMultiEditor } from '../../core/ShaclFormMultiEditor'
+import { ShaclFormMultiEditorUhtml } from '../../core/ShaclFormMultiEditorUhtml'
 
-export default class Address extends ShaclFormMultiEditor<typeof Address> {
+export default class Address extends ShaclFormMultiEditorUhtml<typeof Address> {
 
   static supportedCombinations: Array<{ [key: string]: NamedNode }> = [
     {
@@ -22,10 +22,10 @@ export default class Address extends ShaclFormMultiEditor<typeof Address> {
 
   public showAdvanced = false
 
-  render () {
+  template () {
     const labelsAndValues = this.getValuesWithLabels()
 
-    render(this, html`
+    return html`
       ${this.showAdvanced ? this.combinedFields : html`
         <p>
           ${labelsAndValues.map(({ label, value, key }) => {
@@ -72,6 +72,6 @@ export default class Address extends ShaclFormMultiEditor<typeof Address> {
         this.render()
       }}>${this.showAdvanced ? 'Hide advanced' : 'Show advanced'}</button>
 
-    `)
+    `
   } 
 }

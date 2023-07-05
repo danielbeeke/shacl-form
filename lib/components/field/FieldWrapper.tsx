@@ -41,6 +41,7 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
 
   let showAdd = !maxCount || fieldData.terms.length < maxCount
   if (Widget.type === 'multi') showAdd = false
+  if (Widget.hideAddButton) showAdd = false
 
   const items = fieldData.terms.map((term, index) => {
     const cid = JSON.stringify([_pathPart, term]) + index
@@ -65,9 +66,9 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
 
   return (
     <div ref={element} className={`field`} data-predicate={_predicate?.value}>
-      {name ? (<h3>{name}</h3>) : null}
+      {name ? (<label className='form-label'>{name}</label>) : null}
 
-      {description ? (<p dangerouslySetInnerHTML={{__html: description}}></p>) : null}
+      {description ? (<p className='form-text' dangerouslySetInnerHTML={{__html: description}}></p>) : null}
 
       <FieldItem 
         key={'header'} 
@@ -85,7 +86,7 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
       <div className='items'>
         {items}
       </div>
-     
+
       <FieldItem 
         key={'footer'} 
         index={-2} 
@@ -100,7 +101,7 @@ export function FieldWrapper ({ Widget, children, structure, uiLanguagePrioritie
       </FieldItem>
 
       {showAdd ? (
-        <button className='btn-add-item' onClick={() => addItem(dataPointer(), _predicate, element, Widget, _pathPart)}>
+        <button className='btn btn-secondary btn-sm btn-add-item ms-auto' onClick={() => addItem(dataPointer(), _predicate, element, Widget, _pathPart)}>
           Add item
         </button>
       ) : null} 

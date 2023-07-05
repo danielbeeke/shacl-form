@@ -1,0 +1,28 @@
+#demo-full {
+  display: grid;
+  max-width: 1200px;
+  margin: auto;
+  grid-template-columns: 1fr 300px;
+  grid-template-rows: auto auto auto;
+  grid-template-areas: "top top"
+  "left right"
+  "bottom bottom";
+
+  .MainGroup {
+    grid-area: top;
+  }
+
+  .LeftGroup {
+    grid-area: left;
+    margin-right: 40px;
+  }
+
+  .RightGroup {
+    padding: 20px;
+    grid-area: right;
+    background: rgb(198, 241, 248);
+    border-radius: 6px;
+  }
+
+
+}
