@@ -17,21 +17,24 @@ ex:RootShape
 
 	sh:property [
 		sh:path schema:name;
+		sh:minCount 1 ;
 		sh:name "Product name"@en ;
 		sh:description "Please enter a product name"@en ;
-		sh:datatype xsd:langString ;
+		sh:datatype rdf:langString ;
 		sh:group ex:LeftGroup ;
 	] ;
 
 	sh:property [
+		sh:minCount 1 ;
 		sh:path schema:description;
 		sh:name "Product description"@en ;
 		sh:description "Please enter a product description"@en ;
-		sh:datatype xsd:langString ;
+		sh:datatype rdf:langString ;
 		sh:group ex:LeftGroup ;
 	] ;
 
 	sh:property [
+		sh:minCount 1 ;
 		sh:path schema:date;
 		sh:name "Date"@en ;
 		sh:datatype xsd:date ;
@@ -42,8 +45,11 @@ ex:RootShape
 	sh:property [
 		sh:path schema:url;
 		sh:name "File upload"@en ;
+		sh:minCount 1 ;
 		sh:maxCount 2 ;
-		sh:datatype xsd:string;
+		sh:pattern ".svg$" ;
+		sh:nodeKind sh:IRI ;
+		sh:flags "i" ;
 		sh:group ex:LeftGroup ;
 		dash:uriStart "http://localhost:8000/test" ;
 	] ;

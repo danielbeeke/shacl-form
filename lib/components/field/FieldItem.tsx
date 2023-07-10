@@ -12,8 +12,8 @@ type FieldItemProps = {
   children: (values: GrapoiPointer) => Array<any>,
   dataPointer: () => GrapoiPointer
   uiLanguagePriorities: Array<string>,
-  isHeader: boolean,
-  isFooter: boolean
+  isHeader?: boolean,
+  isFooter?: boolean
 }
 
 // TODO move to the element?
@@ -33,7 +33,7 @@ const removeItem = async (element: ShaclFormSingleEditor<any>) => {
   ;(element.closest('.shacl-form') as any).render()
 }
 
-export function FieldItem ({ structure, Widget, index, children, dataPointer, uiLanguagePriorities, isHeader, isFooter }: FieldItemProps) {
+export function FieldItem ({ structure, Widget, index, children, dataPointer, uiLanguagePriorities, isHeader = false, isFooter = false }: FieldItemProps) {
   const [widgetInstance, setWidgetInstance] = useState<ShaclFormSingleEditor<any>>()
   const { _shaclPointer: _shaclPointer, _messages, _path, _predicate, _fields, _mapping } = structure
 
@@ -88,7 +88,7 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer, ui
         {resolvedChildren}
       </div>) : null}
       {showRemove ? (
-        <button className='ms-2 btn btn-danger btn-sm btn-remove-item' onClick={() => removeItem(widgetInstance!)}>Remove</button>
+        <button className='ms-2 btn btn-danger btn-remove-item' onClick={() => removeItem(widgetInstance!)}>Remove</button>
       ) : null}
     </div>
   )

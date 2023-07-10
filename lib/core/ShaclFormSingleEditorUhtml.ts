@@ -8,7 +8,7 @@ extends ShaclFormSingleEditor<T> implements StaticImplements<IShaclFormEditorCon
   render () {
     if (this.isHeader) render(this, this.header())
     else if (this.isFooter) render(this, this.footer())
-    else render(this, this.template())
+    else render(this, this.template(this.getInputProps()))
   }
 
 }

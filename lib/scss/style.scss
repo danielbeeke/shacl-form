@@ -37,7 +37,10 @@
   align-self: start;
 }
 
-.group + .group,
+.group + .group {
+  margin-top: 2rem;
+}
+
 .field + .field {
   margin-top: 1rem;
 }
@@ -65,12 +68,17 @@ input {
 .group-language-tabs .nav-link {
   cursor: pointer;
   display: flex;
+  padding: 0;
+
+  > span {
+    padding: .5rem 1rem;
+  }
 
   .btn-remove-language {
     border: none;
     background-color: transparent;
-    margin-left: 10px;
-    margin-right: -.5rem;
+    margin-left: -10px;
+    padding-right: .5rem;
   }
 }
 
@@ -83,6 +91,7 @@ input {
 
   .bcp47-picker {
     display: block;
+    width: 380px;
   }
 
   .bcp47-value.input-group {

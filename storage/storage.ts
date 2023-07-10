@@ -4,23 +4,6 @@ import { env } from './storage.env.ts'
 import { Readable } from 'node:stream'
 import { mime } from "https://deno.land/x/mimetypes@v1.0.0/src/mime.ts"
 
-// const files =  Deno.readDir('./tmp/test')
-
-// const filePaths: Array<string> = []
-// for await (const file of files) {
-//   if (file.isFile) filePaths.push(file.name)
-// }
-
-// const  newFileContents = `
-// @prefix schema: <https://schema.org/>.
-// @prefix ex: <http://example.com/>.
-// @prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
-
-// ex:name 
-//   schema:url ${filePaths.map(filePath => `<http://localhost:8000/local/test/${encodeURIComponent(filePath)}>`)} .
-// `
-// await Deno.writeTextFile('../data/storage.ttl', newFileContents)
-
 /**
  * Here is a development storage connection.
  * You can use this implementation to make something similar but then ofcourse with access control.
@@ -41,7 +24,7 @@ for (const [name, config] of Object.entries(env.buckets)) {
 app.use(async (ctx: Context) => {
   try {
     const { method, url } = ctx.request
-    const bucketName: keyof typeof buckets = Object.keys(buckets).find(bucketName => url.pathname.substring(1).startsWith(bucketName))!
+    const bucketName: keyof typeof buckets = Object.keys(buckets).find((bucketName: string) => url.pathname.substring(1).startsWith(bucketName))!
     if (!bucketName || !buckets[bucketName]) throw new Error('Could not find the bucket')
     const bucket = buckets[bucketName]
     const path = url.pathname.substring(1).split('/').slice(1).join('/')

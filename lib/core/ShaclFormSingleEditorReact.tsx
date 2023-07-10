@@ -31,14 +31,14 @@ extends ShaclFormSingleEditor<T> implements StaticImplements<IShaclFormEditorCon
   render () {
     if (this.isHeader) this.#root?.render(createElement(this.#boundHeader))
     else if (this.isFooter) this.#root?.render(createElement(this.#boundFooter))
-    else this.#root?.render(createElement(this.#boundTemplate))
+    else this.#root?.render(createElement(this.#boundTemplate, this.getInputProps()))
   }
 
   header (): any {
     return null
   }
 
-  template (): any {
+  template (props: any): any {
     return (<h3>Please implement template()</h3>)
   }
 

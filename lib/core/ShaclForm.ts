@@ -3,7 +3,7 @@ import { Parser, Store } from 'n3'
 import rdfDataset from '@rdfjs/dataset'
 import factory from 'rdf-ext'
 import DatasetCore from '@rdfjs/dataset/DatasetCore'
-import { sh, rdf, shFrm } from '../helpers/namespaces'
+import { sh, rdf, shFrm, shn } from '../helpers/namespaces'
 import { createRoot } from 'react-dom/client'
 import { createElement, StrictMode } from 'react'
 import { FormLevelBase } from '../components/FormLevel'
@@ -15,6 +15,7 @@ import type { Options, NamedNode, GrapoiPointer, Literal } from '../types'
 import grapoi from 'grapoi'
 import '../scss/style.scss'
 import { swapSubject } from '../helpers/swapSubject'
+import { Writer } from 'n3'
 
 export const init = (options: Options) => {
 
@@ -161,12 +162,50 @@ export const init = (options: Options) => {
       ]}))
     }
 
+    async save () {
+      await this.render()
+
+      this.querySelector('form')?.reportValidity()
+
+      const html5Valid = this.querySelector('form')?.checkValidity()
+
+      const rdfIsValid = await this.validate()
+      const errors = rdfIsValid.results.filter((result: any) => !shn('Trace').equals(result.severity) && !shn('Debug').equals(result.severity))
+
+      if (!html5Valid || errors.length || rdfIsValid.dataset.size === 0) return
+
+      const dataset = this.store
+      const lists = dataset.extractLists({ remove: true });
+      const writer = new Writer({ lists })
+      for (const quad of dataset) {
+        // We simply skip empty items.
+        if (quad.object.value) writer.addQuad(quad)
+      }
+      writer.end((error, turtle) => {
+        this.dispatchEvent(new CustomEvent('save', {
+          detail: { turtle, dataset }
+        }))
+      })
+    }
+
     set subject (newValue: NamedNode) {
       swapSubject(this.#store, this.subject, newValue)
     }
 
     validate () {
-      return this.#validator.validate({ dataset: this.#store, terms: [this.subject] })
+      const dataset = this.store
+      const validateStore = rdfDataset.dataset()
+
+      for (const quad of dataset) {
+        // We simply skip empty items.
+        if (quad.object.value) validateStore.add(quad)
+      }
+
+      const report = this.#validator.validate({ dataset: validateStore, terms: [this.subject] })
+
+      report.dataset = validateStore
+
+      return report
     }
 
     get shapeUri () {

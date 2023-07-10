@@ -1,5 +1,5 @@
 import { ShaclFormSingleEditorReact } from '../../core/ShaclFormSingleEditorReact'
-import { xsd } from '../../helpers/namespaces'
+import { rdf } from '../../helpers/namespaces'
 import { GrapoiPointer } from '../../types'
 import { scorer } from '../../core/Scorer'
 import factory from 'rdf-ext'
@@ -8,7 +8,7 @@ export default class LanguageString extends ShaclFormSingleEditorReact<typeof La
 
   static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
     return scorer(shaclPointer, dataPointer)
-      .datatype([xsd('langString')])
+      .datatype([rdf('langString')])
       .toNumber()
   }
 
@@ -16,12 +16,12 @@ export default class LanguageString extends ShaclFormSingleEditorReact<typeof La
     return factory.literal('', form.activeContentLanguage)
   }
 
-  template () {
+  template (props: any) {
     const language = this.form.activeContentLanguage
 
     return (
     <>
-      <input className='form-control' defaultValue={this.value.value ?? ''} onBlur={(event) => {
+      <input {...props} className='form-control' defaultValue={this.value.value ?? ''} onBlur={(event) => {
         this.value = this.df.literal((event.target as HTMLInputElement).value, language)
       }} />
       {this.form.activeContentLanguages.length > 1 ? (

@@ -64,6 +64,7 @@ export function FormLevel ({
             key={hash(cid + widget._widget.name + outerIndex + index)} 
             structure={widget} 
             form={form}
+            errors={field._messages}
             dataPointer={() => dataPointer}
             Widget={widget._widget}
           >
@@ -132,14 +133,18 @@ type FormLevelBaseProps = {
 
 export function FormLevelBase ({ tree, uiLanguagePriorities, dataPointer, form, shaclPointer, ignoreGroups = false }: FormLevelBaseProps) {
   return (
-    <FormLevel 
-      uiLanguagePriorities={uiLanguagePriorities} 
-      key="main" depth={0} 
-      tree={tree} 
-      shaclPointer={shaclPointer} 
-      dataPointer={dataPointer} 
-      form={form} 
-      ignoreGroups={ignoreGroups}
-    />
+    <form onSubmit={(event) => {
+      event.preventDefault()
+    }}>
+      <FormLevel 
+        uiLanguagePriorities={uiLanguagePriorities} 
+        key="main" depth={0} 
+        tree={tree} 
+        shaclPointer={shaclPointer} 
+        dataPointer={dataPointer} 
+        form={form} 
+        ignoreGroups={ignoreGroups}
+      />
+    </form>
   )
 }

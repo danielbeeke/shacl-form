@@ -18,13 +18,27 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
   return (
     <div className={`group group-language-tabs ${machineName}`}>
       <bcp47-picker style={{'display': 'none'}} ref={(languagePicker: any) => {
-        setTimeout(() => setLanguagePicker(languagePicker), 200)
+        // TODO this mess should be fixed in bcp47 picker instead of here.
+        const tryLabel = () => setTimeout(() => {
+          if (languagePicker?.label && typeof languagePicker.label === 'function') {
+            setLanguagePicker(languagePicker)
+          }
+          else {
+            tryLabel()
+          }
+        }, 100)
+
+        tryLabel()        
       }} />
 
       {name ? (<h1 className='group-header'>{name}</h1>) : null}
 
       <ul className='languages nav nav-tabs mb-5'>
-        {form.contentLanguages.map((languageCode: string) => (
+        {form.contentLanguages.map((languageCode: string) => { 
+          /** @ts-ignore */
+          const label = languagePicker?.getLabel ? languagePicker?.getLabel(languageCode) : ''
+
+          return (
           <li key={languageCode} className={`nav-item language-tab`}>
             <span className={`nav-link ${form.activeContentLanguages.includes(languageCode) ? 'active' : ''}`}>
               <span onClick={() => {
@@ -37,7 +51,7 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
                 
                 form.activeContentLanguages = [languageCode]
               }}>
-                {languagePicker?.label ? languagePicker.label(languageCode) ?? languageCode : languageCode}
+                {label}
               </span>
 
               {form.contentLanguages.length > 1 ? <button className='btn-remove-language' onClick={() => {
@@ -58,7 +72,7 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
               </button> : null}
             </span>
           </li>
-        ))}
+        )})}
 
         {showLanguagePicker ? (<li className="ms-auto nav-add-language"><bcp47-picker ref={(element: any) => element?.addEventListener('change', () => {
           const languageCode = element.value.toLowerCase()

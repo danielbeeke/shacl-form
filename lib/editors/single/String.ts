@@ -17,7 +17,10 @@ export default class String extends ShaclFormSingleEditorUhtml<typeof String> {
     return factory.literal('')
   }
 
-  template () {
+  template (inputProps: any) {
+
+    console.log(inputProps)
+
     return html`
       <input class="form-control" onChange=${(event: Event) => {
         const language = (this.value as Literal).language ? (this.value as Literal).language : undefined

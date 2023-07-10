@@ -1,6 +1,7 @@
 import type { GrapoiPointer, Term, NamedNode, ShaclFormType } from '../types'
 import factory from 'rdf-ext'
 import { IShaclFormEditorConstructor, StaticImplements } from './ShaclFormEditor'
+import { sh } from '../helpers/namespaces'
 
 export abstract class ShaclFormSingleEditor<T extends IShaclFormEditorConstructor> 
 extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> {
@@ -99,11 +100,25 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
     return null
   }
 
-  template (): any {
+  template (props: any): any {
     return null
   }
 
   footer (): any {
     return null
+  }
+
+  getInputProps () {
+    const props: { [key: string]: any } = {}
+
+    const maxCount = this.shaclPointer.out([sh('maxCount')]).value ?? Infinity
+    const minCount = this.shaclPointer.out([sh('minCount')]).value ?? 0
+
+    const nonEmptyValues = this.values.filter(value => value.value)
+
+    const required = minCount > 0 && maxCount >= nonEmptyValues.length
+    if (required) props.required = true
+
+    return props
   }
 }
