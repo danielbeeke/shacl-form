@@ -1,7 +1,7 @@
 import { FieldWrapper } from './field/FieldWrapper'
 import { hash } from '../helpers/hash'
 import { GrapoiPointer } from '../types'
-import { sh, rdf } from '../helpers/namespaces'
+import { sh, rdf, dash } from '../helpers/namespaces'
 import { createElement } from 'react'
 
 type FormLevelProps = { 
@@ -32,7 +32,8 @@ export function FormLevel ({
     if (!ignoreGroups && field._usedInGroup) return
 
     const childrenObject = Object.fromEntries(Object.entries(field as any).filter(([name]) => name[0] !== '_'))
-    const children = (dataPointer: GrapoiPointer) => {
+    const children = Object.keys(childrenObject).length ? (dataPointer: GrapoiPointer) => {
+
       return Object.keys(childrenObject).length ? 
         (<FormLevel 
           dataPointer={dataPointer} 
@@ -45,15 +46,21 @@ export function FormLevel ({
           tree={childrenObject} 
         />)
         : null
-    }
+    } : null
 
     const widgets = field._widgets
 
     for (const widget of widgets) {
-      widget._score = widget._widget.score(widget._shaclPointer, dataPointer, form.options)
+      const widgetScore = widget._widget.score(widget._shaclPointer, dataPointer, form.options)
+      const definedEditor = widget._shaclPointer.out([dash('editor')]).value
+      widget._definedEditor = definedEditor
+      widget._score = definedEditor && widget._widget.iri === definedEditor ? 100 : widgetScore
     }
 
-    return widgets?.length ? widgets
+    // console.log(predicate)
+    // console.table(widgets.map(widget => [widget._widget.name, widget._score]))
+
+    const finalWidget = widgets?.length ? widgets
       .filter((widget: any) => widget._score > 0)
       .sort((a: any, b: any) => b._score - a._score)
       .slice(0, 1)
@@ -64,6 +71,7 @@ export function FormLevel ({
             key={hash(cid + widget._widget.name + outerIndex + index)} 
             structure={widget} 
             form={form}
+            isOrderedList={field._isOrderedList}
             errors={field._messages}
             dataPointer={() => dataPointer}
             Widget={widget._widget}
@@ -72,6 +80,10 @@ export function FormLevel ({
           </FieldWrapper>
         )
       }) : null
+
+    if (finalWidget.length) return finalWidget
+
+    return children ? children(dataPointer) : null
   })
   .filter(Boolean)
   .sort((a: any, b: any) => {
@@ -90,20 +102,22 @@ export function FormLevel ({
   const groups = new Map()
 
   const groupedWidgets = [
-    ...widgets.map(widget => [widget.props.structure._shaclPointer.out([sh('group')]).term ?? 'none', widget]), 
+    ...widgets.map(widget => [widget.props?.structure?._shaclPointer?.out([sh('group')]).term ?? 'none', widget]), 
     ...Object.values(tree._groups ?? {}).map((group: any) => [group.group]) ?? []
   ].filter(Boolean)
 
   for (const [group, widget] of groupedWidgets) {
-    if (!groups.has(group.value)) {
+    const groupName = group?.value ?? group
+
+    if (!groups.has(groupName)) {
       const groupPointer = shaclPointer.out([null], group)
       const groupTypes = groupPointer.out([rdf('type')]).terms
       const order = groupPointer.out([sh('order')]).value ? parseInt(groupPointer.out([sh('order')]).value) : 0
       let [element] = groupTypes.map(groupType => form.options.groups[groupType.value]).filter(Boolean)
       if (!element) element = form.options.groups.default
-      groups.set(group.value, { element, props: { groupPointer, order }, children: [], order })
+      groups.set(groupName, { element, props: { groupPointer, order }, children: [], order })
     }
-    const groupObject = groups.get(group.value)
+    const groupObject = groups.get(groupName)
     groupObject.children.push(widget)
   }
 
@@ -116,6 +130,7 @@ export function FormLevel ({
           form
         }, ...groupObject.children)
       }).sort((a, b) => {
+        /** @ts-ignore */
         return a.props.order - b.props.order
       })}
     </>

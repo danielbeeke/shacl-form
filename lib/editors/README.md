@@ -5,7 +5,7 @@ export default class YourWidgetName extends ShaclFormEditor<typeof YourWidgetNam
 
   static score(shaclPointer: GrapoiPointer): number {
     return scorer(shaclPointer)
-      .datatypes([xsd('langString'), xsd('string')])
+      .datatypes([rdf('langString'), xsd('string')])
       .toNumber()
   }
 

@@ -4,8 +4,14 @@ import { Enhancer } from './core/Enhancer'
 import String from './editors/single/String'
 import BlankNodeOrIri from './editors/single/BlankNodeOrIri'
 import Date from './editors/single/Date'
-import LanguageString from './editors/single/LanguageString'
-import createFileUpload from './editors/single/FileUpload'
+import FileUpload from './editors/single/FileUpload'
+import Iconify from './editors/single/Iconify'
+import Reference from './editors/single/Reference'
+import WYSIWYG from './editors/single/WYSIWYG'
+import EnumSelect from './editors/single/EnumSelect'
+import Text from './editors/single/Text'
+import Switch from './editors/single/Switch'
+import Color from './editors/single/Color'
 
 // multi Widgets
 import Address from './editors/multi/Address'
@@ -23,16 +29,24 @@ import { init as bcp47PickerInit } from 'bcp47-picker/init'
 
 bcp47PickerInit({ sources: ['https://bcp47.danielbeeke.nl/data/lmt.json']})
 
+const uploadSetttings = {
+  backend: import.meta.env.STORAGE_BACKEND ?? 'http://localhost:8008/local'
+}
+
 export default {
   widgets: {
     single: {
       String,
-      LanguageString,
+      Iconify,
+      Reference,
       BlankNodeOrIri,
       Date,
-      FileUpload: createFileUpload({
-        backend: import.meta.env.STORAGE_BACKEND ?? 'http://localhost:8000/local'
-      })
+      EnumSelect,
+      Text,
+      Switch,
+      Color,
+      WYSIWYG: [WYSIWYG, uploadSetttings],
+      FileUpload: [FileUpload, uploadSetttings]
     },
     multi: {
       Address
@@ -48,3 +62,5 @@ export default {
     geocoder: new PositionstackGeocoder(import.meta.env.POSITIONSTACK),
   }
 }
+
+// 

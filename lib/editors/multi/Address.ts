@@ -67,7 +67,7 @@ export default class Address extends ShaclFormMultiEditorUhtml<typeof Address> {
 
       <br />
 
-      <button onClick=${() => {
+      <button class="btn btn-secondary btn-sm" onClick=${() => {
         this.showAdvanced = !this.showAdvanced
         this.render()
       }}>${this.showAdvanced ? 'Hide advanced' : 'Show advanced'}</button>

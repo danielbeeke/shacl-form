@@ -6,6 +6,7 @@ ex:name
   schema:address ex:address1, ex:address2 .
 
 ex:address1
+  a schema:PostalAddress ;
   schema:streetAddress "Oosterdokskade 67" ;
   schema:addressRegion "Noord Holland" ;
   schema:addressLocality "Amsterdam" ;
@@ -13,6 +14,7 @@ ex:address1
   schema:addressCountry "NL" .
 
 ex:address2
+  a schema:PostalAddress ;
   schema:streetAddress "Hauptplatz 12 Rosenarcade" ;
   schema:addressRegion "Tulln an der Donau" ;
   schema:addressLocality "Lower Austria" ;

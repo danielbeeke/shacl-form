@@ -3,21 +3,37 @@ import { bestLanguage } from '../../helpers/bestLanguage'
 import { FieldItem } from './FieldItem'
 import { GrapoiPointer, Widget, NamedNode, Literal, Term } from '../../types'
 import { useRef } from 'react'
+import { ReactSortable } from "react-sortablejs";
+import { replaceList } from '../../helpers/replaceList'
+import factory from 'rdf-ext'
+import { Icon } from '@iconify-icon/react';
 
 type FieldWrapperProps = { 
   Widget: any, 
   children: any, 
   structure: Widget, 
   errors: any,
+  isOrderedList: boolean,
   uiLanguagePriorities: Array<string>,
   dataPointer: () => GrapoiPointer,
   form: any
 }
 
 // TODO move to element?
-const addItem = (pointer: GrapoiPointer, predicate: NamedNode, elementRef: any, Widget: any, _pathPart: any) => {
+const addItem = (pointer: GrapoiPointer, predicate: NamedNode, elementRef: any, Widget: any, _pathPart: any, isList: boolean, setSortableState: any, shaclPointer: GrapoiPointer) => {
   const form = elementRef.current.closest('.shacl-form')
-  pointer.addOut(predicate, Widget.createNewObject(form))
+
+  if (isList) {
+    const newValues = [...pointer.out([predicate]).list()].map(part => part.term)
+    newValues.push(Widget.createNewObject(form, shaclPointer))
+    replaceList(newValues, pointer.out([predicate]))
+    const newSortableState = newValues.map((term: Term) => ({ id: JSON.stringify(term), term }))
+    setSortableState(newSortableState)
+  }
+  else {
+    pointer.addOut(predicate, Widget.createNewObject(form, shaclPointer))
+  }
+  
   form.render()
 }
 
@@ -29,7 +45,10 @@ type ErrorProp = {
   }
 }
 
-export function Errors ({ errors: { errors, infos, warnings } }: ErrorProp) {
+export function Errors (props: ErrorProp) {
+  if (!props.errors) return null
+  const { errors: { errors, infos, warnings } } = props
+
   return <>
     {errors.length ? errors.map(error => <div key={error} className='alert alert-danger'>{error}</div>) : null}
     {infos.length ? infos.map(info => <div key={info} className='alert alert-info'>{info}</div>) : null}
@@ -37,22 +56,99 @@ export function Errors ({ errors: { errors, infos, warnings } }: ErrorProp) {
   </>
 }
 
-export function FieldWrapper ({ Widget, children, structure, errors, uiLanguagePriorities, dataPointer, form }: FieldWrapperProps) {
+export const orderCache: Map<string, Array<string>> = new Map()
+
+export function FieldWrapper ({ Widget, isOrderedList, children, structure, errors, uiLanguagePriorities, dataPointer, form }: FieldWrapperProps) {
   const { _shaclPointer, _predicate, _pathPart } = structure
+
+  const getTerms = () => {
+    return isOrderedList 
+    ? [...dataPointer().execute(_pathPart)?.list() ?? []]?.map(part => part.term)
+    : (_pathPart ? dataPointer().execute(_pathPart).trim() : dataPointer()).terms
+  }
+
+  let terms = getTerms()
+
+  const activeTerms = terms.filter(term => {
+    return !(term as Literal).language || 
+      form.activeContentLanguages.includes((term as Literal).language)
+  })
+
+  if (activeTerms.length === 0) {
+    const newObject = Widget.createNewObject(form, _shaclPointer)
+
+    if (isOrderedList) {
+      const blankNode = factory.blankNode()
+      dataPointer().addOut([_predicate], [blankNode])
+      const pointer = dataPointer().node([blankNode])
+
+      replaceList([newObject], pointer)
+    }
+    else {
+      dataPointer().addOut(_predicate, newObject)
+    }
+
+    terms = getTerms()
+  }
 
   const name = bestLanguage(_shaclPointer.out([sh('name')]), uiLanguagePriorities)
   const description = bestLanguage(_shaclPointer.out([sh('description')]), uiLanguagePriorities)
 
-  const fieldData = _pathPart ? dataPointer().execute(_pathPart).trim() : dataPointer()
+  const sortableItems = terms.map((term: Term) => ({ id: JSON.stringify(term), term }))
+  const sortableState = sortableItems
+  const setSortableState = (newState: any) => {
+    const pointer: GrapoiPointer = dataPointer().execute(_pathPart)
+    replaceList(newState.map((item: any) => item.term), pointer)
+    form.render()
+  }
 
-  const activeItems = fieldData.terms.map((term, index) => {
+  const path = JSON.stringify(_pathPart)
+
+  const serializedTerms = terms.map(term => JSON.stringify(term))
+
+  if (!isOrderedList) {
+    // Because standard RDF is unordered we need to simulate order.
+    // Create the initial order
+    if (!orderCache.has(path)) {
+      orderCache.set(path, serializedTerms)
+    }
+
+    // Update the order
+    else {
+      const existingOrder = orderCache.get(path)!
+      for (const term of serializedTerms) {
+        if (!existingOrder.includes(term)) existingOrder.push(term)
+      }
+
+      const emptyRowContents = '{"termType":"DefaultGraph","value":""}'
+      const emptyRowIndex = existingOrder.indexOf(emptyRowContents)
+      // Empty rows must be at the end
+      if (emptyRowIndex !== -1) {
+        existingOrder.splice(emptyRowIndex, 1)
+        existingOrder.push('{"termType":"DefaultGraph","value":""}')
+      }
+
+      // Removals
+      const newOrder = []
+      for (const existingOrderItem of existingOrder) {
+        if (serializedTerms.includes(existingOrderItem)) {
+          newOrder.push(existingOrderItem)
+        }
+      }
+      orderCache.set(path, newOrder)
+    }
+  }
+
+  const activeItems = terms
+  .map((term, index) => {
     const cid = JSON.stringify([_pathPart, term]) + index
 
     return [(
       <FieldItem 
-        key={cid} 
+        key={cid}
         index={index} 
         structure={structure}
+        isList={isOrderedList}
         uiLanguagePriorities={uiLanguagePriorities}
         dataPointer={dataPointer}
         Widget={Widget}
@@ -65,23 +161,46 @@ export function FieldWrapper ({ Widget, children, structure, errors, uiLanguageP
       form.activeContentLanguages.includes((term as Literal).language)
   })
   
-  const items = activeItems.map(([field]) => field as JSX.Element)
+  const items = activeItems
+    .sort((a, b) => {
+      if (isOrderedList) {
+        const aTermSerialized = JSON.stringify(a[1])
+        const aTerm = sortableState.find(sortableItem => sortableItem.id === aTermSerialized)
+        const aIndex = aTerm ? sortableState.indexOf(aTerm) : 1000
+
+        const bTermSerialized = JSON.stringify(b[1])
+        const bTerm = sortableState.find(sortableItem => sortableItem.id === bTermSerialized)
+        const bIndex = bTerm ? sortableState.indexOf(bTerm) : 1000
+
+        return aIndex - bIndex  
+      }
+      else {
+        const aTerm = JSON.stringify(a[1])
+        const bTerm = JSON.stringify(b[1])
+        const aIndex = orderCache.get(path)!.indexOf(aTerm) ?? 10000
+        const bIndex = orderCache.get(path)!.indexOf(bTerm) ?? 10000
+  
+        return aIndex - bIndex  
+      }
+    })
+    .map(([field]) => field as JSX.Element)
 
   const element = useRef<HTMLDivElement>(null)
 
-  if (items.length === 0) {
-    const newObject = Widget.createNewObject(form)
-    if (newObject.termType !== 'BlankNode') {
-      dataPointer().addOut(_predicate, Widget.createNewObject(form))
-    }
-  }
-
   const maxCount = _shaclPointer.out([sh('maxCount')]).value
+  const uniqueLang = _shaclPointer.out([sh('uniqueLang')]).value
 
-  let showAdd = !maxCount || fieldData.terms.length < maxCount
+  let showAdd = !maxCount || terms.length < maxCount
   if (Widget.type === 'multi') showAdd = false
   if (Widget.hideAddButton) showAdd = false
   if ((activeItems[activeItems.length - 1]?.[1] as Term)?.value === '') showAdd  = false
+  if (uniqueLang) showAdd = false
+
+  const formSaveHasBeenTouched = form.touchedSave
+
+  if (!formSaveHasBeenTouched && errors) {
+    errors.errors = errors.errors.filter((message: string) => !message.startsWith('Less than'))
+  }
 
   return (
     <div ref={element} className={`field`} data-predicate={_predicate?.value}>
@@ -104,7 +223,9 @@ export function FieldWrapper ({ Widget, children, structure, errors, uiLanguageP
       </FieldItem>
 
       <div className='items'>
-        {items}
+        {isOrderedList ? <ReactSortable filter="input,.list-group,.form-control" preventOnFilter={false} list={sortableState} setList={setSortableState}>
+          {items}
+        </ReactSortable> : items}
       </div>
 
       <FieldItem 
@@ -120,8 +241,8 @@ export function FieldWrapper ({ Widget, children, structure, errors, uiLanguageP
       </FieldItem>
 
       {showAdd ? (
-        <button className='btn btn-secondary btn-sm btn-add-item ms-auto' onClick={() => addItem(dataPointer(), _predicate, element, Widget, _pathPart)}>
-          Add item
+        <button type="button" className='btn btn-secondary btn-sm btn-add-item me-auto mb-4' onClick={() => addItem(dataPointer(), _predicate, element, Widget, _pathPart, isOrderedList, setSortableState, _shaclPointer)}>
+          <Icon icon="fa6-solid:plus" />
         </button>
       ) : null} 
     </div>

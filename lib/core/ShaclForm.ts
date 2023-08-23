@@ -38,6 +38,7 @@ export const init = (options: Options) => {
     #uiLanguagePriorities: Array<string> = ['*']
     public options: Options
     #data: GrapoiPointer = {} as GrapoiPointer
+    public touchedSave = false
 
     constructor () {
       super()
@@ -88,7 +89,7 @@ export const init = (options: Options) => {
           shfrm:ButtonGroup
             a sh:PropertyGroup, shfrm:Buttons .
 
-          <${this.#rootShaclIri}> 
+          <${this.#rootShaclIri.value}> 
             sh:property [
               sh:group shfrm:ButtonGroup ;
               sh:order 1000 ;
@@ -141,7 +142,6 @@ export const init = (options: Options) => {
     async render () {
       const report = await this.validate()
       const tree = shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
-
       const shacl = grapoi({ dataset: this.#shaclDataset, factory })
 
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [
@@ -163,6 +163,7 @@ export const init = (options: Options) => {
     }
 
     async save () {
+      this.touchedSave = true
       await this.render()
 
       this.querySelector('form')?.reportValidity()
@@ -172,16 +173,23 @@ export const init = (options: Options) => {
       const rdfIsValid = await this.validate()
       const errors = rdfIsValid.results.filter((result: any) => !shn('Trace').equals(result.severity) && !shn('Debug').equals(result.severity))
 
-      if (!html5Valid || errors.length || rdfIsValid.dataset.size === 0) return
+      if (!html5Valid || errors.length || rdfIsValid.dataset.size === 0) console.error('Form did NOT validate')
 
-      const dataset = this.store
+      const dataset = new Store([...this.store])
       const lists = dataset.extractLists({ remove: true });
       const writer = new Writer({ lists })
       for (const quad of dataset) {
         // We simply skip empty items.
-        if (quad.object.value) writer.addQuad(quad)
+        if (quad.object.value && quad.object.termType !== 'BlankNode') writer.addQuad(quad)
+        if (quad.object.termType === 'BlankNode') {
+          const children = dataset.getQuads(quad.object, null, null, null)
+          if (children.length) writer.addQuad(quad)
+        }
       }
-      writer.end((error, turtle) => {
+      writer.end((error: Error, turtle: string) => {
+        if (error) {
+          console.error(error)
+        }
         this.dispatchEvent(new CustomEvent('save', {
           detail: { turtle, dataset }
         }))
@@ -201,7 +209,9 @@ export const init = (options: Options) => {
         if (quad.object.value) validateStore.add(quad)
       }
 
-      const report = this.#validator.validate({ dataset: validateStore, terms: [this.subject] })
+      const report = this.#validator.validate({ dataset: validateStore, terms: [this.subject] }, [{
+        terms: [this.#rootShaclIri]
+      }])
 
       report.dataset = validateStore
 

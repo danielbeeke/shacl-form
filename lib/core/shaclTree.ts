@@ -23,24 +23,39 @@ export const shaclTree = (report: any, shaclDataset: DatasetCore, options: Optio
   const shacl = grapoi({ dataset: shaclDataset, factory, term: rootShaclIri })
   const shaclShapes = shacl.hasOut([rdf('type')], [sh('NodeShape')])
   const shaclProperties = shaclShapes.hasOut([sh('property')])
-  return processLevel(shaclProperties, report, options, shacl, shaclDataset)
+  return processLevel(shaclProperties, report, options, shacl, shaclDataset, 1)
 }
 
-export const processLevel = (shaclProperties: GrapoiPointer, report: any, options: Options, rootPointer: GrapoiPointer, shaclDataset: DatasetCore) => {
+export const processLevel = (shaclProperties: GrapoiPointer, report: any, options: Options, rootPointer: GrapoiPointer, shaclDataset: DatasetCore, depth: number) => {
   const level: any = {}
 
   for (const shaclProperty of shaclProperties.out([sh('property')])) {
     const shaclPropertyInner = shaclProperty.trim()
 
-    const path = parsePath(shaclPropertyInner.out([sh('path')]))
+    let path = parsePath(shaclPropertyInner.out([sh('path')]))
 
+    // TODO evaluate this structure. THis feels hackish.
+    // Unfortunatly so does SHACL ordered list validation: https://archive.topquadrant.com/constraints-on-rdflists-using-shacl/
+    const isOrderedList = path && path.length === 3 && 
+      path?.[0].quantifier === 'one' && 
+      path?.[1].quantifier === 'zeroOrMore' && 
+      path?.[2].quantifier === 'one' && 
+      path[1].predicates[0].equals(rdf('rest')) &&
+      path[2].predicates[0].equals(rdf('first'))
+
+    if (isOrderedList) path = [path[0]]
+    
     let pointer = level
 
     if (!path) {
       const group = shaclPropertyInner.out([sh('group')]).term
-      const groupPointer = rootPointer.node().trim().out([null], [group])
-      if (!pointer._groups) pointer._groups = {}
-      pointer._groups[shaclPropertyInner.term.value] = { groupPointer, group }
+
+      if (group) {
+        const groupPointer = rootPointer.node().trim().out([null], [group]).distinct()
+        if (!pointer._groups) pointer._groups = {}
+        pointer._groups[shaclPropertyInner.term.value] = { groupPointer, group }  
+      }
+
       continue
     }
 
@@ -62,6 +77,8 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
             _shaclPointers: [],
             _pathPart: pathPart,
             _types: [],
+            _isOrderedList: isOrderedList,
+            _shaclPointer: shaclPropertyInner,
             // sh:or, sh:xone, sh:qualifiedValueShape
             get _alternatives () {
               return _.once(() => pointersToAlternatives(item._shaclPointers))()
@@ -71,15 +88,21 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
                 const { single: singleWidgets } = options.widgets
 
                 return item._alternatives.flatMap(alternative => {
-                  return Object.values(singleWidgets).map(widget => ({
-                    _shaclPointer: alternative.pointer,
-                    _alternative: alternative,
-                    _order: alternative.pointer.out(sh('order')).value ? parseInt(alternative.pointer.out(sh('order')).value) : 0,
-                    _widget: widget,
-                    _predicate: predicate,
-                    _path: pathPartsTillNow,
-                    _pathPart: pathPart
-                  }))
+                  return Object.values(singleWidgets).map(widget => {
+                    const widgetClass = Array.isArray(widget) ? widget[0] : widget
+                    const widgetSettings = Array.isArray(widget) ? widget[1] : {}
+
+                    return {
+                      _shaclPointer: alternative.pointer.distinct(),
+                      _alternative: alternative,
+                      _order: alternative.pointer.out(sh('order')).value ? parseInt(alternative.pointer.out(sh('order')).value) : 0,
+                      _widget: widgetClass,
+                      _widgetSettings: widgetSettings,
+                      _predicate: predicate,
+                      _path: pathPartsTillNow,
+                      _pathPart: pathPart
+                    }
+                  })
                 })
               })()
             }
@@ -109,10 +132,19 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
 
         const nestedShape = shaclPropertyInner.out(sh('node')).term
 
+        /**
+         * TODO Should we also allow blankNodes?
+         */
         if (nestedShape?.termType === 'NamedNode') {
           const shacl = grapoi({ dataset: shaclDataset, factory, term: nestedShape })
           const shaclProperties = shacl.hasOut([sh('property')]).trim()
-          const nestedTree = processLevel(shaclProperties.distinct(), report, options, shacl, shaclDataset)
+
+          const mergedPointer = shaclPropertyInner.node([
+            ...shaclProperties.distinct().terms,
+            ...shaclPropertyInner.terms,
+          ]).distinct()
+
+          const nestedTree = processLevel(mergedPointer, report, options, shacl, shaclDataset, depth++)
           Object.assign(pointer[predicate.value], nestedTree)
         }
 
@@ -120,6 +152,15 @@ export const processLevel = (shaclProperties: GrapoiPointer, report: any, option
         pointer = pointer[predicate.value]
       }
     }
+  }
+
+  if (depth === 1) {
+    const shaclGroups = rootPointer.node().out([rdf('type')], [sh('PropertyGroup')]).in().distinct()
+
+    for (const shaclGroup of shaclGroups) {
+      if (!level._groups) level._groups = {}
+      level._groups[shaclGroup.term.value] = { groupPointer: shaclGroup, group: shaclGroup.term }  
+    }  
   }
 
   for (const multiWidget of Object.values(options.widgets.multi)) {

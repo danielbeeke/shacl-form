@@ -13,4 +13,5 @@ export interface IShaclFormEditor extends HTMLElement {
   uiLanguagePriorities: Array<string>
 }
 
+/** @ts-ignore */
 export type StaticImplements<I extends new (...args: any[]) => any, C extends I> = InstanceType<I>

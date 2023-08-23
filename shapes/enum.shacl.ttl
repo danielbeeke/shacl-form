@@ -4,15 +4,16 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix dash: <http://datashapes.org/dash#> .
 @prefix shfrm: <https://github.com/danielbeeke/shacl-form/ontology#> .
+@prefix dash: <http://datashapes.org/dash#> .
 
 ex:RootShape
 	a sh:NodeShape ;
 
 	sh:property [
-		sh:path schema:url;
-		sh:name "File upload"@en ;
-		dash:uriStart "http://localhost:8008/test" ;
+		sh:path schema:choice;
+		sh:name "Choice"@en ;
+		sh:in ( "a" "b" "c" ) ;
 	] ;
+
   .

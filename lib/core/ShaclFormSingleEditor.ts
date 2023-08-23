@@ -1,7 +1,9 @@
 import type { GrapoiPointer, Term, NamedNode, ShaclFormType } from '../types'
 import factory from 'rdf-ext'
 import { IShaclFormEditorConstructor, StaticImplements } from './ShaclFormEditor'
-import { sh } from '../helpers/namespaces'
+import { sh, shFrm } from '../helpers/namespaces'
+import { replaceList } from '../helpers/replaceList'
+import DatasetCore from '@rdfjs/dataset/DatasetCore'
 
 export abstract class ShaclFormSingleEditor<T extends IShaclFormEditorConstructor> 
 extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> {
@@ -16,6 +18,7 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
     warnings: []
   }
 
+  public isList: boolean = false
   public path: any
   public predicate: NamedNode = factory.namedNode('')
   public index: number = 0
@@ -25,56 +28,90 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
   public uiLanguagePriorities: Array<string> = []
   public isHeader: boolean = false
   public isFooter: boolean = false
+  #form: ShaclFormType = undefined as unknown as ShaclFormType
+  public widgetSettings: any
 
   public static type = 'single'
 
+  static get iri () {
+    return shFrm(ShaclFormSingleEditor.name).value
+  }
+
+  static set iri (_value: any) {
+
+  }
+    
+  static score(_shaclPointer: GrapoiPointer, _dataPointer: GrapoiPointer) {
+    return 0
+  }
+
+  static createNewObject (_form: any, _shaclPointer: GrapoiPointer) {
+    return factory.namedNode('') as any
+  }
+
   get values (): Array<Term> {
-    return this.dataPointer()
-      .out([this.predicate]).terms
+    if (this.dataPointer().out([this.predicate]).isList()) {
+      return [...this.dataPointer().out([this.predicate]).list()]
+        .map(part => part.term)
+    }
+    else {
+      return this.dataPointer()
+        .out([this.predicate]).terms
+    }
   }
 
   get value (): Term {
-    return this.dataPointer()
-      .out([this.predicate]).terms[this.index]
+    return this.values[this.index]
   }
 
   set value (newValue: Term) {
-    (async () => {
-      this.dataPointer()
-        .deleteOut(this.predicate, this.value)
-        .addOut(this.predicate, newValue)
+    if (newValue.equals(this.value)) return
 
-      const event = new CustomEvent('value.set', {
-        detail: {
-          predicate: this.predicate,
-          object: newValue,
-          dataPointer: this.dataPointer(),
-          shaclPointer: this.shaclPointer,
-          element: this
-        }
-      })
-      this.form.dispatchEvent(event)
-      this.renderAll()
-    })()
+    if (this.isList) {
+      const newValues = [...this.values]
+      newValues[this.index] = newValue
+      replaceList(newValues, this.dataPointer().out([this.predicate]))
+    }
+    else {
+      this.dataPointer()
+      .deleteOut(this.predicate, this.value)
+      .addOut(this.predicate, newValue)
+    }
+
+    const event = new CustomEvent('value.set', {
+      detail: {
+        predicate: this.predicate,
+        object: newValue,
+        dataPointer: this.dataPointer(),
+        shaclPointer: this.shaclPointer,
+        element: this
+      }
+    })
+    this.form.dispatchEvent(event)
+    this.renderAll()
   }
 
   addValue (newValue: Term) {
-    (async () => {
-      this.dataPointer()
-        .addOut(this.predicate, newValue)
+    if (this.isList) {
+      const newValues = [...this.values]
+      newValues.push(newValue)
+      replaceList(newValues, this.dataPointer().out([this.predicate]))
+    }
+    else {
+      this.dataPointer().addOut(this.predicate, newValue)
+    }
 
-      const event = new CustomEvent('value.set', {
-        detail: {
-          predicate: this.predicate,
-          object: newValue,
-          dataPointer: this.dataPointer(),
-          shaclPointer: this.shaclPointer,
-          element: this
-        }
-      })
-      this.form.dispatchEvent(event)
-      this.renderAll()
-    })()
+    const event = new CustomEvent('value.set', {
+      detail: {
+        predicate: this.predicate,
+        object: newValue,
+        dataPointer: this.dataPointer(),
+        shaclPointer: this.shaclPointer,
+        element: this
+      }
+    })
+    this.form.dispatchEvent(event)
+    this.renderAll()
   }
 
 
@@ -82,8 +119,14 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
     this.form.render()
   }
 
+  get rdfDataset (): DatasetCore {
+    return this.dataPointer().ptrs[0].dataset
+  }
+
   get form () {
-    return this.closest('.shacl-form') as ShaclFormType
+    if (this.#form) return this.#form
+    this.#form = this.closest('.shacl-form') as ShaclFormType
+    return this.#form
   }
 
   async beforeRemove (): Promise<boolean> {
@@ -100,7 +143,7 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
     return null
   }
 
-  template (props: any): any {
+  template (_props: any): any {
     return null
   }
 

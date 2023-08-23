@@ -20,7 +20,7 @@ ex:RootShape
 		sh:order 2 ;
 		sh:name "Birthday"@en ;
 		sh:description "When was this friend born?"@en ;
-		sh:maxCount 1 ;
+		# sh:maxCount 1 ;
 		sh:datatype xsd:date;
 	] ;
 	
@@ -32,8 +32,7 @@ ex:RootShape
 		sh:description "How do you call this friend?"@en ;
 		sh:maxCount 3 ;
 		sh:minCount 1 ;
-		sh:datatype xsd:langString;
-		sh:uniqueLang true ;
+		sh:datatype rdf:langString;
 	] ;
 
   .

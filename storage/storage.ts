@@ -21,6 +21,8 @@ for (const [name, config] of Object.entries(env.buckets)) {
   }
 }
 
+const port = 8008
+
 app.use(async (ctx: Context) => {
   try {
     const { method, url } = ctx.request
@@ -53,9 +55,11 @@ app.use(async (ctx: Context) => {
       /** @ts-ignore */
       const [file] = requestData.files
 
+      const cleanedName = file.originalName.replace(/[^a-z0-9]/gi, '_').toLowerCase()
       const filePath = file.filename
-      await bucket.addFileFromPath(filePath, path + file.originalName)
-      ctx.response.body = `http://localhost:8000/${bucketName}/${path + file.originalName}`
+      
+      await bucket.addFileFromPath(filePath, path + cleanedName)
+      ctx.response.body = `http://localhost:${port}/${bucketName}/${path + cleanedName}`
     }
     else if (method === 'OPTIONS') {
       ctx.response.status = 200
@@ -73,5 +77,5 @@ app.use(async (ctx: Context) => {
   }
 })
 
-console.log('Running storage demo on localhost:8000')
-await app.listen({ port: 8000 })
+console.log(`Running storage demo on localhost:${port}`)
+await app.listen({ port })

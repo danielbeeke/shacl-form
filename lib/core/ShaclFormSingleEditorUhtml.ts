@@ -1,6 +1,6 @@
 import { IShaclFormEditorConstructor, StaticImplements } from './ShaclFormEditor'
 import { ShaclFormSingleEditor } from './ShaclFormSingleEditor'
-import { render } from 'uhtml'
+import { render } from 'uhtml/async'
 
 export abstract class ShaclFormSingleEditorUhtml<T extends IShaclFormEditorConstructor> 
 extends ShaclFormSingleEditor<T> implements StaticImplements<IShaclFormEditorConstructor, T> {

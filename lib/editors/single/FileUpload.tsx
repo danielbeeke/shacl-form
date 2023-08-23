@@ -1,6 +1,6 @@
 import { ShaclFormSingleEditorReact } from '../../core/ShaclFormSingleEditorReact'
 import { GrapoiPointer } from '../../types'
-import { dash, sh } from '../../helpers/namespaces'
+import { dash, sh, shFrm } from '../../helpers/namespaces'
 import { scorer } from '../../core/Scorer'
 import Dropzone from 'react-dropzone'
 import factory from 'rdf-ext'
@@ -10,13 +10,15 @@ type FileUploadOptions = {
   backend: string
 }
 
-export class FileUpload extends ShaclFormSingleEditorReact<typeof FileUpload> {
+export default class FileUpload extends ShaclFormSingleEditorReact<typeof FileUpload> {
 
-  public static options: FileUploadOptions
+  public widgetSettings: FileUploadOptions | undefined = undefined
 
   static hideAddButton = true
   public error: string = ''
   public isUploading = false
+
+  static iri = shFrm('FileUpload').value
 
   static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
     return scorer(shaclPointer, dataPointer)
@@ -78,7 +80,7 @@ export class FileUpload extends ShaclFormSingleEditorReact<typeof FileUpload> {
         this.isUploading = true
         this.render()
 
-        const response = await fetch(`${FileUpload.options.backend}/${prefix}/`, {
+        const response = await fetch(`${this.widgetSettings!.backend}/${prefix}/`, {
           body: formData,
           method: 'POST'
         })
@@ -101,9 +103,4 @@ export class FileUpload extends ShaclFormSingleEditorReact<typeof FileUpload> {
     const output = await response.json()
     return output.success === true
   }
-}
-
-export default function createFileUpload (options: FileUploadOptions) {
-  FileUpload.options = options
-  return FileUpload
 }

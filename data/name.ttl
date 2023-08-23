@@ -4,9 +4,9 @@
 
 ex:name 
   schema:knows [
-    schema:name "John", "Johnny" ;
+    schema:name "John"@en, "Johnny"@en ;
     schema:birthDay "1992-04-22"^^xsd:date ;
   ], [
-    schema:name "Frank" ;
+    schema:name "Frank"@en ;
     schema:birthDay "1990-03-12"^^xsd:date ;
   ] .

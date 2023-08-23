@@ -2,7 +2,6 @@ import { IShaclFormEditorConstructor, StaticImplements } from './ShaclFormEditor
 import { ShaclFormSingleEditor } from './ShaclFormSingleEditor'
 import { createRoot, Root } from 'react-dom/client'
 import { createElement } from 'react'
-import factory from 'rdf-ext'
 
 /**
  * Use <input defaultValue={this.value.value ?? ''} onBlur={} /> instead of <input value={this.value.value ?? ''} onChange={} />
@@ -23,11 +22,7 @@ extends ShaclFormSingleEditor<T> implements StaticImplements<IShaclFormEditorCon
     this.#boundTemplate = this.template.bind(this)
     this.#boundFooter = this.footer.bind(this)
   }
-
-  static createNewObject (form: any) {
-    return factory.namedNode('') as any
-  }
-
+  
   render () {
     if (this.isHeader) this.#root?.render(createElement(this.#boundHeader))
     else if (this.isFooter) this.#root?.render(createElement(this.#boundFooter))
@@ -38,7 +33,7 @@ extends ShaclFormSingleEditor<T> implements StaticImplements<IShaclFormEditorCon
     return null
   }
 
-  template (props: any): any {
+  template (_props: any): any {
     return (<h3>Please implement template()</h3>)
   }
 

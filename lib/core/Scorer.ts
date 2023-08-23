@@ -1,4 +1,4 @@
-import { GrapoiPointer, NamedNode } from '../types'
+import { GrapoiPointer, NamedNode, Term } from '../types'
 import { sh } from '../helpers/namespaces'
 
 /**
@@ -19,9 +19,10 @@ export class Scorer {
   constructor (shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
     this.#shaclPointer = shaclPointer
     this.#dataPointer = dataPointer
+    console.log(this.#dataPointer)
   }
 
-  datatype (acceptedTypes: Array<NamedNode>, score: number = 1) {
+  datatype (acceptedTypes: Array<NamedNode>, score: number = 1, exclusive = true) {
     const datatypes = this.#shaclPointer.out([sh('datatype')]).terms
     const isAllowed = datatypes.every(datatype => acceptedTypes.some(acceptedType => acceptedType.equals(datatype)))
 
@@ -32,15 +33,28 @@ export class Scorer {
     if (node) this.#foundIncompatibility = true
 
     if (isAllowed) this.#scores.push({ type: 'datatype', score })
-    else this.#foundIncompatibility = true
+    else if (exclusive) this.#foundIncompatibility = true
     return this
   }
 
   has (predicates: Array<NamedNode>, score?: number): this
+  has (predicates: Array<NamedNode>, value?: Term, score?: number): this
+  has (predicates: Array<NamedNode>, values?: Array<Term>, score?: number): this
+
+  has (predicate: NamedNode, value?: Term, score?: number): this
+  has (predicate: NamedNode, values?: Array<Term>, score?: number): this
+
   has (predicate: NamedNode, score?: number): this
-  has (input: Array<NamedNode> | NamedNode, score: number = 10) {
+  has (input: Array<NamedNode> | NamedNode, scoreOrValues?: number | Term | Array<Term>, finalScore?: number) {
     const predicates = Array.isArray(input) ? input : [input]
-    const hasMatch = this.#shaclPointer.out(predicates).terms.length > 0
+    let hasMatch = this.#shaclPointer.out(predicates).terms.length > 0
+
+    const score = (typeof scoreOrValues === 'number' ? scoreOrValues : finalScore) ?? 10
+
+    if (scoreOrValues && typeof scoreOrValues !== 'number') {
+      const valuesToMatch = Array.isArray(scoreOrValues) ? scoreOrValues : [scoreOrValues]
+      hasMatch = valuesToMatch.every((valueToMatch, index) => this.#shaclPointer.out(predicates).terms[index]?.equals(valueToMatch))
+    }
 
     if (hasMatch) this.#scores.push({ type: 'hash', score })
     else this.#foundIncompatibility = true

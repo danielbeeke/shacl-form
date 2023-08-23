@@ -1,7 +1,6 @@
 import type { NamedNode, Quad, Term } from '@rdfjs/types'
 import { ShaclFormSingleEditor } from './core/ShaclFormSingleEditor'
 import { GeocoderBase } from './plugins/GeoCoder/GeoCoderBase'
-import { FileUploaderBase } from './plugins/FileUploader/FileUploaderBase'
 export type { BlankNode, Literal, Quad, Variable, NamedNode, Term } from '@rdfjs/types'
 
 export type ShaclProperties = {
@@ -30,6 +29,7 @@ export type GrapoiPointer = {
   filter: (item: any) => boolean
   value: any
   isList: () => Boolean,
+  deleteList: () => GrapoiPointer,
   list: () => Array<GrapoiPointer>
   ptrs: Array<any>
   clone: (data: any) => GrapoiPointer  
@@ -55,8 +55,7 @@ export type Options = {
   },
   enhancer: any,
   plugins: {
-    geocoder?: GeocoderBase,
-    fileuploader?: FileUploaderBase
+    geocoder?: GeocoderBase
   }
 }
 
@@ -70,6 +69,7 @@ export type Widget = {
   _alternative: Alternative,
   _widget: any,
   _predicate: NamedNode,
+  _widgetSettings: any,
   _path: Array<any>,
   _pathPart: Array<any>,
   _messages: {
@@ -86,6 +86,8 @@ export type Widget = {
 
 export type TreeItem = {
   _shaclPointers: Array<GrapoiPointer>,
+  _isOrderedList: boolean,
+  _shaclPointer: GrapoiPointer,
   _messages: {
     errors: Array<string>,
     infos: Array<string>,
