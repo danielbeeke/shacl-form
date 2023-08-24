@@ -1,6 +1,6 @@
 import { ShaclFormSingleEditorUhtml } from '../../../core/ShaclFormSingleEditorUhtml'
 import { xsd } from '../../../helpers/namespaces'
-import { html } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
+import { html } from 'uhtml/async' // You could use React, Vue, Angular, basically anything and export it to a customElement.
 
 export default class Date extends ShaclFormSingleEditorUhtml<typeof Date> {
   template () {

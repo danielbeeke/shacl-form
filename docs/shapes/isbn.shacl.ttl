@@ -1,0 +1,25 @@
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+@prefix ex: <http://example.com/>.
+@prefix schema: <https://schema.org/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ex:RootShape
+	a sh:NodeShape ;
+
+
+	sh:property [
+		sh:path schema:isbn;
+		sh:name "ISBN"@en ;
+		sh:description """Try to fill <strong>9780001939776</strong>""" ;
+		sh:datatype xsd:string;
+		sh:maxCount 1;
+	] ;
+
+	sh:property [
+		sh:path schema:name;
+		sh:name "Name"@en ;
+		sh:datatype xsd:string;
+	] ;
+  .

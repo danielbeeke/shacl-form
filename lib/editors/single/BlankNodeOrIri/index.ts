@@ -3,7 +3,7 @@ import { BlankNode } from '../../../types'
 import { schema, rdfs, sh } from '../../../helpers/namespaces'
 import factory from 'rdf-ext'
 import { bestLanguage } from '../../../helpers/bestLanguage'
-import { html } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
+import { html } from 'uhtml/async' // You could use React, Vue, Angular, basically anything and export it to a customElement.
 import { swapSubject } from '../../../helpers/swapSubject'
 
 

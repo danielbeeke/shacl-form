@@ -1,0 +1,17 @@
+@prefix schema: <https://schema.org/>.
+@prefix ex: <http://example.com/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+<http://example.com/name> <https://schema.org/text> _:b3_b0.
+_:b3_b0 <https://editorjs.io/blocks> _:b7_b1, _:b7_b3;
+    <https://editorjs.io/time> 1692014534796;
+    <https://editorjs.io/version> "2.27.2".
+_:b7_b1 <https://editorjs.io/data> _:b7_b2;
+    <https://editorjs.io/id> "7PUJLLoYhl";
+    <https://editorjs.io/type> "header".
+_:b7_b3 <https://editorjs.io/data> _:b7_b4;
+    <https://editorjs.io/id> "-ZLPt9UUoa";
+    <https://editorjs.io/type> "paragraph".
+_:b7_b2 <https://editorjs.io/text> "Heading";
+    <https://editorjs.io/level> 2.
+_:b7_b4 <https://editorjs.io/text> "Test 1".

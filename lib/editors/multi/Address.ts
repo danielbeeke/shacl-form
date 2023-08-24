@@ -1,6 +1,6 @@
 import { NamedNode } from '../../types'
 import { schema, xsd } from '../../helpers/namespaces'
-import { html } from 'uhtml'
+import { html } from 'uhtml/async'
 import factory from 'rdf-ext'
 import { iso31661 } from 'iso-3166'
 

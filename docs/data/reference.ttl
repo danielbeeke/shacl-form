@@ -1,0 +1,6 @@
+@prefix schema: <https://schema.org/>.
+@prefix ex: <http://example.com/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+ex:name 
+  schema:author <http://dbpedia.org/resource/Søren_Kierkegaard> .

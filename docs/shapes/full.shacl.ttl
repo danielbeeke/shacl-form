@@ -1,0 +1,142 @@
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+@prefix ex: <http://example.com/>.
+@prefix schema: <https://schema.org/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix shfrm: <https://github.com/danielbeeke/shacl-form/ontology#> .
+@prefix dash: <http://datashapes.org/dash#> .
+
+ex:RootShape
+	a sh:NodeShape ;
+
+	sh:property [
+		sh:group ex:MainGroup ;
+		sh:order 1 ;
+	] ;
+
+	sh:property [
+		sh:path schema:name;
+		sh:minCount 1 ;
+		sh:name "Product name"@en ;
+		sh:uniqueLang true ;
+		sh:languageIn ( "en" "fr" "de" "nl" ) ;
+		sh:description "Please enter a product name"@en ;
+		sh:datatype rdf:langString ;
+		sh:group ex:LeftGroup ;
+	] ;
+
+	sh:property [
+		sh:minCount 1 ;
+		sh:path schema:description;
+		sh:name "Product description"@en ;
+		dash:singleLine false ;
+		sh:description "Please enter a product description"@en ;
+		sh:datatype rdf:langString ;
+		sh:group ex:LeftGroup ;
+	] ;
+
+	sh:property [
+		sh:path schema:published;
+		sh:name "Published"@en ;
+		sh:datatype xsd:boolean ;
+		sh:maxCount 1;
+		sh:group ex:RightGroup ;
+	] ;
+
+	sh:property [
+		sh:minCount 1 ;
+		sh:path schema:date;
+		sh:name "Date"@en ;
+		sh:datatype xsd:date ;
+		sh:group ex:RightGroup ;
+		sh:maxCount 1 ;
+	] ;
+
+	sh:property [
+		sh:path schema:icon;
+		sh:name "Icon"@en ;
+		sh:group ex:RightGroup ;
+		dash:editor shfrm:Iconify ;
+	] ;
+
+	sh:property [
+		sh:path schema:color;
+		sh:name "Colors"@en ;
+		sh:group ex:RightGroup ;
+		dash:editor shfrm:Color ;
+	] ;
+
+	sh:property [
+		sh:path schema:url;
+		sh:name "File upload"@en ;
+		sh:pattern ".svg$" ;
+		sh:nodeKind sh:IRI ;
+		sh:flags "i" ;
+		sh:group ex:LeftGroup ;
+		dash:uriStart "http://localhost:8000/test" ;
+	] ;
+
+	sh:property [
+		sh:path schema:text;
+		sh:name "Content"@en ;
+		sh:maxCount 1;
+		dash:editor shfrm:EditorJS ;
+		sh:group ex:LeftGroup ;
+	] ;
+
+	sh:property [
+		sh:path schema:choice;
+		sh:name "Choice"@en ;
+		sh:in ( "a" "b" "c" ) ;
+		sh:group ex:RightGroup ;
+	] ;
+
+	sh:property [
+    sh:path ( schema:author [ sh:zeroOrMorePath rdf:rest ] rdf:first ) ;
+    sh:name "Author reference"@en ;
+				sh:group ex:RightGroup ;
+
+    dash:editor dash:AutoCompleteEditor ;
+    shfrm:source <https://dbpedia.org/sparql> ;
+    sh:select """
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX dbo:  <http://dbpedia.org/ontology/>
+        PREFIX bif: <bif:>
+
+        SELECT DISTINCT ?uri (SAMPLE(?label) AS ?label) (SAMPLE(?image) AS ?image) {
+            ?uri rdfs:label ?label .
+            ?label bif:contains ?searchTerm .
+            ?uri rdf:type dbo:Person .
+            OPTIONAL { 
+                ?uri dbo:thumbnail ?image .
+            }
+        }
+        GROUP BY ?uri
+        LIMIT 10
+    """ ;
+	] ;
+
+
+	sh:property [
+		sh:group ex:ButtonGroup ;
+		sh:group ex:RightGroup ;
+		sh:order 10 ;
+	] ;
+.
+
+ex:MainGroup
+	sh:order 1 ;
+	a sh:PropertyGroup, shfrm:LanguageTabs .
+
+ex:LeftGroup
+	sh:order 2 ;
+	a sh:PropertyGroup .
+
+ex:RightGroup
+	sh:order 3 ;
+	a sh:PropertyGroup .
+
+ex:ButtonGroup
+	sh:order 4 ;
+	a sh:PropertyGroup, shfrm:Buttons .

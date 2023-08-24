@@ -6,6 +6,7 @@
   "scripts": {
     "serve": "vite",
     "build": "tsc && vite build",
+    "build-demo": "vite build --config vite.config.demo.ts && cp -R data docs/data && cp -R shapes docs/shapes && cp docs/index.html docs/404.html",
     "preview": "vite preview",
     "storage": "cd storage && deno run --allow-all storage.ts"
   },
@@ -24,7 +25,8 @@
     "@types/sortablejs": "^1.15.1",
     "sass": "^1.62.1",
     "typescript": "^5.0.3",
-    "vite": "^4.2.0"
+    "vite": "^4.2.0",
+    "vite-plugin-dts": "^3.5.2"
   },
   "dependencies": {
     "@comunica/query-sparql": "^2.6.9",

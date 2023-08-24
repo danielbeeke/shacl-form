@@ -1,0 +1,38 @@
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+@prefix ex: <http://example.com/>.
+@prefix schema: <https://schema.org/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix shfrm: <https://github.com/danielbeeke/shacl-form/ontology#> .
+@prefix dash: <http://datashapes.org/dash#> .
+
+# https://archive.topquadrant.com/constraints-on-rdflists-using-shacl/
+
+ex:RootShape
+	a sh:NodeShape ;
+
+	sh:property [
+    sh:path ( schema:author [ sh:zeroOrMorePath rdf:rest ] rdf:first ) ;
+    sh:name "Author reference"@en ;
+    dash:editor dash:AutoCompleteEditor ;
+    shfrm:source <https://dbpedia.org/sparql> ;
+    sh:select """
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX dbo:  <http://dbpedia.org/ontology/>
+        PREFIX bif: <bif:>
+
+        SELECT DISTINCT ?uri (SAMPLE(?label) AS ?label) (SAMPLE(?image) AS ?image) {
+            ?uri rdfs:label ?label .
+            ?label bif:contains ?searchTerm .
+            ?uri rdf:type dbo:Person .
+            OPTIONAL { 
+                ?uri dbo:thumbnail ?image .
+            }
+        }
+        GROUP BY ?uri
+        LIMIT 10
+    """ ;
+	] ;
+
+  .

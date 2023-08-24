@@ -1,4 +1,9 @@
-import { init, defaultOptions } from '../lib'
+// import { init, defaultOptions } from '../lib/ShaclForm'
+// import '../lib/scss/style.scss'
+
+import { init, defaultOptions } from '../dist/ShaclForm'
+import '../dist/style.css'
+
 import factory from 'rdf-ext'
 import { schema } from '../lib/helpers/namespaces'
 import './demo.scss'

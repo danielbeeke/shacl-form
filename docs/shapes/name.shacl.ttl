@@ -1,0 +1,38 @@
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+@prefix ex: <http://example.com/>.
+@prefix schema: <https://schema.org/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ex:RootShape
+	a sh:NodeShape ;
+
+	sh:property [
+		sh:path schema:knows;
+		sh:name "Friends"@en ;
+		sh:description "Who are your friends?"@en ;
+		sh:nodeKind sh:BlankNodeOrIRI;
+	] ;
+
+	sh:property [
+		sh:path (schema:knows schema:birthDay);
+		sh:order 2 ;
+		sh:name "Birthday"@en ;
+		sh:description "When was this friend born?"@en ;
+		# sh:maxCount 1 ;
+		sh:datatype xsd:date;
+	] ;
+	
+	sh:property [
+		sh:path (schema:knows schema:name);
+		sh:order 1 ;
+		sh:name "Given name"@en ;
+		sh:name "Gegeven naam"@nl ;
+		sh:description "How do you call this friend?"@en ;
+		sh:maxCount 3 ;
+		sh:minCount 1 ;
+		sh:datatype rdf:langString;
+	] ;
+
+  .
