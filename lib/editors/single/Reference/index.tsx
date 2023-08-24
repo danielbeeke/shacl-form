@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { SparqlEndpointFetcher } from "fetch-sparql-endpoint"
 import { debounce } from 'lodash-es'
 import { Icon } from '@iconify-icon/react';
-
+import '../../../helpers/nextTick'
 
 const fetcher = async (endpoint: string, sparql: string, callback: (binding: any) => void) => {
   (new SparqlEndpointFetcher()).fetchBindings(endpoint, sparql)
