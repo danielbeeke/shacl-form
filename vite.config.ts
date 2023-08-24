@@ -1,12 +1,13 @@
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
 import { watchExtensions } from './vite/watchExtensions'
-import PackageJSON from './package.json' assert { type: 'json'}
 
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(__dirname, 'lib/index.ts'),
+      entry: [
+        resolve(__dirname, 'lib/index.ts'),
+      ],
       name: 'ShaclForm',
       fileName: 'ShaclForm',
     }

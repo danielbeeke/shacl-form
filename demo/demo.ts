@@ -1,5 +1,4 @@
-import defaultOptions from '../lib/defaultOptions'
-import { init } from '../lib/core/ShaclForm'
+import { init, defaultOptions } from '../lib'
 import factory from 'rdf-ext'
 import { schema } from '../lib/helpers/namespaces'
 import './demo.scss'

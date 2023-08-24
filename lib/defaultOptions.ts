@@ -39,7 +39,7 @@ const uploadSetttings = {
   backend: import.meta.env.STORAGE_BACKEND ?? 'http://localhost:8008/local'
 }
 
-export default {
+export const defaultOptions = {
   widgets: {
     single: {
       String,

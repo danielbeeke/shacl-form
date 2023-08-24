@@ -1,3 +1,2 @@
-import { init } from './core/ShaclForm'
-import defaultOptions from './defaultOptions'
-init(defaultOptions)
+export { init } from './core/ShaclForm'
+export { defaultOptions } from './defaultOptions'
