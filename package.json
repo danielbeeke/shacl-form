@@ -6,7 +6,7 @@
   "scripts": {
     "serve": "vite",
     "build": "tsc && vite build",
-    "build-demo": "vite build --config vite.config.demo.ts && cp -R data docs/data && cp -R shapes docs/shapes && cp docs/index.html docs/404.html",
+    "build-demo": "vite build --config vite.config.demo.ts && cp -R data docs/data && cp -R shapes docs/shapes && cp docs/index.html docs/404.html && touch docs/.nojekyll",
     "preview": "vite preview",
     "storage": "cd storage && deno run --allow-all storage.ts"
   },
