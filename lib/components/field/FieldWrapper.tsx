@@ -7,6 +7,7 @@ import { ReactSortable } from "react-sortablejs";
 import { replaceList } from '../../helpers/replaceList'
 import factory from 'rdf-ext'
 import { Icon } from '@iconify-icon/react';
+import { useState, useEffect } from 'react'
 
 type FieldWrapperProps = { 
   Widget: any, 
@@ -60,6 +61,11 @@ export const orderCache: Map<string, Array<string>> = new Map()
 
 export function FieldWrapper ({ Widget, isOrderedList, children, structure, errors, uiLanguagePriorities, dataPointer, form }: FieldWrapperProps) {
   const { _shaclPointer, _predicate, _pathPart } = structure
+  const [WidgetClass, setWidgetClass] = useState<any>(null)
+
+  useEffect(() => {
+    Widget.resolve().then(({ default: WidgetClass }: { default: any }) => setWidgetClass(() => WidgetClass))
+  }, [])
 
   const getTerms = () => {
     return isOrderedList 
@@ -97,9 +103,15 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
   const sortableItems = terms.map((term: Term) => ({ id: JSON.stringify(term), term }))
   const sortableState = sortableItems
   const setSortableState = (newState: any) => {
-    const pointer: GrapoiPointer = dataPointer().execute(_pathPart)
-    replaceList(newState.map((item: any) => item.term), pointer)
-    form.render()
+    const oldStateSerialized = terms.map(term => JSON.stringify(term)).join('')
+    const newStateSerialized = newState.map((item: any) => JSON.stringify(item.term)).join('')
+
+    if (oldStateSerialized !== newStateSerialized) {
+      const pointer: GrapoiPointer = dataPointer().execute(_pathPart)
+      replaceList(newState.map((item: any) => item.term), pointer)
+
+      form.render()
+    }
   }
 
   const path = JSON.stringify(_pathPart)
@@ -151,7 +163,7 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
         isList={isOrderedList}
         uiLanguagePriorities={uiLanguagePriorities}
         dataPointer={dataPointer}
-        Widget={Widget}
+        Widget={WidgetClass}
       >
         {children}
       </FieldItem>
@@ -191,8 +203,9 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
   const uniqueLang = _shaclPointer.out([sh('uniqueLang')]).value
 
   let showAdd = !maxCount || terms.length < maxCount
-  if (Widget.type === 'multi') showAdd = false
-  if (Widget.hideAddButton) showAdd = false
+
+  if (WidgetClass?.type === 'multi') showAdd = false
+  if (WidgetClass?.hideAddButton) showAdd = false
   if ((activeItems[activeItems.length - 1]?.[1] as Term)?.value === '') showAdd  = false
   if (uniqueLang) showAdd = false
 
@@ -202,7 +215,7 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
     errors.errors = errors.errors.filter((message: string) => !message.startsWith('Less than'))
   }
 
-  return (
+  return WidgetClass ? (
     <div ref={element} className={`field`} data-predicate={_predicate?.value}>
       {name ? (<label className='form-label'>{name}</label>) : null}
 
@@ -210,41 +223,45 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
 
       <Errors errors={errors} />
 
-      <FieldItem 
-        key={'header'} 
-        index={-1} 
-        structure={structure}
-        isHeader={true}
-        uiLanguagePriorities={uiLanguagePriorities}
-        dataPointer={dataPointer}
-        Widget={Widget}
-      >
-        {children}
-      </FieldItem>
+      <div className="field-inner">
 
-      <div className='items'>
-        {isOrderedList ? <ReactSortable filter="input,.list-group,.form-control" preventOnFilter={false} list={sortableState} setList={setSortableState}>
-          {items}
-        </ReactSortable> : items}
+        <FieldItem 
+          key={'header'} 
+          index={-1} 
+          structure={structure}
+          isHeader={true}
+          uiLanguagePriorities={uiLanguagePriorities}
+          dataPointer={dataPointer}
+          Widget={WidgetClass}
+        >
+          {undefined}
+        </FieldItem>
+
+        <div className='items'>
+          {isOrderedList ? <ReactSortable filter="input,.list-group,.form-control" preventOnFilter={false} list={sortableState} setList={setSortableState}>
+            {items}
+          </ReactSortable> : items}
+        </div>
+
+        <FieldItem 
+          key={'footer'} 
+          index={-2} 
+          structure={structure}
+          isFooter={true}
+          uiLanguagePriorities={uiLanguagePriorities}
+          dataPointer={dataPointer}
+          Widget={WidgetClass}
+        >
+          {undefined}
+        </FieldItem>
+
+        {showAdd ? (
+          <button type="button" className='btn btn-secondary btn-sm btn-add-item me-auto mb-4' onClick={() => addItem(dataPointer(), _predicate, element, Widget, _pathPart, isOrderedList, setSortableState, _shaclPointer)}>
+            <Icon icon="fa6-solid:plus" />
+          </button>
+        ) : null} 
+
       </div>
-
-      <FieldItem 
-        key={'footer'} 
-        index={-2} 
-        structure={structure}
-        isFooter={true}
-        uiLanguagePriorities={uiLanguagePriorities}
-        dataPointer={dataPointer}
-        Widget={Widget}
-      >
-        {children}
-      </FieldItem>
-
-      {showAdd ? (
-        <button type="button" className='btn btn-secondary btn-sm btn-add-item me-auto mb-4' onClick={() => addItem(dataPointer(), _predicate, element, Widget, _pathPart, isOrderedList, setSortableState, _shaclPointer)}>
-          <Icon icon="fa6-solid:plus" />
-        </button>
-      ) : null} 
     </div>
-  )
+  ) : null
 }

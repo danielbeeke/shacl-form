@@ -1,12 +1,14 @@
-#demo-full form {
+#demo-full > form {
+  padding-inline: 20px;
   display: grid;
   max-width: 1200px;
   margin: auto;
-  grid-template-columns: 1fr 400px;
-  grid-template-rows: auto auto auto;
-  grid-template-areas: "top top"
-  "left right"
-  "bottom bottom";
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  grid-template-areas: "top"
+  "left"
+  "right"
+  "bottom";
 
   .MainGroup {
     grid-area: top;
@@ -14,7 +16,6 @@
 
   .LeftGroup {
     grid-area: left;
-    margin-right: 40px;
   }
 
   .RightGroup {
@@ -22,12 +23,8 @@
     grid-area: right;
     background: rgb(231, 240, 241);
     border-radius: 6px;
-    // align-self: start;
   }
-
-
 }
-
 
 .type-BlankNodeOrIri {
   .children > .group > div {
@@ -46,8 +43,49 @@
   }
 }
 
-form {
+shacl-form > form {
   max-width: 1200px;
   margin: auto;
   margin-top: 40px !important;
+}
+
+@media (min-width: 720px) {
+  #demo-full form {
+    grid-template-columns: 1fr 400px;
+    grid-template-rows: auto auto auto;
+    grid-template-areas: "top top"
+    "left right"
+    "bottom bottom";  
+
+    .LeftGroup {
+      margin-right: 40px;
+    }
+
+    // Shows fields as rows.
+    // .field {
+    //   display: grid;
+    //   grid-template-columns: 240px 1fr;
+    //   grid-template-rows: auto auto;
+    //   grid-template-areas: "title field"
+    //   "description field";
+
+    //   .form-label {
+    //     margin-top: 14px;
+    //   }
+
+    //   > .field-inner {
+    //     grid-area: field;
+    //   }
+
+    //   > .form-text {
+    //     grid-area: description;
+    //   }
+    // }
+  }
+}
+
+.demo-list {
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
 }

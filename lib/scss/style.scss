@@ -50,8 +50,16 @@ shacl-form {
     background-color: rgba(0, 53, 70, .15);
   }
 
-  .type-BlankNodeOrIri  > .widget {
-    flex: 1 1 100%;
+  .type-BlankNodeOrIri  {
+    > .widget {
+      flex: 1 1 100%;
+    }
+
+    > .btn-remove-item {
+      position: absolute;
+      top: -3px;
+      right: 0;
+    }
   }
 
   .btn-remove-item {
@@ -243,5 +251,10 @@ shacl-form {
     .empty-label + input {
       opacity: 0;
     }
+  }
+
+  .group-inner {
+    display: flex;
+    flex-direction: column;
   }
 }

@@ -1,8 +1,8 @@
-// import { init, defaultOptions } from '../lib/ShaclForm'
-// import '../lib/scss/style.scss'
+import { init, defaultOptions } from '../lib/ShaclForm'
+import '../lib/scss/style.scss'
 
-import { init, defaultOptions } from '../dist/ShaclForm'
-import '../dist/style.css'
+// import { init, defaultOptions } from '../dist/ShaclForm'
+// import '../dist/style.css'
 
 import factory from 'rdf-ext'
 import { schema } from '../lib/helpers/namespaces'
@@ -11,6 +11,15 @@ import './demo.scss'
 init(defaultOptions)
 
 const demos = [
+  {
+    title: 'Full with layout',
+    shaclUrl: '../shapes/full.shacl.ttl?raw',
+    shaclIri: 'http://example.com/RootShape',
+    dataIri: 'http://example.com/name',
+    dataUrl: '../data/full.ttl?raw',
+    contentLanguage: 'en,fr,de,nl',
+    activeContentLanguage: 'en',
+  },
   {
     title: 'Name (blank nodes with a SHACL property path)',
     shaclUrl: '../shapes/name.shacl.ttl?raw',
@@ -60,15 +69,6 @@ const demos = [
     dataIri: 'http://example.com/name',
     dataUrl: '../data/storage.ttl?raw',
     // contentLanguage: 'en,fr,de',
-    activeContentLanguage: 'en',
-  },
-  {
-    title: 'Full with layout',
-    shaclUrl: '../shapes/full.shacl.ttl?raw',
-    shaclIri: 'http://example.com/RootShape',
-    dataIri: 'http://example.com/name',
-    dataUrl: '../data/full.ttl?raw',
-    contentLanguage: 'en,fr,de,nl',
     activeContentLanguage: 'en',
   },
   {
@@ -123,15 +123,17 @@ const index = location.pathname.substring(1) ? parseInt(location.pathname.substr
 if (index === null) {
   document.body.innerHTML = `
 
-    <h3>Please pick an example</h3>
+    <div class="demo-list">
+      <h3>Please pick an example</h3>
 
-    <ul>
-      ${demos.map((demo, index) => `
-      <li>
-        <a href="${index}">${demo.title}</a>
-      </li>
-      `).join('')}
-    </ul>
+      <ul>
+        ${demos.map((demo, index) => `
+        <li>
+          <a href="${index}">${demo.title}</a>
+        </li>
+        `).join('')}
+      </ul>
+    </div>
   `
 }
 else {

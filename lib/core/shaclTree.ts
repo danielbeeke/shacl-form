@@ -144,7 +144,7 @@ export const processLevel = async (shaclProperties: GrapoiPointer, report: any, 
             ...shaclPropertyInner.terms,
           ]).distinct()
 
-          const nestedTree = processLevel(mergedPointer, report, options, shacl, shaclDataset, depth++)
+          const nestedTree = await processLevel(mergedPointer, report, options, shacl, shaclDataset, depth++)
           Object.assign(pointer[predicate.value], nestedTree)
         }
 

@@ -1,7 +1,5 @@
 import { importSingleWidgets } from './helpers/importSingleWidgets'
-
-// multi Widgets
-import Address from './editors/multi/Address'
+import { importMultiWidgets } from './helpers/importMultiWidgets'
 
 // Groups
 import Buttons, { iri as buttonsIri } from './components/groups/Buttons'
@@ -38,6 +36,15 @@ bcp47PickerInit({ sources: ['https://bcp47.danielbeeke.nl/data/lmt.json']})
 const uploadSetttings = {
   backend: import.meta.env.STORAGE_BACKEND ?? 'http://localhost:8008/local'
 }
+
+const multiEditors = importMultiWidgets(
+  import.meta.glob('./editors/multi/**/index*'),
+  import.meta.glob('./editors/multi/**/meta.ts', { eager: true })
+)
+
+const {
+  Address
+} = multiEditors
 
 export const defaultOptions = {
   widgets: {

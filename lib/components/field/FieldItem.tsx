@@ -11,7 +11,7 @@ type FieldItemProps = {
   structure: Widget, 
   Widget: any, 
   index: number,
-  children: (values: GrapoiPointer) => Array<any>,
+  children?: (values: GrapoiPointer) => Array<any> | undefined,
   dataPointer: () => GrapoiPointer
   uiLanguagePriorities: Array<string>,
   isHeader?: boolean,
@@ -51,28 +51,26 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer, ui
 
   useEffect(() => {
     if (!widgetInstance) {
-      Widget.resolve().then(({ default: WidgetClass }: any) => {
-        const widgetHtmlName = 'sf-' + WidgetClass.name.toLowerCase().replaceAll('$', '-')
-        if (!customElements.get(widgetHtmlName)) customElements.define(widgetHtmlName, WidgetClass)
-        const element = document.createElement(widgetHtmlName) as ShaclFormSingleEditor<any>
-        element.widgetSettings = _widgetSettings
-        element.shaclPointer = _shaclPointer
-        element.messages = _messages
-        element.dataPointer = dataPointer
-        element.index = index
-        element.path = _path
-        element.isList = isList
-        element.isHeader = isHeader
-        element.isFooter = isFooter
-        element.uiLanguagePriorities = uiLanguagePriorities
-        element.predicate = _predicate
-  
-        ;(element as unknown as ShaclFormMultiEditor<any>).fields = _fields
-        ;(element as unknown as ShaclFormMultiEditor<any>).mapping = _mapping
-  
-        structure._element = element
-        setWidgetInstance(element)  
-      })
+      const widgetHtmlName = 'sf-' + Widget.name.toLowerCase().replaceAll('$', '-')
+      if (!customElements.get(widgetHtmlName)) customElements.define(widgetHtmlName, Widget)
+      const element = document.createElement(widgetHtmlName) as ShaclFormSingleEditor<any>
+      element.widgetSettings = _widgetSettings
+      element.shaclPointer = _shaclPointer
+      element.messages = _messages
+      element.dataPointer = dataPointer
+      element.index = index
+      element.path = _path
+      element.isList = isList
+      element.isHeader = isHeader
+      element.isFooter = isFooter
+      element.uiLanguagePriorities = uiLanguagePriorities
+      element.predicate = _predicate
+
+      ;(element as unknown as ShaclFormMultiEditor<any>).fields = _fields
+      ;(element as unknown as ShaclFormMultiEditor<any>).mapping = _mapping
+
+      structure._element = element
+      setWidgetInstance(element)  
     }
 
     return () => widgetInstance?.remove()

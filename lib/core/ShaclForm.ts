@@ -145,6 +145,8 @@ export const init = (options: Options) => {
       const tree = await shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
       const shacl = grapoi({ dataset: this.#shaclDataset, factory })
 
+      console.log(tree)
+
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [
         createElement(StrictMode, {
           key: 'strictmode',

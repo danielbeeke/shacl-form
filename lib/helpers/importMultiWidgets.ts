@@ -1,17 +1,14 @@
-import factory from 'rdf-ext'
-import { Term } from '../types'
-
 const cleanPath = (path: string) => path.split('/').at(-2)?.replace(/\.tsx|\.ts/g, '')!
 
-type SingleWidget = { 
-  score: () => number, 
+type MultiWidget = { 
   iri: string,
+  score: () => number, 
   name: string,
-  createNewObject: () => Term
+  supportedCombinations: any,
   resolve: () => Promise<any>
 }
 
-export const importSingleWidgets = (widgetGlob: Record<string, () => Promise<unknown>>, metaGlob: Record<string, unknown>) => {
+export const importMultiWidgets = (widgetGlob: Record<string, () => Promise<unknown>>, metaGlob: Record<string, unknown>) => {
   const widgetGlobEntries = Object.entries(widgetGlob)
   const metaGlobEntries = Object.entries(metaGlob)
   
@@ -20,23 +17,23 @@ export const importSingleWidgets = (widgetGlob: Record<string, () => Promise<unk
     return metaGlobEntries.find(([path]) => path.includes(metaMatch))
   })
 
-  const output: { [key: string]: Partial<SingleWidget> } = {}
+  const output: { [key: string]: Partial<MultiWidget> } = {}
 
   for (const [path, module] of filteredEntries) {
     const metaMatch = cleanPath(path) + '/meta.ts'
     const meta = metaGlobEntries.find(([path]) => path.includes(metaMatch))?.[1]
 
     const identifier = cleanPath(path)
-    const { iri, score, createNewObject } = meta as any
+    const { iri, supportedCombinations, score } = meta as any
 
     output[identifier] = {
       iri, 
-      name: identifier,
-      score: score ? score : () => 0, 
-      createNewObject: createNewObject ? createNewObject : () => factory.namedNode('') as any,
+      name: cleanPath(path),
+      score: score ? score : () => 100, 
+      supportedCombinations,
       resolve: module
     }
   }
 
-  return output as { [key: string]: SingleWidget }
+  return output as { [key: string]: MultiWidget }
 }

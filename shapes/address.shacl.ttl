@@ -22,13 +22,13 @@ ex:AddressShape
     sh:targetClass schema:PostalAddress ;
     sh:closed true ;
 
-    sh:property [
-        sh:path rdf:type ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-        sh:nodeKind sh:IRI ;
-        sh:hasValue schema:PostalAddress ;
-    ] ;
+    # sh:property [
+    #     sh:path rdf:type ;
+    #     sh:minCount 1 ;
+    #     sh:maxCount 1 ;
+    #     sh:nodeKind sh:IRI ;
+    #     sh:hasValue schema:PostalAddress ;
+    # ] ;
 
     sh:property [
         sh:path schema:streetAddress ;
@@ -57,7 +57,10 @@ ex:AddressShape
     sh:property [
         sh:path schema:postalCode ;
         sh:name "Postal code"@en ;
-        sh:datatype xsd:string ;
+        sh:or (
+            [ sh:datatype xsd:string ]
+            [ sh:datatype xsd:number ]
+        ) ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
     ] ;

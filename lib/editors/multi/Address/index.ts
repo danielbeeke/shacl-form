@@ -1,25 +1,11 @@
-import { NamedNode } from '../../types'
-import { schema, xsd } from '../../helpers/namespaces'
+import { xsd } from '../../../helpers/namespaces'
 import { html } from 'uhtml/async'
 import factory from 'rdf-ext'
 import { iso31661 } from 'iso-3166'
 
-import { ShaclFormMultiEditorUhtml } from '../../core/ShaclFormMultiEditorUhtml'
+import { ShaclFormMultiEditorUhtml } from '../../../core/ShaclFormMultiEditorUhtml'
 
 export default class Address extends ShaclFormMultiEditorUhtml<typeof Address> {
-
-  static supportedCombinations: Array<{ [key: string]: NamedNode }> = [
-    {
-      street: schema('streetAddress'),
-      postalCode: schema('postalCode'),
-      locality: schema('addressLocality'),
-      'latitude?': schema('latitude'),
-      'longitude?': schema('longitude'),
-      'region?': schema('addressRegion'),
-      'country?': schema('addressCountry')
-    }
-  ]
-
   public showAdvanced = false
 
   template () {

@@ -28,10 +28,11 @@ export function FormLevel ({
   const cid = Object.keys(tree).join(',') + depth
 
   const widgets = Object.entries(tree).flatMap(([predicate, field]: [any, any], outerIndex: number) => {
-    if (predicate[0] === '_') return
+    if (predicate[0] === '_') return    
     if (!ignoreGroups && field._usedInGroup) return
 
     const childrenObject = Object.fromEntries(Object.entries(field as any).filter(([name]) => name[0] !== '_'))
+
     const children = Object.keys(childrenObject).length ? (dataPointer: GrapoiPointer) => {
 
       return Object.keys(childrenObject).length ? 
@@ -58,8 +59,10 @@ export function FormLevel ({
       widget._score = definedEditor && widget._widget.iri === definedEditor ? 100 : widgetScore
     }
 
-    // console.log(predicate)
-    // console.table(widgets.map(widget => [widget._widget.name, widget._score]))
+    if (predicate === 'https://schema.org/postalCode') {
+      console.log(predicate)
+      console.table(widgets.map(widget => [widget._widget.name, widget._score]))  
+    }
 
     const finalWidget = widgets?.length ? widgets
       .filter((widget: any) => widget._score > 0)
