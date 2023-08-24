@@ -6,7 +6,7 @@ import type { GrapoiPointer, NamedNode, Quad } from '../types'
 import { QueryEngine } from '@comunica/query-sparql';
 import parsePath from 'shacl-engine/lib/parsePath.js'
 
-export class Enhancer {
+export default class Enhancer {
 
   #engine: QueryEngine
 

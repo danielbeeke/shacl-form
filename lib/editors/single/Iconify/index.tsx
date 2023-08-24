@@ -1,13 +1,11 @@
-import { ShaclFormSingleEditorReact } from '../../core/ShaclFormSingleEditorReact'
-import { shFrm } from '../../helpers/namespaces'
+import { ShaclFormSingleEditorReact } from '../../../core/ShaclFormSingleEditorReact'
+import { shFrm } from '../../../helpers/namespaces'
 import { useEffect, useState } from 'react'
 import { Icon } from '@iconify-icon/react';
 
 const iconStyle = { fontSize: 34 }
 
 export default class Iconify extends ShaclFormSingleEditorReact<typeof Iconify> {
-
-  static iri = shFrm('Iconify').value
 
   template () {
     const [searchTerm, setSearchTerm] = useState('')

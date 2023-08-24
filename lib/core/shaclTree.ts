@@ -19,14 +19,14 @@ import { GrapoiPointer, NamedNode, Options, TreeItem } from '../types'
  * TODO make recursive
  * Grab the required languages and think about language tabs in a recursive situation.
  */
-export const shaclTree = (report: any, shaclDataset: DatasetCore, options: Options, rootShaclIri: NamedNode) => {
+export const shaclTree = async (report: any, shaclDataset: DatasetCore, options: Options, rootShaclIri: NamedNode) => {
   const shacl = grapoi({ dataset: shaclDataset, factory, term: rootShaclIri })
   const shaclShapes = shacl.hasOut([rdf('type')], [sh('NodeShape')])
   const shaclProperties = shaclShapes.hasOut([sh('property')])
   return processLevel(shaclProperties, report, options, shacl, shaclDataset, 1)
 }
 
-export const processLevel = (shaclProperties: GrapoiPointer, report: any, options: Options, rootPointer: GrapoiPointer, shaclDataset: DatasetCore, depth: number) => {
+export const processLevel = async (shaclProperties: GrapoiPointer, report: any, options: Options, rootPointer: GrapoiPointer, shaclDataset: DatasetCore, depth: number) => {
   const level: any = {}
 
   for (const shaclProperty of shaclProperties.out([sh('property')])) {

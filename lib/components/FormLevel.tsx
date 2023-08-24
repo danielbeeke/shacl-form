@@ -51,6 +51,7 @@ export function FormLevel ({
     const widgets = field._widgets
 
     for (const widget of widgets) {
+      if (!widget._widget) continue
       const widgetScore = widget._widget.score(widget._shaclPointer, dataPointer, form.options)
       const definedEditor = widget._shaclPointer.out([dash('editor')]).value
       widget._definedEditor = definedEditor

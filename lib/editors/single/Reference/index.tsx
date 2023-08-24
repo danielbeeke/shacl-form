@@ -1,8 +1,6 @@
-import { ShaclFormSingleEditorReact } from '../../core/ShaclFormSingleEditorReact'
-import { dash, sh, shFrm } from '../../helpers/namespaces'
+import { ShaclFormSingleEditorReact } from '../../../core/ShaclFormSingleEditorReact'
+import { sh, shFrm } from '../../../helpers/namespaces'
 import { useEffect, useState } from 'react'
-import { scorer } from '../../core/Scorer'
-import { GrapoiPointer } from '../../types'
 import { SparqlEndpointFetcher } from "fetch-sparql-endpoint"
 import { debounce } from 'lodash-es'
 import { Icon } from '@iconify-icon/react';
@@ -16,15 +14,6 @@ const fetcher = async (endpoint: string, sparql: string, callback: (binding: any
 const debouncedFetcher = debounce(fetcher, 300)
 
 export default class Reference extends ShaclFormSingleEditorReact<typeof Reference> {
-
-  static iri = dash('AutoCompleteEditor').value
-
-  static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
-    return scorer(shaclPointer, dataPointer)
-      .nodeKind([sh('IRI')])
-      .toNumber()
-  }
-
   template () {
     const [searchTerm, setSearchTerm] = useState('')
     const [results, setResults] = useState<Array<any>>([])

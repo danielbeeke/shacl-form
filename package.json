@@ -1,7 +1,7 @@
 {
-  "name": "shacl-form",
+  "name": "@om-mediaworks/shacl-form",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "serve": "vite",
@@ -70,5 +70,19 @@
     "shacl-engine": "^0.1.0",
     "sortablejs": "^1.15.0",
     "uhtml": "^3.1.0"
-  }
+  },
+  "description": "SHACL form is a frontend library that shows forms from a SHACL shape. It uses customElements, also for the widgets, this will enable a third party developer to bring their own widgets that might be made with any other technology as long as it is exported as a customElement.",
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OM-MediaWorks/shacl-form.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/OM-MediaWorks/shacl-form/issues"
+  },
+  "homepage": "https://github.com/OM-MediaWorks/shacl-form#readme"
 }

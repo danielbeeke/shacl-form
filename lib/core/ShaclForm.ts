@@ -59,7 +59,8 @@ export const init = (options: Options) => {
       const mustEnhance = this.getAttribute('enhance') !== null
 
       if (mustEnhance && this.options.enhancer) {
-        const enhancer = new this.options.enhancer()
+        const ResolvedEnhancer = await this.options.enhancer()
+        const enhancer = new ResolvedEnhancer()
         await enhancer.execute(this.#shaclDataset)  
       }
 
@@ -141,7 +142,7 @@ export const init = (options: Options) => {
 
     async render () {
       const report = await this.validate()
-      const tree = shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
+      const tree = await shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
       const shacl = grapoi({ dataset: this.#shaclDataset, factory })
 
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [

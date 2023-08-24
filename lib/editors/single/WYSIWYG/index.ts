@@ -1,9 +1,8 @@
-import { ShaclFormSingleEditorUhtml } from '../../core/ShaclFormSingleEditorUhtml'
-import { shFrm, dash } from '../../helpers/namespaces'
+import { ShaclFormSingleEditorUhtml } from '../../../core/ShaclFormSingleEditorUhtml'
+import { dash } from '../../../helpers/namespaces'
 import EditorJS from '@editorjs/editorjs'
 import jsonld from 'jsonld';
 import { BlankNode, Parser } from 'n3';
-import factory from 'rdf-ext'
 
 import List from '@editorjs/list'
 import LinkTool from '@editorjs/link'
@@ -14,8 +13,8 @@ import Delimiter from '@editorjs/delimiter'
 import Image from '@editorjs/image'
 import DragDrop from 'editorjs-drag-drop';
 
-import { NamedNode, Quad } from '../../types'
-import { nest } from '../../helpers/jsonLdNester'
+import { NamedNode, Quad } from '../../../types'
+import { nest } from '../../../helpers/jsonLdNester'
 import QuadExt from 'rdf-ext/lib/Quad'
 
 const editors = new Map()
@@ -32,13 +31,7 @@ class AdvancedImage extends Image {
 
 export default class WYSIWYG extends ShaclFormSingleEditorUhtml<typeof WYSIWYG> {
 
-  static iri = shFrm('EditorJS').value
-
   public widgetSettings: WYSIWYGOptions | undefined = undefined
-
-  static createNewObject () {
-    return factory.blankNode()
-  }
 
   async beforeRemove (): Promise<boolean> {
     const cid = JSON.stringify([this.path, this.index])

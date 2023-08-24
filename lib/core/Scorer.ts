@@ -19,7 +19,7 @@ export class Scorer {
   constructor (shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
     this.#shaclPointer = shaclPointer
     this.#dataPointer = dataPointer
-    console.log(this.#dataPointer)
+    this.#dataPointer
   }
 
   datatype (acceptedTypes: Array<NamedNode>, score: number = 1, exclusive = true) {

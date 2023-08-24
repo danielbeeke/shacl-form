@@ -1,11 +1,10 @@
-import { ShaclFormSingleEditorUhtml } from '../../core/ShaclFormSingleEditorUhtml'
-import { GrapoiPointer, BlankNode } from '../../types'
-import { scorer } from '../../core/Scorer'
-import { schema, rdfs, sh, dash } from '../../helpers/namespaces'
+import { ShaclFormSingleEditorUhtml } from '../../../core/ShaclFormSingleEditorUhtml'
+import { BlankNode } from '../../../types'
+import { schema, rdfs, sh } from '../../../helpers/namespaces'
 import factory from 'rdf-ext'
-import { bestLanguage } from '../../helpers/bestLanguage'
+import { bestLanguage } from '../../../helpers/bestLanguage'
 import { html } from 'uhtml' // You could use React, Vue, Angular, basically anything and export it to a customElement.
-import { swapSubject } from '../../helpers/swapSubject'
+import { swapSubject } from '../../../helpers/swapSubject'
 
 
 /**
@@ -16,19 +15,6 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditorUhtml<typeof Bl
 
   public showIdentifier = false
   public identifierSuggestion = ''
-
-  static iri = dash('BlankNodeEditor').value
-
-  static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
-    return scorer(shaclPointer, dataPointer)
-      .node()
-      .nodeKind([sh('IRI'), sh('BlankNode'), sh('BlankNodeOrIRI')], 3)
-      .toNumber()
-  }
-
-  static createNewObject () {
-    return factory.blankNode()
-  }
 
   template () {
     const namesPointer = this.dataPointer().out([this.predicate])

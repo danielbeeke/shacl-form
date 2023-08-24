@@ -1,17 +1,4 @@
-import { Enhancer } from './core/Enhancer'
-
-// Single Widgets
-import String from './editors/single/String'
-import BlankNodeOrIri from './editors/single/BlankNodeOrIri'
-import Date from './editors/single/Date'
-import FileUpload from './editors/single/FileUpload'
-import Iconify from './editors/single/Iconify'
-import Reference from './editors/single/Reference'
-import WYSIWYG from './editors/single/WYSIWYG'
-import EnumSelect from './editors/single/EnumSelect'
-import Text from './editors/single/Text'
-import Switch from './editors/single/Switch'
-import Color from './editors/single/Color'
+import { importSingleWidgets } from './helpers/importSingleWidgets'
 
 // multi Widgets
 import Address from './editors/multi/Address'
@@ -26,6 +13,25 @@ import { PositionstackGeocoder } from './plugins/GeoCoder/PositionstackGeocoder'
 
 /** @ts-ignore */
 import { init as bcp47PickerInit } from 'bcp47-picker/init'
+
+const singleEditors = importSingleWidgets(
+  import.meta.glob('./editors/single/**/index*'),
+  import.meta.glob('./editors/single/**/meta.ts', { eager: true })
+)
+
+const {
+  String,
+  Iconify,
+  Reference,
+  BlankNodeOrIri,
+  Date,
+  EnumSelect,
+  Text,
+  Switch,
+  Color,
+  WYSIWYG,
+  FileUpload
+} = singleEditors
 
 bcp47PickerInit({ sources: ['https://bcp47.danielbeeke.nl/data/lmt.json']})
 
@@ -57,10 +63,8 @@ export default {
     [buttonsIri.value]: Buttons,
     [languageTabsIri.value]: LanguageTabs
   },
-  enhancer: Enhancer,
+  enhancer: () => import('./core/Enhancer').then(module => module.default),
   plugins: {
     geocoder: new PositionstackGeocoder(import.meta.env.POSITIONSTACK),
   }
 }
-
-// 

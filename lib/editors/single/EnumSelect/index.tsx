@@ -1,23 +1,7 @@
-import { sh, dash } from '../../helpers/namespaces'
-import { GrapoiPointer } from '../../types'
-import { scorer } from '../../core/Scorer'
-import factory from 'rdf-ext'
-import { ShaclFormSingleEditorReact } from '../../core/ShaclFormSingleEditorReact'
+import { sh } from '../../../helpers/namespaces'
+import { ShaclFormSingleEditorReact } from '../../../core/ShaclFormSingleEditorReact'
 
 export default class EnumSelect extends ShaclFormSingleEditorReact<typeof EnumSelect> {
-
-  static iri = dash('EnumSelectEditor').value
-
-  static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
-    return scorer(shaclPointer, dataPointer)
-      .has(sh('in'), 10)
-      .toNumber()
-  }
-
-  static createNewObject () {
-    return factory.literal('')
-  }
-
   template () {
     const options = [
       ...this.shaclPointer
