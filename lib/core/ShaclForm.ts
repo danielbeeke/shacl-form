@@ -16,6 +16,7 @@ import grapoi from 'grapoi'
 import '../scss/style.scss'
 import { swapSubject } from '../helpers/swapSubject'
 import { Writer } from 'n3'
+import { StoreProxy } from './StoreProxy'
 
 export const init = (options: Options) => {
 
@@ -30,7 +31,7 @@ export const init = (options: Options) => {
 
     #validator: typeof Validator
     #subject: NamedNode = factory.namedNode('')
-    #store: Store = new Store()
+    #store: Store
     #shaclDataset: DatasetCore = rdfDataset.dataset()
     shapeUris: Array<NamedNode> = []
     #rootShaclIri: NamedNode = factory.namedNode('')
@@ -42,12 +43,13 @@ export const init = (options: Options) => {
 
     constructor () {
       super()
-      this.init()
+      // this.init()
+      this.#store = new Proxy(new Store(), StoreProxy(this))
       this.options = options
       this.#root = createRoot(this)
     }
 
-    async init () {
+    async connectedCallback () {
       this.classList.add('shacl-form')
       const parser = new Parser()
       const shaclUrl = this.attributes.getNamedItem('shacl-url')?.value
@@ -105,7 +107,7 @@ export const init = (options: Options) => {
         const dataText = await fetch(dataUrl).then(response => response.text())
         if (dataText) {
           const dataQuads = await parser.parse(dataText)
-          await this.#store.addQuads(dataQuads)
+          for (const dataQuad of dataQuads) this.#store.add(dataQuad)
           if (dataQuads?.[0]?.subject) this.#subject = dataQuads[0].subject as NamedNode  
         }
       }
@@ -144,8 +146,6 @@ export const init = (options: Options) => {
       const report = await this.validate()
       const tree = await shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
       const shacl = grapoi({ dataset: this.#shaclDataset, factory })
-
-      console.log(tree)
 
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [
         createElement(StrictMode, {
@@ -203,11 +203,12 @@ export const init = (options: Options) => {
       swapSubject(this.#store, this.subject, newValue)
     }
 
-    validate () {
+    async validate () {
       const dataset = this.store
       const validateStore = rdfDataset.dataset()
+      const quads = await dataset.match().toArray()
 
-      for (const quad of dataset) {
+      for (const quad of quads) {
         // We simply skip empty items.
         if (quad.object.value) validateStore.add(quad)
       }

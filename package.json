@@ -12,6 +12,7 @@
   },
   "main": "dist/ShaclForm.js",
   "devDependencies": {
+    "@m-ld/m-ld": "^0.9.2",
     "@types/lodash-es": "^4.17.7",
     "@types/n3": "^1.10.4",
     "@types/node": "^18.15.11",
@@ -23,7 +24,10 @@
     "@types/rdfjs__score": "^0.1.1",
     "@types/react-dom": "^18.0.11",
     "@types/sortablejs": "^1.15.1",
+    "buffer": "^6.0.3",
+    "memory-level": "^1.0.0",
     "sass": "^1.62.1",
+    "socket.io-client": "^4.7.2",
     "typescript": "^5.0.3",
     "vite": "^4.2.0",
     "vite-plugin-dts": "^3.5.2"

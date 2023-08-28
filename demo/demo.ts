@@ -7,6 +7,7 @@ import '../lib/scss/style.scss'
 import factory from 'rdf-ext'
 import { schema } from '../lib/helpers/namespaces'
 import './demo.scss'
+import factory from 'rdf-ext'
 
 init(defaultOptions)
 
@@ -115,7 +116,7 @@ const demos = [
     dataUrl: '../data/enum.ttl?raw',
     contentLanguage: 'en',
     activeContentLanguage: 'en',
-  },
+  }
 ]
 
 const index = location.pathname.substring(1) ? parseInt(location.pathname.substring(1)) : null
@@ -140,27 +141,26 @@ else {
   const demo = demos[index]
 
   const formId = demo.shaclUrl.split('/').pop()?.split('.')[0]
+    document.body.innerHTML = `
+      <shacl-form 
+        id=${`demo-${formId}`}
+        class="p-5"
+        shacl-url="${demo.shaclUrl ?? ''}" 
+        shacl-iri="${demo.shaclIri ?? ''}" 
+        data-url="${demo.dataUrl ?? ''}" 
+        data-iri="${demo.dataIri ?? ''}"
+        ${demo.contentLanguage ? `content-languages="${demo.contentLanguage}"` : ''}
+        ${demo.activeContentLanguage ? `active-content-languages="${demo.activeContentLanguage}"` : ''}
+        ui-language-priorities="${demo.uiLanguagePriorities ?? ''}"
+        ${demo.enhance ? `enhance` : ''}
+      ></shacl-form>
+    `
 
-  document.body.innerHTML = `
-    <shacl-form 
-      id=${`demo-${formId}`}
-      class="p-5"
-      shacl-url="${demo.shaclUrl ?? ''}" 
-      shacl-iri="${demo.shaclIri ?? ''}" 
-      data-url="${demo.dataUrl ?? ''}" 
-      data-iri="${demo.dataIri ?? ''}"
-      ${demo.contentLanguage ? `content-languages="${demo.contentLanguage}"` : ''}
-      ${demo.activeContentLanguage ? `active-content-languages="${demo.activeContentLanguage}"` : ''}
-      ui-language-priorities="${demo.uiLanguagePriorities ?? ''}"
-      ${demo.enhance ? `enhance` : ''}
-    ></shacl-form>
-  `
+    const form = document.querySelector('shacl-form')! as any
 
-  const form = document.querySelector('shacl-form')! as any
-
-  form.addEventListener('save', (event) => {
-    console.log(event.detail.turtle)
-  })
+    form.addEventListener('save', (event) => {
+      console.log(event.detail.turtle)
+    })
 
   /**
    * Demonstration of data intregration on API call.
