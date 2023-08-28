@@ -59,10 +59,8 @@ export function FormLevel ({
       widget._score = definedEditor && widget._widget.iri === definedEditor ? 100 : widgetScore
     }
 
-    if (predicate === 'https://schema.org/postalCode') {
-      console.log(predicate)
-      console.table(widgets.map(widget => [widget._widget.name, widget._score]))  
-    }
+    // console.log(predicate)
+    // console.table(widgets.map(widget => [widget._widget.name, widget._score]))  
 
     const finalWidget = widgets?.length ? widgets
       .filter((widget: any) => widget._score > 0)

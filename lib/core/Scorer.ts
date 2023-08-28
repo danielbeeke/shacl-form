@@ -61,11 +61,11 @@ export class Scorer {
     return this
   }
 
-  nodeKind (accepedKinds: Array<NamedNode>, score: number = 1) {
+  nodeKind (accepedKinds: Array<NamedNode>, score: number = 1, exclusive = true) {
     const kinds = this.#shaclPointer.out([sh('nodeKind')]).terms
     const isAllowed = kinds.length && kinds.every(kind => accepedKinds.some(acceptedKind => acceptedKind.equals(kind)))
     if (isAllowed) this.#scores.push({ type: 'nodeKind', score })
-    else this.#foundIncompatibility = true
+    else if (exclusive) this.#foundIncompatibility = true
     return this
   }
 

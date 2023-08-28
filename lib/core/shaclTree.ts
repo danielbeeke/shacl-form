@@ -1,6 +1,6 @@
 import DatasetCore from '@rdfjs/dataset/DatasetCore'
 import grapoi from 'grapoi'
-import { rdf, sh } from '../helpers/namespaces'
+import { rdf, sh, shFrm } from '../helpers/namespaces'
 import factory from 'rdf-ext'
 import parsePath from 'shacl-engine/lib/parsePath.js'
 import * as _ from 'lodash-es'
@@ -132,10 +132,7 @@ export const processLevel = async (shaclProperties: GrapoiPointer, report: any, 
 
         const nestedShape = shaclPropertyInner.out(sh('node')).term
 
-        /**
-         * TODO Should we also allow blankNodes?
-         */
-        if (nestedShape?.termType === 'NamedNode') {
+        if (nestedShape) {
           const shacl = grapoi({ dataset: shaclDataset, factory, term: nestedShape })
           const shaclProperties = shacl.hasOut([sh('property')]).trim()
 
@@ -144,7 +141,18 @@ export const processLevel = async (shaclProperties: GrapoiPointer, report: any, 
             ...shaclPropertyInner.terms,
           ]).distinct()
 
+          
           const nestedTree = await processLevel(mergedPointer, report, options, shacl, shaclDataset, depth++)
+          const languageDiscriminator = shaclPropertyInner.out(shFrm('languageDiscriminator')).term
+          const discriminatorValue = shaclPropertyInner.out(shFrm('discriminatorValue')).term
+
+          if (languageDiscriminator && discriminatorValue) {
+           nestedTree[languageDiscriminator.value]._usedInGroup = true
+          }
+
+          nestedTree._languageDiscriminator = languageDiscriminator
+          nestedTree._discriminatorValue = discriminatorValue
+
           Object.assign(pointer[predicate.value], nestedTree)
         }
 

@@ -7,7 +7,7 @@ export default class Date extends ShaclFormSingleEditorUhtml<typeof Date> {
     return html`
       <input type="date" class="form-control" onChange=${(event: Event) => {
         this.value = this.df.literal((event.target as HTMLInputElement).value, xsd('date'))
-      }} type="text" .value=${this.value?.value ?? ''} />
+      }} type="text" value=${this.value?.value ?? ''} />
     `
   }
 

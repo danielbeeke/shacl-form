@@ -116,6 +116,15 @@ const demos = [
     dataUrl: '../data/enum.ttl?raw',
     contentLanguage: 'en',
     activeContentLanguage: 'en',
+  },
+  {
+    title: 'Language discriminator',
+    shaclUrl: '../shapes/multilingual-discriminator.shacl.ttl?raw',
+    shaclIri: 'http://example.com/RootShape',
+    dataIri: 'http://example.com/name',
+    dataUrl: '../data/multilingual-discriminator.ttl?raw',
+    contentLanguage: 'en,nl',
+    activeContentLanguage: 'en',
   }
 ]
 

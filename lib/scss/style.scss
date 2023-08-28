@@ -44,8 +44,8 @@ shacl-form {
     flex-direction: column;
   }
 
-  sf-blanknodeoriri {
-    display: flex !important;
+  .type-BlankNodeOrIri sf-blanknodeoriri {
+    display: flex;
     gap: 10px;
     background-color: rgba(0, 53, 70, .15);
   }
@@ -55,11 +55,11 @@ shacl-form {
       flex: 1 1 100%;
     }
 
-    > .btn-remove-item {
-      position: absolute;
-      top: -3px;
-      right: 0;
-    }
+    // > .btn-remove-item {
+    //   position: absolute;
+    //   top: -3px;
+    //   right: 0;
+    // }
   }
 
   .btn-remove-item {

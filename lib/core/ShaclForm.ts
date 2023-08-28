@@ -129,6 +129,9 @@ export const init = (options: Options) => {
             contentLanguages.add((quad.object as Literal).language)
           }
         }
+
+        // TODO add language discriminator 
+        // Always execute so that we are able to displays any language if it is in the data
         
         this.setAttribute('content-languages', [...contentLanguages.values()].join(','))
       }

@@ -1,6 +1,6 @@
 import { ShaclFormSingleEditorUhtml } from '../../../core/ShaclFormSingleEditorUhtml'
 import { BlankNode } from '../../../types'
-import { schema, rdfs, sh } from '../../../helpers/namespaces'
+import { schema, rdfs, sh, shFrm } from '../../../helpers/namespaces'
 import factory from 'rdf-ext'
 import { bestLanguage } from '../../../helpers/bestLanguage'
 import { html } from 'uhtml/async' // You could use React, Vue, Angular, basically anything and export it to a customElement.
@@ -25,6 +25,12 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditorUhtml<typeof Bl
     const name = bestLanguage(indexSpecificNamesPointer, this.uiLanguagePriorities)
     const nodeKind = this.shaclPointer.out([sh('nodeKind')]).term
     const enforceIri = nodeKind?.equals(sh('IRI'))
+
+    const languageDiscriminator = this.shaclPointer.out([shFrm('languageDiscriminator')]).term
+    if (languageDiscriminator) {
+      this.style.display = 'none'
+      return html``
+    }
 
     return html`
       <span class="d-flex align-items-center">

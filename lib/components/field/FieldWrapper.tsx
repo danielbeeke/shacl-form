@@ -1,4 +1,4 @@
-import { sh } from '../../helpers/namespaces'
+import { sh, shFrm } from '../../helpers/namespaces'
 import { bestLanguage } from '../../helpers/bestLanguage'
 import { FieldItem } from './FieldItem'
 import { GrapoiPointer, Widget, NamedNode, Literal, Term } from '../../types'
@@ -62,6 +62,10 @@ export const orderCache: Map<string, Array<string>> = new Map()
 export function FieldWrapper ({ Widget, isOrderedList, children, structure, errors, uiLanguagePriorities, dataPointer, form }: FieldWrapperProps) {
   const { _shaclPointer, _predicate, _pathPart } = structure
   const [WidgetClass, setWidgetClass] = useState<any>(null)
+  const languageDiscriminator = _shaclPointer.out([shFrm('languageDiscriminator')]).term as NamedNode | null
+  const path = JSON.stringify(_pathPart)
+  const maxCount = _shaclPointer.out([sh('maxCount')]).value
+  const uniqueLang = _shaclPointer.out([sh('uniqueLang')]).value
 
   useEffect(() => {
     Widget.resolve().then(({ default: WidgetClass }: { default: any }) => setWidgetClass(() => WidgetClass))
@@ -73,14 +77,35 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
     : (_pathPart ? dataPointer().execute(_pathPart).trim() : dataPointer()).terms
   }
 
-  let terms = getTerms()
+  const getActiveTerms = () => {
+    return getTerms().filter(term => {
+      const language = languageDiscriminator ? dataPointer().node([term]).out([languageDiscriminator]).value : (term as Literal).language
+      return !language || form.activeContentLanguages.includes(language)
+    }).sort((a, b) => {
+      if (isOrderedList) {
+        const aTermSerialized = JSON.stringify(a)
+        const aTerm = sortableState.find(sortableItem => sortableItem.id === aTermSerialized)
+        const aIndex = aTerm ? sortableState.indexOf(aTerm) : 1000
 
-  const activeTerms = terms.filter(term => {
-    return !(term as Literal).language || 
-      form.activeContentLanguages.includes((term as Literal).language)
-  })
+        const bTermSerialized = JSON.stringify(b)
+        const bTerm = sortableState.find(sortableItem => sortableItem.id === bTermSerialized)
+        const bIndex = bTerm ? sortableState.indexOf(bTerm) : 1000
 
-  if (activeTerms.length === 0) {
+        return aIndex - bIndex  
+      }
+      else {
+        const aTerm = JSON.stringify(a)
+        const bTerm = JSON.stringify(b)
+        const aIndex = orderCache.get(path)!.indexOf(aTerm) ?? 10000
+        const bIndex = orderCache.get(path)!.indexOf(bTerm) ?? 10000
+  
+        return aIndex - bIndex  
+      }
+    })
+  }
+
+  // TODO move this logic to shaclTree so that adding new nested value do not trigger an invalid state.
+  if (getActiveTerms().length === 0) {
     const newObject = Widget.createNewObject(form, _shaclPointer)
 
     if (isOrderedList) {
@@ -93,31 +118,25 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
     else {
       dataPointer().addOut(_predicate, newObject)
     }
-
-    terms = getTerms()
   }
 
   const name = bestLanguage(_shaclPointer.out([sh('name')]), uiLanguagePriorities)
   const description = bestLanguage(_shaclPointer.out([sh('description')]), uiLanguagePriorities)
 
-  const sortableItems = terms.map((term: Term) => ({ id: JSON.stringify(term), term }))
-  const sortableState = sortableItems
+  const sortableState = getTerms().map((term: Term) => ({ id: JSON.stringify(term), term }))
   const setSortableState = (newState: any) => {
-    const oldStateSerialized = terms.map(term => JSON.stringify(term)).join('')
+    const oldStateSerialized = getTerms().map(term => JSON.stringify(term)).join('')
     const newStateSerialized = newState.map((item: any) => JSON.stringify(item.term)).join('')
 
     if (oldStateSerialized !== newStateSerialized) {
       const pointer: GrapoiPointer = dataPointer().execute(_pathPart)
       replaceList(newState.map((item: any) => item.term), pointer)
-
       form.render()
     }
   }
 
-  const path = JSON.stringify(_pathPart)
-
-  const serializedTerms = terms.map(term => JSON.stringify(term))
-
+  const serializedTerms = getTerms().map(term => JSON.stringify(term))
+  
   if (!isOrderedList) {
     // Because standard RDF is unordered we need to simulate order.
     // Create the initial order
@@ -151,8 +170,11 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
     }
   }
 
-  const activeItems = terms
-  .map((term, index) => {
+  const allTerms = getTerms()
+  const renderedItemsIndexed = getActiveTerms()
+  .map((term) => {
+    const matchedTerm = allTerms.find(innerTerm => term.equals(innerTerm))
+    const index = allTerms.indexOf(matchedTerm!)
     const cid = JSON.stringify([_pathPart, term]) + index
 
     return [(
@@ -168,45 +190,16 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
         {children}
       </FieldItem>
     ), term]
-  }).filter(([_field, term]) => {
-    return !(term as Literal).language || 
-      form.activeContentLanguages.includes((term as Literal).language)
   })
   
-  const items = activeItems
-    .sort((a, b) => {
-      if (isOrderedList) {
-        const aTermSerialized = JSON.stringify(a[1])
-        const aTerm = sortableState.find(sortableItem => sortableItem.id === aTermSerialized)
-        const aIndex = aTerm ? sortableState.indexOf(aTerm) : 1000
-
-        const bTermSerialized = JSON.stringify(b[1])
-        const bTerm = sortableState.find(sortableItem => sortableItem.id === bTermSerialized)
-        const bIndex = bTerm ? sortableState.indexOf(bTerm) : 1000
-
-        return aIndex - bIndex  
-      }
-      else {
-        const aTerm = JSON.stringify(a[1])
-        const bTerm = JSON.stringify(b[1])
-        const aIndex = orderCache.get(path)!.indexOf(aTerm) ?? 10000
-        const bIndex = orderCache.get(path)!.indexOf(bTerm) ?? 10000
-  
-        return aIndex - bIndex  
-      }
-    })
-    .map(([field]) => field as JSX.Element)
-
+  const renderedItems = renderedItemsIndexed.map(([field]) => field as JSX.Element)
   const element = useRef<HTMLDivElement>(null)
 
-  const maxCount = _shaclPointer.out([sh('maxCount')]).value
-  const uniqueLang = _shaclPointer.out([sh('uniqueLang')]).value
-
-  let showAdd = !maxCount || terms.length < maxCount
+  let showAdd = !maxCount || getTerms().length < maxCount
 
   if (WidgetClass?.type === 'multi') showAdd = false
   if (WidgetClass?.hideAddButton) showAdd = false
-  if ((activeItems[activeItems.length - 1]?.[1] as Term)?.value === '') showAdd  = false
+  if ((renderedItemsIndexed[renderedItemsIndexed.length - 1]?.[1] as Term)?.value === '') showAdd  = false
   if (uniqueLang) showAdd = false
 
   const formSaveHasBeenTouched = form.touchedSave
@@ -239,8 +232,8 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
 
         <div className='items'>
           {isOrderedList ? <ReactSortable filter="input,.list-group,.form-control" preventOnFilter={false} list={sortableState} setList={setSortableState}>
-            {items}
-          </ReactSortable> : items}
+            {renderedItems}
+          </ReactSortable> : renderedItems}
         </div>
 
         <FieldItem 

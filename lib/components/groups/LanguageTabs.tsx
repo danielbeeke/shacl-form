@@ -45,6 +45,7 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
               <span onClick={() => {
                 const previousActiveLanguage = form.activeContentLanguages[0]
                 const dataset = form.dataPointer.ptrs[0].dataset
+                // TODO add logic for language discriminator.
                 for (const quad of dataset) {
                   if (quad.object.language === previousActiveLanguage && quad.object.value === '')
                     dataset.delete(quad)
