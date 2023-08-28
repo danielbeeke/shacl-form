@@ -12,7 +12,5 @@ export const score = (shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) =
 }
 
 export const createNewObject = () => {
-  const today = new Date()
-  const todayAsString = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${(today.getDate() + 1).toString().padStart(2, '0')}`
-  return factory.literal(todayAsString, xsd('date'))
+  return factory.literal('', xsd('date'))
 }

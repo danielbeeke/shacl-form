@@ -257,4 +257,15 @@ shacl-form {
     display: flex;
     flex-direction: column;
   }
+
+  .is-language-discriminator {
+    > .field-inner > .items > .item > .children {
+      padding: 0;
+      margin-bottom: -10px;
+
+      .item {
+        background-color: transparent;
+      }
+    }
+  }
 }

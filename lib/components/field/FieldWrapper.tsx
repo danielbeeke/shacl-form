@@ -209,7 +209,7 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
   }
 
   return WidgetClass ? (
-    <div ref={element} className={`field`} data-predicate={_predicate?.value}>
+    <div ref={element} className={`field ${languageDiscriminator ? 'is-language-discriminator': ''}`} data-predicate={_predicate?.value}>
       {name ? (<label className='form-label'>{name}</label>) : null}
 
       {description ? (<p className='form-text' dangerouslySetInnerHTML={{__html: description}}></p>) : null}
