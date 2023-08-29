@@ -7,7 +7,6 @@ import '../lib/scss/style.scss'
 import factory from 'rdf-ext'
 import { schema } from '../lib/helpers/namespaces'
 import './demo.scss'
-import factory from 'rdf-ext'
 
 init(defaultOptions)
 

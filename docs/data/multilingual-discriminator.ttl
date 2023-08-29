@@ -1,0 +1,12 @@
+@prefix schema: <https://schema.org/>.
+@prefix ex: <http://example.com/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+ex:name 
+    schema:date [
+        schema:inLanguage "en" ;
+        schema:value "2023-08-05"^^<http://www.w3.org/2001/XMLSchema#date> ;
+    ], [
+        schema:inLanguage "nl" ;
+        schema:value "2003-01-02"^^<http://www.w3.org/2001/XMLSchema#date> ;
+    ] .

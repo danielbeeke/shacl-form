@@ -1,0 +1,36 @@
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+@prefix ex: <http://example.com/>.
+@prefix schema: <https://schema.org/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix shfrm: <https://github.com/danielbeeke/shacl-form/ontology#> .
+
+ex:RootShape
+	a sh:NodeShape ;
+
+	sh:property [
+		sh:path schema:date;
+		sh:name "Date"@en ;
+    shfrm:languageDiscriminator schema:inLanguage ;
+    shfrm:discriminatorValue schema:value ;
+		
+    sh:node [
+      sh:property [ sh:path schema:inLanguage; sh:minCount 1; sh:maxCount 1 ] ;
+      sh:property [ sh:path schema:value ; sh:datatype xsd:date; sh:minCount 1; sh:maxCount 1 ] ;
+    ] ;
+
+		sh:group ex:MainGroup ;
+	] ;
+
+	sh:property [
+		sh:group ex:ButtonGroup ;
+		sh:order 10 ;
+	] ;
+.
+
+ex:MainGroup
+	a sh:PropertyGroup, shfrm:LanguageTabs .
+
+ex:ButtonGroup
+	a sh:PropertyGroup, shfrm:Buttons .

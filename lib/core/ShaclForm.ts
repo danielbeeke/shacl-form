@@ -213,8 +213,14 @@ export const init = (options: Options) => {
     async validate () {
       const dataset = this.store
       const validateStore = rdfDataset.dataset()
+      /** @ts-ignore */
       const quads = await dataset.match().toArray()
-
+      
+      /**
+       * TODO
+       * Interesting... When validating and when saving it might be better to execute all the SHACL paths 
+       * so that the values are gather and we at that moment can decid if we want to keep the empy value.
+       */
       for (const quad of quads) {
         // We simply skip empty items.
         if (quad.object.value) validateStore.add(quad)
@@ -235,7 +241,7 @@ export const init = (options: Options) => {
         if (quad.object.language === languageCode)
           dataset.delete(quad)
       }
-      
+
       const shacl = grapoi({ dataset: this.#shaclDataset, factory })
       const languageDiscriminatorNodes = shacl.hasOut([shFrm('languageDiscriminator')])
 
