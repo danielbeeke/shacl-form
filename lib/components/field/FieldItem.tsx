@@ -6,6 +6,7 @@ import { cast } from '../../helpers/cast'
 import { ShaclFormMultiEditor } from '../../core/ShaclFormMultiEditor'
 import { Icon } from '@iconify-icon/react';
 import { replaceList } from '../../helpers/replaceList'
+import { removeRecursively } from '../../helpers/removeRecursively'
 
 type FieldItemProps = {
   structure: Widget, 
@@ -31,15 +32,8 @@ const removeItem = async (element: ShaclFormSingleEditor<any>, isList: boolean) 
     replaceList(filteredValues, element.dataPointer().out([element.predicate]))
   }
   else {
-    // Removes also the children of this item.
     let resolvedPointer = element.dataPointer().trim().out([element.predicate], [element.value as any])
-    const quadsToRemove = new Set()
-    while ([...resolvedPointer.quads()].length) {
-      for (const quad of resolvedPointer.quads()) quadsToRemove.add(quad)
-      resolvedPointer = resolvedPointer.out()
-    }
-
-    element.dataPointer().ptrs[0].dataset.removeQuads([...quadsToRemove.values()])
+    removeRecursively(resolvedPointer)
   }
 
   ;(element.closest('.shacl-form') as any).render()

@@ -43,30 +43,13 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
           <li key={languageCode} className={`nav-item language-tab`}>
             <span className={`nav-link ${form.activeContentLanguages.includes(languageCode) ? 'active' : ''}`}>
               <span onClick={() => {
-                const previousActiveLanguage = form.activeContentLanguages[0]
-                const dataset = form.dataPointer.ptrs[0].dataset
-                // TODO add logic for language discriminator.
-                for (const quad of dataset) {
-                  if (quad.object.language === previousActiveLanguage && quad.object.value === '')
-                    dataset.delete(quad)
-                }
-                
                 form.activeContentLanguages = [languageCode]
               }}>
                 {label}
               </span>
 
               {form.contentLanguages.length > 1 ? <button className='btn-remove-language' onClick={() => {
-                const dataset = form.dataPointer.ptrs[0].dataset
-                for (const quad of dataset) {
-                  if (quad.object.language === languageCode)
-                    dataset.delete(quad)
-                }
-                
-                form.contentLanguages = form.contentLanguages.filter((language: string) => language !== languageCode)
-                form.activeContentLanguages = [form.contentLanguages[0]]
-                
-                form.render()
+                form.removeLanguage(languageCode)
               }}>
                 <Icon style={{ fontSize: 12 }} icon="fa6-solid:xmark" />
               </button> : null}

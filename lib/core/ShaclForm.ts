@@ -17,6 +17,8 @@ import '../scss/style.scss'
 import { swapSubject } from '../helpers/swapSubject'
 import { Writer } from 'n3'
 import { StoreProxy } from './StoreProxy'
+import parsePath from 'shacl-engine/lib/parsePath.js'
+import { removeRecursively } from '../helpers/removeRecursively'
 
 export const init = (options: Options) => {
 
@@ -150,6 +152,8 @@ export const init = (options: Options) => {
       const tree = await shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
       const shacl = grapoi({ dataset: this.#shaclDataset, factory })
 
+      // TODO try a new structure that has data and definition as input and that creates a render structure instead of two separate structures.
+
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [
         createElement(StrictMode, {
           key: 'strictmode',
@@ -225,6 +229,36 @@ export const init = (options: Options) => {
       return report
     }
 
+    removeLanguage (languageCode: string) {
+      const dataset = this.dataPointer.ptrs[0].dataset
+      for (const quad of dataset) {
+        if (quad.object.language === languageCode)
+          dataset.delete(quad)
+      }
+      
+      const shacl = grapoi({ dataset: this.#shaclDataset, factory })
+      const languageDiscriminatorNodes = shacl.hasOut([shFrm('languageDiscriminator')])
+
+      for (const languageDiscriminatorNode of languageDiscriminatorNodes) {
+        const [languageDiscriminator] = languageDiscriminatorNode.out([shFrm('languageDiscriminator')]).terms
+        const parsedPath = parsePath(languageDiscriminatorNode.out([sh('path')]))
+
+        const discriminatorSets = this.dataPointer.executeAll(parsedPath)
+        for (const discriminatorSet of discriminatorSets) {
+          const language = discriminatorSet.out([languageDiscriminator]).value
+          if (language === languageCode) {
+            removeRecursively(discriminatorSet)
+          }
+        }
+      }
+
+
+      this.contentLanguages = this.contentLanguages.filter((language: string) => language !== languageCode)
+      this.activeContentLanguages = [this.contentLanguages[0]]
+
+      this.render()
+    }
+
     get shapeUri () {
       const givenShapeUri = this.attributes.getNamedItem('shape-uri')?.value
       if (!givenShapeUri) return this.shapeUris[0]
@@ -245,7 +279,6 @@ export const init = (options: Options) => {
   
     get activeContentLanguages () {
       const activeContentLanguages = this.getAttribute('active-content-languages')?.split(',') ?? []
-      if (!activeContentLanguages.every(activeContentLanguage => this.contentLanguages.includes(activeContentLanguage))) throw new Error(`An active language was set that is not included in the available languages.`)
       if (activeContentLanguages.length === 0) return this.contentLanguages
       return activeContentLanguages
     }
@@ -255,6 +288,14 @@ export const init = (options: Options) => {
     }
 
     set activeContentLanguages (languages: Array<string>) {
+      const previousActiveLanguage = this.activeContentLanguages[0]
+      const dataset = this.dataPointer.ptrs[0].dataset
+      // TODO add logic for language discriminator.
+      for (const quad of dataset) {
+        if (quad.object.language === previousActiveLanguage && quad.object.value === '')
+          dataset.delete(quad)
+      }
+
       if (languages.length === 0) languages = this.contentLanguages
       this.setAttribute('active-content-languages', languages.join(','))
       this.render()
