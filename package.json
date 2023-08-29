@@ -57,7 +57,7 @@
     "@rdfjs/dataset": "^2.0.1",
     "@rdfjs/namespace": "^2.0.0",
     "@rdfjs/score": "^0.1.1",
-    "bcp47-picker": "^1.0.15",
+    "bcp47-picker": "^1.0.16",
     "editorjs-drag-drop": "^1.1.13",
     "fetch-sparql-endpoint": "^4.0.0",
     "grapoi": "^1.0.0",

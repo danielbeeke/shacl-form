@@ -1,4 +1,4 @@
-import { sh, shFrm } from '../../helpers/namespaces'
+import { sh, shFrm, rdf } from '../../helpers/namespaces'
 import { bestLanguage } from '../../helpers/bestLanguage'
 import { FieldItem } from './FieldItem'
 import { GrapoiPointer, Widget, NamedNode, Literal, Term } from '../../types'
@@ -66,6 +66,7 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
   const path = JSON.stringify(_pathPart)
   const maxCount = _shaclPointer.out([sh('maxCount')]).value
   const uniqueLang = _shaclPointer.out([sh('uniqueLang')]).value
+  const isMultiLingual = _shaclPointer.out([sh('datatype')]).terms.some(term => term.equals(rdf('langString')))
 
   useEffect(() => {
     Widget.resolve().then(({ default: WidgetClass }: { default: any }) => setWidgetClass(() => WidgetClass))
@@ -210,7 +211,12 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
 
   return WidgetClass ? (
     <div ref={element} className={`field ${languageDiscriminator ? 'is-language-discriminator': ''}`} data-predicate={_predicate?.value}>
-      {name ? (<label className='form-label'>{name}</label>) : null}
+      {name ? (<label className='form-label'>
+        {name}
+        {languageDiscriminator || isMultiLingual || (getActiveTerms()[0] as any).language
+         ? <em className='ms-2' style={{ fontWeight: 100, fontSize: '.9em', opacity: .6 }}>Language specific<Icon className='ms-2' style={{ position: 'relative', top: 3}} icon="ooui:language" /></em>
+          : null}
+      </label>) : null}
 
       {description ? (<p className='form-text' dangerouslySetInnerHTML={{__html: description}}></p>) : null}
 
