@@ -31,7 +31,7 @@ const {
   FileUpload
 } = singleEditors
 
-bcp47PickerInit({ sources: ['https://bcp47.danielbeeke.nl/data/lmt.json']})
+bcp47PickerInit({ sources: ['https://bcp47.mediaworks.global/data/lmt.json']})
 
 const uploadSetttings = {
   backend: import.meta.env.STORAGE_BACKEND ?? 'http://localhost:8008/local'

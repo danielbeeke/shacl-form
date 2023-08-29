@@ -1,7 +1,7 @@
 import { bestLanguage } from '../../helpers/bestLanguage'
 import { rdfs, shFrm } from '../../helpers/namespaces'
 import { GrapoiPointer } from '../../types'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Icon } from '@iconify-icon/react'
 
 export const iri = shFrm('LanguageTabs')
@@ -19,25 +19,19 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
   return (
     <div className={`group group-language-tabs ${machineName}`}>
       <bcp47-picker style={{'display': 'none'}} ref={(languagePicker: any) => {
-        // TODO this mess should be fixed in bcp47 picker instead of here.
-        const tryLabel = () => setTimeout(() => {
-          if (languagePicker?.label && typeof languagePicker.label === 'function') {
             setLanguagePicker(languagePicker)
-          }
-          else {
-            tryLabel()
-          }
-        }, 100)
-
-        tryLabel()        
       }} />
 
       {name ? (<h1 className='group-header'>{name}</h1>) : null}
 
       <ul className='languages nav nav-tabs mb-3'>
         {form.contentLanguages.map((languageCode: string) => { 
-          /** @ts-ignore */
-          const label = languagePicker?.getLabel ? languagePicker?.getLabel(languageCode) : ''
+          const [label, setLabel] = useState(null)
+
+          useEffect(() => {
+            /** @ts-ignore */
+            if (languagePicker?.getLabel) languagePicker?.getLabel(languageCode).then(setLabel)
+          })
 
           return (
           <li key={languageCode} className={`nav-item language-tab`}>

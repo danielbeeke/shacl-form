@@ -45,12 +45,17 @@ ex:RootShape
 	] ;
 
 	sh:property [
-		sh:minCount 1 ;
 		sh:path schema:date;
 		sh:name "Date"@en ;
-		sh:datatype xsd:date ;
+    shfrm:languageDiscriminator schema:inLanguage ;
+    shfrm:discriminatorValue schema:value ;
+		
+    sh:node [
+      sh:property [ sh:path schema:inLanguage; sh:minCount 1; sh:maxCount 1 ] ;
+      sh:property [ sh:path schema:value ; sh:datatype xsd:date; sh:minCount 1; sh:maxCount 1 ] ;
+    ] ;
+
 		sh:group ex:RightGroup ;
-		sh:maxCount 1 ;
 	] ;
 
 	sh:property [
