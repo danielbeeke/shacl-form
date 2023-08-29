@@ -75,7 +75,7 @@ ex:RootShape
 	sh:property [
 		sh:path schema:url;
 		sh:name "File upload"@en ;
-		sh:pattern ".svg$" ;
+		# sh:pattern ".svg$" ;
 		sh:nodeKind sh:IRI ;
 		sh:flags "i" ;
 		sh:group ex:LeftGroup ;
