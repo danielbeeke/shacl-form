@@ -10,7 +10,12 @@
     <https://schema.org/date> _:b2, _:b7, _:b8, _:b9;
     <https://schema.org/icon> "fluent-emoji:eye", "fluent-emoji-flat:house", "fluent-emoji:hamburger";
     <https://schema.org/color> "#99c1f1", "#8ff0a4", "#f9f06b", "#9141ac";
-    <https://schema.org/choice> "a", "b".
+    <https://schema.org/choice> "a", "b";
+      <https://schema.org/author> ( 
+    <http://dbpedia.org/resource/Søren_Kierkegaard> 
+    <http://dbpedia.org/resource/Friedrich_Nietzsche>
+    <http://dbpedia.org/resource/Pieter-Jozef_Verhaghen>
+  ) .
 _:b1 <https://editorjs.io/blocks> _:b9_b1, _:b9_b3, _:b9_b5;
     <https://editorjs.io/time> 1693304899810;
     <https://editorjs.io/version> "2.28.0".

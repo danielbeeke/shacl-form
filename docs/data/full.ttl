@@ -3,3 +3,40 @@
 @prefix ex: <http://example.com/>.
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
 
+<http://example.com/name> <https://schema.org/name> "Der Produktname"@de, "De product naam"@nl, "Le nom du produit"@fr, "The product name"@en;
+    <https://schema.org/description> "The product description"@en, "Le descriptif du produit"@fr, "Die Produktbeschreibung"@de, "De product beschrijving"@nl;
+    <https://schema.org/text> _:b1;
+    <https://schema.org/published> true;
+    <https://schema.org/date> _:b2, _:b7, _:b8, _:b9;
+    <https://schema.org/icon> "fluent-emoji:eye", "fluent-emoji-flat:house", "fluent-emoji:hamburger";
+    <https://schema.org/color> "#99c1f1", "#8ff0a4", "#f9f06b", "#9141ac";
+    <https://schema.org/choice> "a", "b";
+      <https://schema.org/author> ( 
+    <http://dbpedia.org/resource/Søren_Kierkegaard> 
+    <http://dbpedia.org/resource/Friedrich_Nietzsche>
+    <http://dbpedia.org/resource/Pieter-Jozef_Verhaghen>
+  ) .
+_:b1 <https://editorjs.io/blocks> _:b9_b1, _:b9_b3, _:b9_b5;
+    <https://editorjs.io/time> 1693304899810;
+    <https://editorjs.io/version> "2.28.0".
+_:b2 <https://schema.org/inLanguage> "en";
+    <https://schema.org/value> "2023-08-08"^^<http://www.w3.org/2001/XMLSchema#date>.
+_:b7 <https://schema.org/inLanguage> "de";
+    <https://schema.org/value> "2023-09-01"^^<http://www.w3.org/2001/XMLSchema#date>.
+_:b8 <https://schema.org/inLanguage> "nl";
+    <https://schema.org/value> "2023-08-03"^^<http://www.w3.org/2001/XMLSchema#date>.
+_:b9 <https://schema.org/inLanguage> "fr";
+    <https://schema.org/value> "2023-08-16"^^<http://www.w3.org/2001/XMLSchema#date>.
+_:b9_b1 <https://editorjs.io/data> _:b9_b2;
+    <https://editorjs.io/id> "6bzJga3dxg";
+    <https://editorjs.io/type> "header".
+_:b9_b3 <https://editorjs.io/data> _:b9_b4;
+    <https://editorjs.io/id> "eYN9nuTN7a";
+    <https://editorjs.io/type> "paragraph".
+_:b9_b5 <https://editorjs.io/data> _:b9_b6;
+    <https://editorjs.io/id> "04JKx6jbB1";
+    <https://editorjs.io/type> "paragraph".
+_:b9_b2 <https://editorjs.io/text> "Lorem ipsum";
+    <https://editorjs.io/level> 2.
+_:b9_b4 <https://editorjs.io/text> "This is EditorJS<br>".
+_:b9_b6 <https://editorjs.io/text> "Pluggable.. awesome..<br>".

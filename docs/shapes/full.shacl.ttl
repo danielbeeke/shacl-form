@@ -83,6 +83,11 @@ ex:RootShape
 	] ;
 
 	sh:property [
+		sh:group ex:ButtonGroup ;
+		sh:order 1000 ;
+	] ;
+
+	sh:property [
 		sh:path schema:text;
 		sh:name "Content"@en ;
 		sh:maxCount 1;
@@ -145,3 +150,4 @@ ex:RightGroup
 ex:ButtonGroup
 	sh:order 4 ;
 	a sh:PropertyGroup, shfrm:Buttons .
+
