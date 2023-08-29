@@ -1,0 +1,13 @@
+lib
+docs
+data
+shapes
+storage
+vite
+demo
+index.html
+tsconfig.json
+vite.config.demo.ts
+vite.config.ts
+widget.svg
+.vscode

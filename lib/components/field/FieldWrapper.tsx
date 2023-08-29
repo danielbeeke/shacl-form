@@ -78,6 +78,42 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
     : (_pathPart ? dataPointer().execute(_pathPart).trim() : dataPointer()).terms
   }
 
+  const sortableState = getTerms().map((term: Term) => ({ id: JSON.stringify(term), term }))
+  const serializedTerms = getTerms().map(term => JSON.stringify(term))
+
+  if (!isOrderedList) {
+    // Because standard RDF is unordered we need to simulate order.
+    // Create the initial order
+    if (!orderCache.has(path)) {
+      orderCache.set(path, serializedTerms)
+    }
+
+    // Update the order
+    else {
+      const existingOrder = orderCache.get(path)!
+      for (const term of serializedTerms) {
+        if (!existingOrder.includes(term)) existingOrder.push(term)
+      }
+
+      const emptyRowContents = '{"termType":"DefaultGraph","value":""}'
+      const emptyRowIndex = existingOrder.indexOf(emptyRowContents)
+      // Empty rows must be at the end
+      if (emptyRowIndex !== -1) {
+        existingOrder.splice(emptyRowIndex, 1)
+        existingOrder.push('{"termType":"DefaultGraph","value":""}')
+      }
+
+      // Removals
+      const newOrder = []
+      for (const existingOrderItem of existingOrder) {
+        if (serializedTerms.includes(existingOrderItem)) {
+          newOrder.push(existingOrderItem)
+        }
+      }
+      orderCache.set(path, newOrder)
+    }
+  }
+
   const getActiveTerms = () => {
     return getTerms().filter(term => {
       const language = languageDiscriminator ? dataPointer().node([term]).out([languageDiscriminator]).value : (term as Literal).language
@@ -124,7 +160,6 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
   const name = bestLanguage(_shaclPointer.out([sh('name')]), uiLanguagePriorities)
   const description = bestLanguage(_shaclPointer.out([sh('description')]), uiLanguagePriorities)
 
-  const sortableState = getTerms().map((term: Term) => ({ id: JSON.stringify(term), term }))
   const setSortableState = (newState: any) => {
     const oldStateSerialized = getTerms().map(term => JSON.stringify(term)).join('')
     const newStateSerialized = newState.map((item: any) => JSON.stringify(item.term)).join('')
@@ -136,41 +171,7 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
     }
   }
 
-  const serializedTerms = getTerms().map(term => JSON.stringify(term))
   
-  if (!isOrderedList) {
-    // Because standard RDF is unordered we need to simulate order.
-    // Create the initial order
-    if (!orderCache.has(path)) {
-      orderCache.set(path, serializedTerms)
-    }
-
-    // Update the order
-    else {
-      const existingOrder = orderCache.get(path)!
-      for (const term of serializedTerms) {
-        if (!existingOrder.includes(term)) existingOrder.push(term)
-      }
-
-      const emptyRowContents = '{"termType":"DefaultGraph","value":""}'
-      const emptyRowIndex = existingOrder.indexOf(emptyRowContents)
-      // Empty rows must be at the end
-      if (emptyRowIndex !== -1) {
-        existingOrder.splice(emptyRowIndex, 1)
-        existingOrder.push('{"termType":"DefaultGraph","value":""}')
-      }
-
-      // Removals
-      const newOrder = []
-      for (const existingOrderItem of existingOrder) {
-        if (serializedTerms.includes(existingOrderItem)) {
-          newOrder.push(existingOrderItem)
-        }
-      }
-      orderCache.set(path, newOrder)
-    }
-  }
-
   const allTerms = getTerms()
   const renderedItemsIndexed = getActiveTerms()
   .map((term) => {

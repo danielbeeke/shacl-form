@@ -187,13 +187,14 @@ export const init = (options: Options) => {
 
       const dataset = new Store([...this.store])
       const lists = dataset.extractLists({ remove: true });
+
       const writer = new Writer({ lists })
       for (const quad of dataset) {
         // We simply skip empty items.
         if (quad.object.value && quad.object.termType !== 'BlankNode') writer.addQuad(quad)
         if (quad.object.termType === 'BlankNode') {
           const children = dataset.getQuads(quad.object, null, null, null)
-          if (children.length) writer.addQuad(quad)
+          if (children.length || lists[quad.object.value]) writer.addQuad(quad)
         }
       }
       writer.end((error: Error, turtle: string) => {
