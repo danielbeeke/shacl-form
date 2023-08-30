@@ -63,7 +63,7 @@ const demos = [
     enhance: true
   },
   {
-    title: 'BackBlaze storage, needs ENV variables',
+    title: 'File upload',
     shaclUrl: '../shapes/storage.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     dataIri: 'http://example.com/name',

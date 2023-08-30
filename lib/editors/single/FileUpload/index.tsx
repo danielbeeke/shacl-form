@@ -87,8 +87,9 @@ export default class FileUpload extends ShaclFormSingleEditorReact<typeof FileUp
 
         this.isUploading = false
   
-        const filePath = await response.text()
-        this.addValue(factory.namedNode(filePath))
+        const filePaths = await response.json()
+        for (const filePath of filePaths)
+          this.addValue(factory.namedNode(filePath))
       }  
     }
     catch (exception: any) {

@@ -127,7 +127,7 @@ export default class WYSIWYG extends ShaclFormSingleEditorUhtml<typeof WYSIWYG> 
                 method: 'POST'
               })
       
-              const filePath = await response.text()
+              const [filePath] = await response.json()
 
               return {
                 "success" : true,

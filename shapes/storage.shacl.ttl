@@ -12,6 +12,7 @@ ex:RootShape
 
 	sh:property [
 		sh:path schema:url;
+		sh:description "This file upload is done to your browser. Feel free to upload anything." ;
 		sh:name "File upload"@en ;
 		dash:uriStart "http://localhost:8008/test" ;
 	] ;

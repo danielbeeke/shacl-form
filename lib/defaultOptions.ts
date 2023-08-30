@@ -34,7 +34,7 @@ const {
 bcp47PickerInit({ sources: ['https://bcp47.mediaworks.global/data/lmt.json']})
 
 const uploadSetttings = {
-  backend: import.meta.env.STORAGE_BACKEND ?? '/storage-service-worker'
+  backend: '/storage-service-worker'
 }
 
 const multiEditors = importMultiWidgets(
