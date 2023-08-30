@@ -1,6 +1,13 @@
 @import './components/LanguageTabs';
 
 shacl-form {
+  position: relative;
+  display: block;
+
+  * {
+    box-sizing: border-box;
+  }
+
   .items .item {
     border-radius: 4px;
     display: flex;

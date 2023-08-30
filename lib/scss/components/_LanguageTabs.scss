@@ -1,7 +1,32 @@
 .group-language-tabs {
+  max-width: 100%;
+  position: relative;
+  display: block;
+
   .languages {
     display: flex;
-    border-bottom: 1px solid #dee2e6;
+    width: 100%;
+    max-width: 100%;
+    height: 43px;
+    position: relative;
+
+    &:after {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 1px;
+      position: absolute;
+      bottom: 0px;
+      z-index: -1;
+      border-bottom: 1px solid #dee2e6;
+    }
+  }
+
+  .nav-item.active {
+    position: sticky;
+    left: 0;
+    right: 0px;
+    z-index: 10;
   }
 
   .nav-link {
@@ -9,6 +34,7 @@
     cursor: pointer;
     display: flex;
     padding: 0;
+    white-space: nowrap;
     color: rgb(173, 173, 173);  
   
     > span {
@@ -37,13 +63,12 @@
   .nav-tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
-    overflow-y: hidden;
+    max-width: calc(100% - 80px);
     scroll-behavior: smooth;
     align-items: center;
+    display: inline-flex;
     height: 43px;
     border: none;
-    margin-right: 10px;
-    padding-right: 10px;
     margin-bottom: -1px;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -51,16 +76,65 @@
     &::-webkit-scrollbar {
       display: none;
     }
+
+    
+    &:before,
+    &:after {
+      content: '';
+      display: block;
+      width: 100px;
+      pointer-events: none;
+      height: calc(100% - 1px);
+      position: absolute;
+      bottom: 1px;
+      z-index: 2;
+      opacity: 1;
+      transition: opacity .1s ease-in-out;
+    }
+
+    &:before {
+      left: 0;
+      background-image: linear-gradient(
+        -90deg, 
+        rgba(255, 255, 255, 0) 0%, 
+        rgba(255, 255, 255, 1) 100%
+      );
+    }
+
+    &:after {
+      right: 64px;
+      background-image: linear-gradient(
+        90deg, 
+        rgba(255, 255, 255, 0) 0%, 
+        rgba(255, 255, 255, 1) 100%
+      );
+    }
+
+
+    &.hide-left-shadow:before {
+      opacity: 0;
+    }
+
+    &.hide-right-shadow:after {
+      opacity: 0;
+    }
   }
 
   .nav-add-language {
     flex: 0 0 auto;
-    position: relative;
+    margin-left: auto;
+    position: absolute;
+    right: 0;
     top: 0px;
+
+    &.expanded {
+      z-index: 20;
+      width: 100%;
+    }
 
     .bcp47-picker {
       display: block;
-      width: 380px;
+      width: 100%;
     }
 
     .bcp47-value.input-group {
@@ -72,6 +146,14 @@
       position: absolute;
       width: 100%;
       z-index: 10;
+    }
+  }
+}
+
+@media (min-width: 720px) {
+  .nav-add-language {
+    &.expanded {
+      width: 380px !important;
     }
   }
 }
