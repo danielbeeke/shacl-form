@@ -1,3 +1,5 @@
+@import './components/LanguageTabs';
+
 shacl-form {
   .items .item {
     border-radius: 4px;
@@ -82,68 +84,12 @@ shacl-form {
     border: none;
   }
 
-  .language-tab {
-    &.active {
-      font-weight: bold;
-    }
-  }
-
   .file-upload-image {
     max-height: 300px;
   }
 
-  .languages.nav-tabs {
-    align-items: center;
-  }
-
-  .group-language-tabs .nav-link {
-    cursor: pointer;
-    display: flex;
-    padding: 0;
-    color: rgb(173, 173, 173);  
-
-    > span {
-      padding: .5rem 1rem;
-    }
-
-    .btn-remove-language {
-      border: none;
-      background-color: transparent;
-      margin-left: -10px;
-      padding-right: .8rem;
-    }
-
-    &:not(.active) {
-      .btn-remove-language {
-        opacity: .4;
-        display: none;
-      }
-    }
-  }
-
   .shacl-form {
     display: block;
-  }
-
-  .nav-add-language {
-    position: relative;
-    top: -3px;
-
-    .bcp47-picker {
-      display: block;
-      width: 380px;
-    }
-
-    .bcp47-value.input-group {
-      position: relative;
-      top: -3px;
-    }
-
-    .bcp47-results {
-      position: absolute;
-      width: 100%;
-      z-index: 10;
-    }
   }
 
   .drop-zone {
