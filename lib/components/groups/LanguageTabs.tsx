@@ -36,7 +36,28 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
   let isDown = false
   let startX: number
   let scrollLeft: number
-  
+
+  const [value, setValue] = useState(null)
+
+  const setShadows = () => {
+    const tabsWrapper = element.current
+
+    if (!tabsWrapper?.scrollWidth) return
+    
+    tabsWrapper.classList.remove('hide-left-shadow')
+    tabsWrapper.classList.remove('hide-right-shadow')
+
+    if (tabsWrapper.scrollLeft === 0) {
+      tabsWrapper.classList.add('hide-left-shadow')
+    }
+
+    if (tabsWrapper.scrollWidth - 1 <= tabsWrapper.clientWidth + tabsWrapper.scrollLeft) {
+      tabsWrapper.classList.add('hide-right-shadow')
+    }
+  }
+
+  if (element.current) setShadows()
+ 
   return (
     <div className={`group group-language-tabs ${machineName}`}>
       {name ? (<h1 className='group-header'>{name}</h1>) : null}
@@ -53,22 +74,7 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
         }} onMouseUp={() => {
           isDown = false
           element.current?.classList.remove('active')
-        }} onScroll={() => {
-          const tabsWrapper = element.current
-
-          if (!tabsWrapper?.scrollWidth) return
-          
-          tabsWrapper.classList.remove('hide-left-shadow')
-          tabsWrapper.classList.remove('hide-right-shadow')
-      
-          if (tabsWrapper.scrollLeft === 0) {
-            tabsWrapper.classList.add('hide-left-shadow')
-          }
-      
-          if (tabsWrapper.scrollWidth - 1 <= tabsWrapper.clientWidth + tabsWrapper.scrollLeft) {
-            tabsWrapper.classList.add('hide-right-shadow')
-          }
-        }} onMouseMove={(e) => {
+        }} onScroll={setShadows} onMouseMove={(e) => {
           if(!isDown) return
           e.preventDefault()
           const x = e.pageX - (element.current?.offsetLeft ?? 0)
@@ -108,14 +114,25 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
 
           element?.addEventListener('change', () => {
             const languageCode = element.value.toLowerCase()
-            if (languageCode) {
-              form.contentLanguages = [...new Set([...form.contentLanguages, languageCode])]
-              form.activeContentLanguages = [languageCode]  
+            setValue(languageCode)
+          })
+        }} />
+        <div className='buttons'>
+          <button onClick={() => {
+            setShowLanguagePicker(false)
+            form.render()
+          }} className='btn btn-secondary'>Cancel</button>
+
+          <button onClick={() => {
+            if (value) {
+              form.contentLanguages = [...new Set([...form.contentLanguages, value])]
+              form.activeContentLanguages = [value]  
             }
             setShowLanguagePicker(false)
             form.render()
-          })
-        }} /></div>) : (
+          }} className='btn btn-primary'>Add language</button>
+        </div>
+        </div>) : (
           <div className='nav-add-language'>
             <button className='btn btn-secondary btn-sm' onClick={() => setShowLanguagePicker(true)}>
               <Icon icon="fa6-solid:plus" />

@@ -125,16 +125,40 @@
     margin-left: auto;
     position: absolute;
     right: 0;
+    background-color: white;
+    border-radius: 4px;
     top: 0px;
 
+    .bcp47-region {
+      margin-bottom: 0 !important;
+    }
+
+    .bcp47-advanced {
+      span {
+        margin-top: 15px;
+        margin-bottom: 20px;;
+      }
+    }
+
     &.expanded {
+      box-shadow: 0 4px 10px rgba(black, .1);
       z-index: 20;
+      padding: 20px;
       width: 100%;
+      top: -20px;
+      right: -20px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: end;
     }
 
     .bcp47-picker {
       display: block;
       width: 100%;
+      margin-bottom: 10px;
     }
 
     .bcp47-value.input-group {
@@ -153,7 +177,7 @@
 @media (min-width: 720px) {
   .nav-add-language {
     &.expanded {
-      width: 380px !important;
+      width: 420px !important;
     }
   }
 }
