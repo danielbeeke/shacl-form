@@ -4,42 +4,49 @@ import { GrapoiPointer } from '../../types'
 import { useEffect, useState } from 'react'
 import { Icon } from '@iconify-icon/react'
 
+declare global {
+  interface Window {
+    languageLabeler: any
+  }
+}
+
 export const iri = shFrm('LanguageTabs')
 
-/**
- * TODO Improve getting the language label.
- */
+function LanguageLabel ({ languageCode }: { languageCode: string }) {
+  const [label, setLabel] = useState(null)
+
+  useEffect(() => {
+    if (!window.languageLabeler)
+      window.languageLabeler = document.createElement('bcp47-picker')
+
+    if (window.languageLabeler?.getLabel) 
+      window.languageLabeler?.getLabel(languageCode).then(setLabel)
+  })
+
+  return <>
+    {label ?? ' '}
+  </>
+}
+
 export default function LanguageTabs ({ children, form, groupPointer }: { children: any, form: any, groupPointer: GrapoiPointer }) {
   const name = bestLanguage(groupPointer.out([rdfs('label')]), form.uiLanguagePriorities)
 
   const [showLanguagePicker, setShowLanguagePicker] = useState(false)
-  const [languagePicker, setLanguagePicker] = useState(false)
   const machineName = groupPointer?.term?.value.split(/\/|#/g).pop() ?? ''
 
   return (
     <div className={`group group-language-tabs ${machineName}`}>
-      <bcp47-picker style={{'display': 'none'}} ref={(languagePicker: any) => {
-            setLanguagePicker(languagePicker)
-      }} />
-
       {name ? (<h1 className='group-header'>{name}</h1>) : null}
 
       <ul className='languages nav nav-tabs mb-3'>
         {form.contentLanguages.map((languageCode: string) => { 
-          const [label, setLabel] = useState(null)
-
-          useEffect(() => {
-            /** @ts-ignore */
-            if (languagePicker?.getLabel) languagePicker?.getLabel(languageCode).then(setLabel)
-          })
-
           return (
           <li key={languageCode} className={`nav-item language-tab`}>
             <span className={`nav-link ${form.activeContentLanguages.includes(languageCode) ? 'active' : ''}`}>
               <span onClick={() => {
                 form.activeContentLanguages = [languageCode]
               }}>
-                {label}
+                <LanguageLabel languageCode={languageCode} />
               </span>
 
               {form.contentLanguages.length > 1 ? <button className='btn-remove-language' onClick={() => {
