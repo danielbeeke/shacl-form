@@ -7,12 +7,15 @@ import '../lib/scss/style.scss'
 import factory from 'rdf-ext'
 import { schema } from '../lib/helpers/namespaces'
 import './demo.scss'
+import ReadMe from '../README.md?raw'
+import { marked } from 'marked'
 
 init(defaultOptions)
 
 const demos = [
   {
-    title: 'Full with layout',
+    title: 'Full demo',
+    description: 'This demo tries to have all features',
     shaclUrl: '../shapes/full.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     dataIri: 'http://example.com/name',
@@ -21,7 +24,8 @@ const demos = [
     activeContentLanguage: 'en',
   },
   {
-    title: 'Name (blank nodes with a SHACL property path)',
+    title: 'People cards',
+    description: 'Blank nodes with a SHACL property path',
     shaclUrl: '../shapes/name.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     dataUrl: '../data/name.ttl?raw',
@@ -31,6 +35,7 @@ const demos = [
   },
   {
     title: 'Address',
+    description: 'Autocompletion with a Geocoder',
     shaclUrl: '../shapes/address.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     dataUrl: '../data/address.ttl?raw',
@@ -39,13 +44,15 @@ const demos = [
     contentLanguage: 'en'
   },
   {
-    title: 'ISBN API intregration',
+    title: 'ISBN',
+    description: 'API integration with openlibrary.org',
     shaclUrl: '../shapes/isbn.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     contentLanguage: 'en'
   },
   {
     title: 'Multilingual Product Name',
+    description: 'Shows language tabs at the top',
     shaclUrl: '../shapes/multilingual.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     dataUrl: '../data/multilingual.ttl?raw',
@@ -54,7 +61,8 @@ const demos = [
     activeContentLanguage: 'en'
   },
   {
-    title: 'Incomplete labels, enhance by fetching ontology',
+    title: 'Missing labels',
+    description: 'When labels are missing and you have opted in the ontology is asked for labels',
     shaclUrl: '../shapes/incomplete.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     dataIri: 'http://example.com/name',
@@ -64,6 +72,7 @@ const demos = [
   },
   {
     title: 'File upload',
+    description: 'Drag and drop file uploading',
     shaclUrl: '../shapes/storage.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     dataIri: 'http://example.com/name',
@@ -72,7 +81,8 @@ const demos = [
     activeContentLanguage: 'en',
   },
   {
-    title: 'Iconify',
+    title: 'Icon',
+    description: 'Search for icons with iconify.design',
     shaclUrl: '../shapes/iconify.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     dataIri: 'http://example.com/name',
@@ -82,6 +92,7 @@ const demos = [
   },
   {
     title: 'Reference',
+    description: 'This widget uses the SPARQL endpoint of dbpedia.org',
     shaclUrl: '../shapes/reference.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     dataIri: 'http://example.com/name',
@@ -91,6 +102,7 @@ const demos = [
   },
   {
     title: 'Ordered reference',
+    description: 'You can also save the data as an ordered list',
     shaclUrl: '../shapes/ordered-reference.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     dataIri: 'http://example.com/name',
@@ -100,6 +112,7 @@ const demos = [
   },
   {
     title: 'WYSIWYG',
+    description: 'Uses Editor.js',
     shaclUrl: '../shapes/wysiwyg.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     dataIri: 'http://example.com/name',
@@ -109,6 +122,7 @@ const demos = [
   },
   {
     title: 'Enum select',
+    description: 'A simple dropdown',
     shaclUrl: '../shapes/enum.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     dataIri: 'http://example.com/name',
@@ -118,6 +132,7 @@ const demos = [
   },
   {
     title: 'Language discriminator',
+    description: 'It is possible to show and hide fields that are not a language string',
     shaclUrl: '../shapes/multilingual-discriminator.shacl.ttl?raw',
     shaclIri: 'http://example.com/RootShape',
     dataIri: 'http://example.com/name',
@@ -133,15 +148,17 @@ if (index === null) {
   document.body.innerHTML = `
 
     <div class="demo-list">
-      <h3>Please pick an example</h3>
-
-      <ul>
+      <div class="pt-5 pb-4">
+      ${marked.parse(ReadMe.split('## Progress')[0])}
+      </div>
+      <div class="list-group">
         ${demos.map((demo, index) => `
-        <li>
-          <a href="${index}">${demo.title}</a>
-        </li>
+        <a class="list-group-item" href="${index}">
+          <strong>${demo.title}</strong><br>
+          <span>${demo.description}</span>
+        </a>
         `).join('')}
-      </ul>
+      </div>
     </div>
   `
 }
@@ -150,9 +167,15 @@ else {
 
   const formId = demo.shaclUrl.split('/').pop()?.split('.')[0]
     document.body.innerHTML = `
+
+      <div class="back-link">
+        <a href="/">< Back to demo list</a>
+        <h1>${demo.title}</h1>
+        <span>${demo.description}</span>
+      </div>
+
       <shacl-form 
         id=${`demo-${formId}`}
-        class="p-5"
         shacl-url="${demo.shaclUrl ?? ''}" 
         shacl-iri="${demo.shaclIri ?? ''}" 
         data-url="${demo.dataUrl ?? ''}" 

@@ -1,3 +1,18 @@
+.back-link {
+  max-width: 1200px;
+  margin: auto;
+  padding: 10px 20px;
+  
+  a {
+    color: gray;
+    font-size: 14px;
+  }
+
+  h1 {
+    margin-top: 40px;
+  }
+}
+
 #demo-full > form {
   padding-inline: 20px;
   display: grid;
@@ -47,6 +62,7 @@
 shacl-form > form {
   max-width: 1200px;
   margin: auto;
+  padding-inline: 20px;;
   margin-top: 40px !important;
 }
 
@@ -91,7 +107,7 @@ shacl-form > form {
   margin: auto;
 }
 
-.group-buttons {
+#demo-full .group-buttons {
   position: fixed;
   box-shadow: 0 0 10px rgba(black, .2);
   bottom: 0;
