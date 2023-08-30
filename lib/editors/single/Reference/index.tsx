@@ -24,7 +24,7 @@ export default class Reference extends ShaclFormSingleEditorReact<typeof Referen
     useEffect(() => {
       if (!this.value?.value) return
 
-      // This enables instant loading of the selecte item.
+      // This enables instant loading of the selected item.
       if (sessionStorage.getItem(this.value.value)) {
         setValue(JSON.parse(sessionStorage.getItem(this.value.value)!))
         return 
@@ -40,7 +40,6 @@ export default class Reference extends ShaclFormSingleEditorReact<typeof Referen
         .join('\n')
 
       fetcher(endpoint, tokenizedSparql, setValue)
-
     }, [])
 
     useEffect(() => {

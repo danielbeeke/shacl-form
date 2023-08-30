@@ -4,6 +4,7 @@ import rdfDataset from '@rdfjs/dataset'
 import factory from 'rdf-ext'
 import DatasetCore from '@rdfjs/dataset/DatasetCore'
 import { sh, rdf, shFrm, shn } from '../helpers/namespaces'
+import * as prefixesSource from '../helpers/namespaces'
 import { createRoot } from 'react-dom/client'
 import { createElement, StrictMode } from 'react'
 import { FormLevelBase } from '../components/FormLevel'
@@ -188,7 +189,7 @@ export const init = (options: Options) => {
       const dataset = new Store([...this.store])
       const lists = dataset.extractLists({ remove: true });
 
-      const writer = new Writer({ lists })
+      const writer = new Writer({ lists, prefixes: Object.fromEntries(Object.entries(prefixesSource).map(([key, term]) => [key, term('')])) })
       for (const quad of dataset) {
         // We simply skip empty items.
         if (quad.object.value && quad.object.termType !== 'BlankNode') writer.addQuad(quad)

@@ -47,6 +47,7 @@ ex:RootShape
 	sh:property [
 		sh:path schema:date;
 		sh:name "Date"@en ;
+		sh:uniqueLang true ;
     shfrm:languageDiscriminator schema:inLanguage ;
     shfrm:discriminatorValue schema:value ;
 		
