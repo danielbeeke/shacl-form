@@ -75,9 +75,10 @@ ex:RootShape
 	sh:property [
 		sh:path schema:url;
 		sh:name "File upload"@en ;
-		# sh:pattern ".svg$" ;
+		sh:description "This file upload is done to your browser. Feel free to upload anything." ;
 		sh:nodeKind sh:IRI ;
-		sh:flags "i" ;
+		# sh:pattern ".svg$" ;
+		# sh:flags "i" ;
 		sh:group ex:LeftGroup ;
 		dash:uriStart "http://localhost:8000/test" ;
 	] ;
