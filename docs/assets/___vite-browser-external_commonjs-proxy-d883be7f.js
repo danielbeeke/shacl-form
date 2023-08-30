@@ -1,1 +1,0 @@
-import{B as getAugmentedNamespace}from"./index-6798334f.js";const __viteBrowserExternal={},__viteBrowserExternal$1=Object.freeze(Object.defineProperty({__proto__:null,default:__viteBrowserExternal},Symbol.toStringTag,{value:"Module"})),require$$4=getAugmentedNamespace(__viteBrowserExternal$1);export{require$$4 as r};

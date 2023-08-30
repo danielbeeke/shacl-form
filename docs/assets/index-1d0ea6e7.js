@@ -1,0 +1,3 @@
+var __defProp=Object.defineProperty;var __name=(target,value)=>__defProp(target,"name",{value,configurable:!0});import{S as ShaclFormSingleEditorUhtml}from"./ShaclFormSingleEditorUhtml-32ffa4f6.js";import{x as xsd}from"./index-8b62073c.js";import{h as html}from"./async-9bb33334.js";import"./ShaclFormSingleEditor-f4b70e60.js";const _Date=class _Date extends ShaclFormSingleEditorUhtml{template(){var _a;return html`
+      <input type="date" class="form-control" onChange=${event=>{this.value=this.df.literal(event.target.value,xsd("date"))}} type="text" value=${((_a=this.value)==null?void 0:_a.value)??""} />
+    `}};__name(_Date,"Date");let Date=_Date;export{Date as default};

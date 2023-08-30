@@ -256,7 +256,7 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
         </FieldItem>
 
         {showAdd ? (
-          <button type="button" className='btn btn-secondary btn-sm btn-add-item me-auto mb-4' onClick={() => addItem(dataPointer(), _predicate, element, Widget, _pathPart, isOrderedList, setSortableState, _shaclPointer)}>
+          <button type="button" className='btn btn-secondary btn-sm btn-add-item me-auto mb-2' onClick={() => addItem(dataPointer(), _predicate, element, Widget, _pathPart, isOrderedList, setSortableState, _shaclPointer)}>
             <Icon icon="fa6-solid:plus" />
           </button>
         ) : null} 
