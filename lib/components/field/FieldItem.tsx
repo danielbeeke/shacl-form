@@ -67,7 +67,9 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer, ui
       setWidgetInstance(element)  
     }
 
-    return () => widgetInstance?.remove()
+    return () => {
+      widgetInstance?.remove()
+    }
   }, [])
 
   let resolvedChildren

@@ -1,5 +1,6 @@
 import factory from 'rdf-ext'
 import { Term } from '../types'
+import { once } from 'lodash-es'
 
 const cleanPath = (path: string) => path.split('/').at(-2)?.replace(/\.tsx|\.ts/g, '')!
 
@@ -34,7 +35,7 @@ export const importSingleWidgets = (widgetGlob: Record<string, () => Promise<unk
       name: identifier,
       score: score ? score : () => 0, 
       createNewObject: createNewObject ? createNewObject : () => factory.namedNode('') as any,
-      resolve: module
+      resolve: once(() => module())
     }
   }
 

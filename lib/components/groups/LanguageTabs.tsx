@@ -83,7 +83,7 @@ export default function LanguageTabs ({ children, form, groupPointer }: { childr
         }}>
         {form.contentLanguages.map((languageCode: string) => { 
           return (
-          <li key={languageCode} className={`nav-item language-tab ${form.activeContentLanguages.includes(languageCode) ? 'active' : ''}`}>
+          <li key={languageCode} title={languageCode} className={`nav-item language-tab ${form.activeContentLanguages.includes(languageCode) ? 'active' : ''}`}>
             <span className={`nav-link ${form.activeContentLanguages.includes(languageCode) ? 'active' : ''}`}>
               <span onClick={(event) => {
                 form.activeContentLanguages = [languageCode]

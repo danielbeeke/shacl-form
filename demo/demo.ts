@@ -57,7 +57,7 @@ const demos = [
     shaclIri: 'http://example.com/RootShape',
     dataUrl: '../data/multilingual.ttl?raw',
     dataIri: 'http://example.com/name',
-    contentLanguage: 'en,fr,de,nl,zh,es,az,ak,ab',
+    contentLanguage: 'en,fr,de,nl,zh,es,az,ak,ab,nso,pau,ja,tk,ahr',
     activeContentLanguage: 'en'
   },
   {
