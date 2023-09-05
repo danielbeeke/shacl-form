@@ -85,6 +85,15 @@ export type Widget = {
   }
 }
 
+export type InputProps = {
+  maxCount: number
+  minCount: number
+  required: boolean
+  value: string
+  language: string | undefined
+  datatype: string | undefined | Term
+}
+
 export type TreeItem = {
   _shaclPointers: Array<GrapoiPointer>,
   _isOrderedList: boolean,

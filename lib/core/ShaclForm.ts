@@ -46,7 +46,6 @@ export const init = (options: Options) => {
 
     constructor () {
       super()
-      // this.init()
       this.#store = new Proxy(new Store(), StoreProxy(this))
       this.options = options
       this.#root = createRoot(this)
@@ -152,8 +151,6 @@ export const init = (options: Options) => {
       const report = await this.validate()
       const tree = await shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
       const shacl = grapoi({ dataset: this.#shaclDataset, factory })
-
-      console.log('react render')
 
       // TODO try a new structure that has data and definition as input and that creates a render structure instead of two separate structures.
 

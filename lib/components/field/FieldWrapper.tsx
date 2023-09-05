@@ -7,7 +7,7 @@ import { ReactSortable } from "react-sortablejs";
 import { replaceList } from '../../helpers/replaceList'
 import factory from 'rdf-ext'
 import { Icon } from '@iconify-icon/react';
-import { useState, useEffect } from 'react'
+import { useState, useLayoutEffect } from 'react'
 
 type FieldWrapperProps = { 
   Widget: any, 
@@ -68,7 +68,7 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
   const uniqueLang = _shaclPointer.out([sh('uniqueLang')]).value
   const isMultiLingual = _shaclPointer.out([sh('datatype')]).terms.some(term => term.equals(rdf('langString')))
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     Widget.resolve().then(({ default: WidgetClass }: { default: any }) => setWidgetClass(() => WidgetClass))
   }, [])
 
@@ -174,7 +174,7 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
   
   const allTerms = getTerms()
   const renderedItemsIndexed = getActiveTerms()
-  .map((term) => {
+  .map((term, termIndex) => {
     const matchedTerm = allTerms.find(innerTerm => term.equals(innerTerm))
     const index = allTerms.indexOf(matchedTerm!)
     const cid = JSON.stringify([_pathPart, term, index])

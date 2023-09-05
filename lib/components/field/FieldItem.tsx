@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import { ShaclFormSingleEditor } from '../../core/ShaclFormSingleEditor'
 import { GrapoiPointer, Widget } from '../../types'
 import { sh } from '../../helpers/namespaces'
@@ -43,7 +43,7 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer, ui
   const [widgetInstance, setWidgetInstance] = useState<ShaclFormSingleEditor<any>>()
   const { _shaclPointer: _shaclPointer, _messages, _path, _predicate, _fields, _mapping, _widgetSettings } = structure
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!widgetInstance) {
       const widgetHtmlName = 'sf-' + Widget.name.toLowerCase().replaceAll('$', '-')
       if (!customElements.get(widgetHtmlName)) customElements.define(widgetHtmlName, Widget)

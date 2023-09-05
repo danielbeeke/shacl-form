@@ -1,7 +1,7 @@
 import { bestLanguage } from '../../helpers/bestLanguage'
 import { rdfs, shFrm } from '../../helpers/namespaces'
 import { GrapoiPointer } from '../../types'
-import { useEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { Icon } from '@iconify-icon/react'
 
 declare global {
@@ -15,7 +15,7 @@ export const iri = shFrm('LanguageTabs')
 function LanguageLabel ({ languageCode }: { languageCode: string }) {
   const [label, setLabel] = useState(null)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!window.languageLabeler)
       window.languageLabeler = document.createElement('bcp47-picker')
 

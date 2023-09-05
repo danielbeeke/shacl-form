@@ -1,6 +1,6 @@
 import { ShaclFormSingleEditorReact } from '../../../core/ShaclFormSingleEditorReact'
 import { shFrm } from '../../../helpers/namespaces'
-import { useEffect, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import { Icon } from '@iconify-icon/react';
 
 const iconStyle = { fontSize: 34 }
@@ -12,7 +12,7 @@ export default class Iconify extends ShaclFormSingleEditorReact<typeof Iconify> 
     const [results, setResults] = useState<Array<string> | null>(null)
     const collections = this.shaclPointer.out([shFrm('iconCollections')]).values
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (!searchTerm) return
       fetch(`https://api.iconify.design/search?query=${searchTerm}&limit=96`)
       .then(response => response.json())

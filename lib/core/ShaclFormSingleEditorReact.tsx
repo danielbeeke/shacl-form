@@ -2,6 +2,7 @@ import { IShaclFormEditorConstructor, StaticImplements } from './ShaclFormEditor
 import { ShaclFormSingleEditor } from './ShaclFormSingleEditor'
 import { createRoot, Root } from 'react-dom/client'
 import { createElement } from 'react'
+import { InputProps } from '../types'
 
 /**
  * Use <input defaultValue={this.value.value ?? ''} onBlur={} /> instead of <input value={this.value.value ?? ''} onChange={} />
@@ -33,7 +34,7 @@ extends ShaclFormSingleEditor<T> implements StaticImplements<IShaclFormEditorCon
     return null
   }
 
-  template (_props: any): any {
+  template (_props: InputProps): any {
     return (<h3>Please implement template()</h3>)
   }
 

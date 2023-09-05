@@ -1,4 +1,4 @@
-import type { GrapoiPointer, Term, NamedNode, ShaclFormType } from '../types'
+import type { GrapoiPointer, Term, NamedNode, ShaclFormType, Literal, InputProps } from '../types'
 import factory from 'rdf-ext'
 import { IShaclFormEditorConstructor, StaticImplements } from './ShaclFormEditor'
 import { sh, shFrm } from '../helpers/namespaces'
@@ -152,7 +152,7 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
   }
 
   getInputProps () {
-    const props: { [key: string]: any } = {}
+    const props: Partial<InputProps> = {}
 
     const maxCount = this.shaclPointer.out([sh('maxCount')]).value ?? Infinity
     const minCount = this.shaclPointer.out([sh('minCount')]).value ?? 0
@@ -162,6 +162,10 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
     const required = minCount > 0 && maxCount >= nonEmptyValues.length
     if (required) props.required = true
 
-    return props
+    props.value = this.value?.value
+    props.language = (this.value as Literal).language
+    props.datatype = (this.value as Literal).datatype
+
+    return props as InputProps
   }
 }

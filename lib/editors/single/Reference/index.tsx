@@ -1,6 +1,6 @@
 import { ShaclFormSingleEditorReact } from '../../../core/ShaclFormSingleEditorReact'
 import { sh, shFrm } from '../../../helpers/namespaces'
-import { useEffect, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import { SparqlEndpointFetcher } from "fetch-sparql-endpoint"
 import { debounce } from 'lodash-es'
 import { Icon } from '@iconify-icon/react';
@@ -21,7 +21,7 @@ export default class Reference extends ShaclFormSingleEditorReact<typeof Referen
     const sparql = this.shaclPointer.out([sh('select')]).value
     const endpoint = this.shaclPointer.out([shFrm('source')]).value
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (!this.value?.value) return
 
       // This enables instant loading of the selected item.
@@ -42,7 +42,7 @@ export default class Reference extends ShaclFormSingleEditorReact<typeof Referen
       fetcher(endpoint, tokenizedSparql, setValue)
     }, [])
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (searchTerm.length < 4) return
       
       const tokenizedSparql = sparql

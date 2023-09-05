@@ -25,7 +25,7 @@ export function FormLevel ({
 }: FormLevelProps) {
   depth++
 
-  const cid = Object.keys(tree).join(',') + depth
+  const cid = hash(Object.keys(tree).join(',')) + depth
 
   const widgets = Object.entries(tree).flatMap(([predicate, field]: [any, any], outerIndex: number) => {
     if (predicate[0] === '_') return    
@@ -41,7 +41,7 @@ export function FormLevel ({
           uiLanguagePriorities={uiLanguagePriorities} 
           form={form} 
           ignoreGroups={ignoreGroups}
-          key={hash(cid + predicate + outerIndex + 'children')} 
+          key={cid + predicate + outerIndex + 'children'} 
           shaclPointer={shaclPointer} 
           depth={depth} 
           tree={childrenObject} 
@@ -70,7 +70,7 @@ export function FormLevel ({
         return (
           <FieldWrapper 
             uiLanguagePriorities={uiLanguagePriorities} 
-            key={hash(cid + widget._widget.name + outerIndex + index)} 
+            key={cid + widget._widget.name + ',' + outerIndex} 
             structure={widget} 
             form={form}
             isOrderedList={field._isOrderedList}
