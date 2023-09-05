@@ -22,6 +22,8 @@ export default class Reference extends ShaclFormSingleEditorReact<typeof Referen
     const endpoint = this.shaclPointer.out([shFrm('source')]).value
 
     useLayoutEffect(() => {
+      if (value) return
+
       if (!this.value?.value) return
 
       // This enables instant loading of the selected item.
@@ -39,7 +41,10 @@ export default class Reference extends ShaclFormSingleEditorReact<typeof Referen
         })
         .join('\n')
 
-      fetcher(endpoint, tokenizedSparql, setValue)
+      fetcher(endpoint, tokenizedSparql, (bindings) => {
+        sessionStorage.setItem(bindings.uri.value, JSON.stringify(bindings))
+        setValue(bindings)
+      })
     }, [])
 
     useLayoutEffect(() => {
