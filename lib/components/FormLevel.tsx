@@ -66,7 +66,7 @@ export function FormLevel ({
       .filter((widget: any) => widget._score > 0)
       .sort((a: any, b: any) => b._score - a._score)
       .slice(0, 1)
-      .map((widget: any, index: number) => {
+      .map((widget: any) => {
         return (
           <FieldWrapper 
             uiLanguagePriorities={uiLanguagePriorities} 
