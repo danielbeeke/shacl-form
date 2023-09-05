@@ -174,7 +174,7 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
   
   const allTerms = getTerms()
   const renderedItemsIndexed = getActiveTerms()
-  .map((term, termIndex) => {
+  .map((term) => {
     const matchedTerm = allTerms.find(innerTerm => term.equals(innerTerm))
     const index = allTerms.indexOf(matchedTerm!)
     const cid = JSON.stringify([_pathPart, term, index])
