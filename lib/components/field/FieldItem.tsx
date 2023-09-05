@@ -75,7 +75,7 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer, ui
   let resolvedChildren
   const pointer = dataPointer().out([_predicate])
 
-  if (children) {
+  if (children && typeof children === 'function') {
     const childPointer = pointer.clone({
       ptrs: [pointer.ptrs[index]].filter(Boolean)
     })
@@ -105,6 +105,7 @@ export function FieldItem ({ structure, Widget, index, children, dataPointer, ui
         {resolvedChildren}
       </div>) : null}
       {showRemove ? (
+        // TODO this icon will flash because it is in the FieldItem.
         <button type="button" className='btn btn-remove-item' onClick={() => removeItem(widgetInstance!, isList)}>
           <Icon icon="octicon:trash-16" />
         </button>

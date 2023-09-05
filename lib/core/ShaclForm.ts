@@ -154,9 +154,9 @@ export const init = (options: Options) => {
 
       // TODO try a new structure that has data and definition as input and that creates a render structure instead of two separate structures.
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [
-        createElement(StrictMode, {
-          key: 'strictmode',
-          children: [
+        // createElement(StrictMode, {
+        //   key: 'strictmode',
+        //   children: [
             createElement(FormLevelBase, { 
               form: this,
               tree, 
@@ -166,8 +166,8 @@ export const init = (options: Options) => {
               key: 'form', 
               uiLanguagePriorities: this.#uiLanguagePriorities 
             })
-          ]
-        })
+        //   ]
+        // })
       ]}))
     }
 

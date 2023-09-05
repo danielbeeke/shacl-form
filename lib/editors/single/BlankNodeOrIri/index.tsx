@@ -28,22 +28,21 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditorUhtml<typeof Bl
     const languageDiscriminator = this.shaclPointer.out([shFrm('languageDiscriminator')]).term
     if (languageDiscriminator) {
       this.style.display = 'none'
-      return html``
+      return <div></div>
     }
 
-    return html`
-      <span class="d-flex align-items-center">
-        <h4 class="me-2 mb-0">${name ?? this.value?.value}</h4>
-        <em class="me-2">${this.value?.value} (${this.value?.termType})</em>
+    return <>
+      <span className="d-flex align-items-center">
+        <h4 className="me-2 mb-0">${name ?? this.value?.value}</h4>
+        <em className="me-2">${this.value?.value} (${this.value?.termType})</em>
 
-        ${this.value?.termType === 'BlankNode' && !this.showIdentifier && !enforceIri ? html`
-        <button class="btn-secondary btn btn-sm" onClick=${() => {
+        {this.value?.termType === 'BlankNode' && !this.showIdentifier && !enforceIri ? <button className="btn-secondary btn btn-sm" onClick={() => {
           this.showIdentifier = true
           this.render()
         }}>Add identifier</button>
-        ` : null}
+         : null}
         
-        ${this.value?.termType === 'NamedNode' && !this.showIdentifier && !enforceIri ? html`
+        {this.value?.termType === 'NamedNode' && !this.showIdentifier && !enforceIri ? html`
         <button class="btn-secondary btn btn-sm" onClick=${() => {
           const store = this.dataPointer().ptrs[0].dataset
           const newSubject = factory.blankNode()
@@ -55,11 +54,13 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditorUhtml<typeof Bl
 
       </span>
 
-      ${this.showIdentifier || enforceIri && this.value?.termType === 'BlankNode' ? html`
-        <input class="" type="url" required placeholder="https://example.com" onChange=${(event: any) => {
+      {this.showIdentifier || enforceIri && this.value?.termType === 'BlankNode' ? 
+        <>
+        <input type="url" required placeholder="https://example.com" onChange={(event: any) => {
           this.identifierSuggestion = event.target.value
         }} />
-        <button class="btn-secondary btn btn-sm" onClick=${() => {
+
+        <button className="btn-secondary btn btn-sm" onClick={() => {
           if (!this.identifierSuggestion) return
           
           const store = this.dataPointer().ptrs[0].dataset
@@ -68,15 +69,14 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditorUhtml<typeof Bl
           this.showIdentifier = false
           this.renderAll()
         }}>Save identifier</button>
-        ${!enforceIri ? html`
-        <button class="btn-secondary btn btn-sm" onClick=${() => {
+        {!enforceIri ? <button className="btn-secondary btn btn-sm" onClick={() => {
           this.showIdentifier = false
           this.render()
         }}>Cancel</button>
-        ` : null}
+         : null}
 
-      ` : null}
-    `
+        </>
+       : null}
+      </>
   }
-
 }
