@@ -43,6 +43,7 @@ export const init = (options: Options) => {
     public options: Options
     #data: GrapoiPointer = {} as GrapoiPointer
     public touchedSave = false
+    oldReport: any
 
     constructor () {
       super()
@@ -147,16 +148,19 @@ export const init = (options: Options) => {
       return this.#data
     }
 
-    async render () {
-      const report = await this.validate()
+    async render (renderOptions?: { skipValidation: boolean }) {
+      const report = renderOptions?.skipValidation ? {} : this.oldReport
+
+      this.oldReport = report
+
       const tree = await shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
       const shacl = grapoi({ dataset: this.#shaclDataset, factory })
 
       // TODO try a new structure that has data and definition as input and that creates a render structure instead of two separate structures.
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [
-        // createElement(StrictMode, {
-        //   key: 'strictmode',
-        //   children: [
+        createElement(StrictMode, {
+          key: 'strictmode',
+          children: [
             createElement(FormLevelBase, { 
               form: this,
               tree, 
@@ -166,8 +170,8 @@ export const init = (options: Options) => {
               key: 'form', 
               uiLanguagePriorities: this.#uiLanguagePriorities 
             })
-        //   ]
-        // })
+          ]
+        })
       ]}))
     }
 

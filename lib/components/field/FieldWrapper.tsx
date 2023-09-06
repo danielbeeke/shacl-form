@@ -160,14 +160,14 @@ export function FieldWrapper ({ Widget, isOrderedList, children, structure, erro
   const name = bestLanguage(_shaclPointer.out([sh('name')]), uiLanguagePriorities)
   const description = bestLanguage(_shaclPointer.out([sh('description')]), uiLanguagePriorities)
 
-  const setSortableState = (newState: any) => {
+  const setSortableState = (newState: any, _context: any) => {
     const oldStateSerialized = getTerms().map(term => JSON.stringify(term)).join('')
     const newStateSerialized = newState.map((item: any) => JSON.stringify(item.term)).join('')
 
     if (oldStateSerialized !== newStateSerialized) {
       const pointer: GrapoiPointer = dataPointer().execute(_pathPart)
       replaceList(newState.map((item: any) => item.term), pointer)
-      form.render()
+      form.render({ skipValidation: true })
     }
   }
 

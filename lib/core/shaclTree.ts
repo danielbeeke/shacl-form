@@ -63,7 +63,7 @@ export const processLevel = async (shaclProperties: GrapoiPointer, report: any, 
     for (const [index, pathPart] of path.entries()) {
       const pathPartsTillNow = path.slice(0, index + 1)
 
-      const shaclResults = report.results.filter((result: any) => _.isEqual(result.path, path))
+      const shaclResults = report?.results?.filter((result: any) => _.isEqual(result.path, path)) ?? []
       const messages = extractMessages(shaclResults)
 
       // Alternatives, only used for sh:alternativePath
