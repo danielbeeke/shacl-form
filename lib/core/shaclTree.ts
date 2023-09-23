@@ -21,7 +21,7 @@ import { GrapoiPointer, NamedNode, Options, TreeItem } from '../types'
  */
 export const shaclTree = async (report: any, shaclDataset: DatasetCore, options: Options, rootShaclIri: NamedNode) => {
   const shacl = grapoi({ dataset: shaclDataset, factory, term: rootShaclIri })
-  const shaclShapes = shacl.hasOut([rdf('type')], [sh('NodeShape')])
+  const shaclShapes = shacl.hasOut([rdf('type')], [sh('NodeShape')]).distinct()
   const shaclProperties = shaclShapes.hasOut([sh('property')])
   return processLevel(shaclProperties, report, options, shacl, shaclDataset, 1)
 }
@@ -64,6 +64,9 @@ export const processLevel = async (shaclProperties: GrapoiPointer, report: any, 
       const pathPartsTillNow = path.slice(0, index + 1)
 
       const shaclResults = report?.results?.filter((result: any) => _.isEqual(result.path, path)) ?? []
+
+      console.log(shaclResults)
+
       const messages = extractMessages(shaclResults)
 
       // Alternatives, only used for sh:alternativePath

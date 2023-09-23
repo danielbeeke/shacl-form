@@ -6,7 +6,7 @@ import type { GrapoiPointer, NamedNode, Quad } from '../types'
 import { QueryEngine } from '@comunica/query-sparql';
 import parsePath from 'shacl-engine/lib/parsePath.js'
 
-export default class Enhancer {
+export default class LabelEnhancer {
 
   #engine: QueryEngine
 
@@ -26,7 +26,7 @@ export default class Enhancer {
 
       if (!labels) {
         promises.push(this.getLabelAndDescription(shaclProperty).then(quads => {
-          for (const quad of quads) dataset.add(quad)
+          if (quads) for (const quad of quads) dataset.add(quad)
         }))
       }
     }
@@ -39,6 +39,8 @@ export default class Enhancer {
    */
   async getLabelAndDescription (shaclProperty: GrapoiPointer) {
     const path = parsePath(shaclProperty.out([sh('path')]))
+    if (!path) return
+
     const predicates = path.pop().predicates
     const labelQuads: Array<Quad> = []
 

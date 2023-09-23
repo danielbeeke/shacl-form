@@ -54,7 +54,7 @@ export type Options = {
   groups: {
     [key: string]: any
   },
-  enhancer: any,
+  enhancers: Array<any>,
   plugins: {
     geocoder?: GeocoderBase
   }

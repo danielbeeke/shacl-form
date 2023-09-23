@@ -7,7 +7,7 @@ import { sh, rdf, shFrm, shn } from '../helpers/namespaces'
 import * as prefixesSource from '../helpers/namespaces'
 import { createRoot } from 'react-dom/client'
 import { createElement, StrictMode } from 'react'
-import { FormLevelBase } from '../components/FormLevel'
+import { FormLevel } from '../new/FormLevel'
 import { shaclTree } from './shaclTree'
 import { LocalizationProvider } from '@fluent/react';
 import { l10n } from './l10n'
@@ -61,15 +61,15 @@ export const init = (options: Options) => {
       const shaclQuads = await parser.parse(shaclText)
       this.#shaclDataset = rdfDataset.dataset(shaclQuads)
 
-      const mustEnhance = this.getAttribute('enhance') !== null
-
-      if (mustEnhance && this.options.enhancer) {
-        const ResolvedEnhancer = await this.options.enhancer()
-        const enhancer = new ResolvedEnhancer()
-        await enhancer.execute(this.#shaclDataset)  
+      if (this.options.enhancers?.length) {
+        for (const enhancerGiver of this.options.enhancers) {
+          const ResolvedEnhancer = await enhancerGiver()
+          const enhancer = new ResolvedEnhancer()
+          await enhancer.execute(this.#shaclDataset, this)    
+        }
       }
 
-      this.#validator = new Validator(this.#shaclDataset, { coverage: true, factory, details: true })
+      this.#validator = new Validator(this.#shaclDataset, { coverage: false, factory, details: true })
 
       const nodeShapeQuads = this.#shaclDataset.match(null, rdf('type'), sh('NodeShape'))
       for (const nodeShapeQuad of nodeShapeQuads) {
@@ -121,9 +121,10 @@ export const init = (options: Options) => {
 
       this.#uiLanguagePriorities = this.uiLanguagePriorities
       this.#uiLanguagePriorities.push('*')
-      this.render()
-
+      
       this.#data = grapoi({ dataset: this.#store, factory, term: this.#subject })
+      this.oldReport = await this.validate()
+      this.render()
 
       if (!this.attributes.getNamedItem('content-languages')) {
         const contentLanguages = new Set()
@@ -153,25 +154,24 @@ export const init = (options: Options) => {
 
       this.oldReport = report
 
-      const tree = await shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
+      // const tree = await shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
       const shacl = grapoi({ dataset: this.#shaclDataset, factory })
 
       // TODO try a new structure that has data and definition as input and that creates a render structure instead of two separate structures.
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [
-        createElement(StrictMode, {
-          key: 'strictmode',
-          children: [
-            createElement(FormLevelBase, { 
+        // createElement(StrictMode, {
+        //   key: 'strictmode',
+        //   children: [
+            createElement(FormLevel, { 
               form: this,
-              tree, 
-              ignoreGroups: false,
               shaclPointer: shacl,
               dataPointer: this.dataPointer,
+              report,
               key: 'form', 
               uiLanguagePriorities: this.#uiLanguagePriorities 
             })
-          ]
-        })
+        //   ]
+        // })
       ]}))
     }
 

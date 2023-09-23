@@ -70,7 +70,10 @@ export const defaultOptions = {
     [buttonsIri.value]: Buttons,
     [languageTabsIri.value]: LanguageTabs
   },
-  enhancer: () => import('./core/Enhancer').then(module => module.default),
+  enhancers: [
+    // () => import('./core/LabelEnhancer').then(module => module.default)
+    // () => import('./core/WidgetEnhancer').then(module => module.default)
+  ],
   plugins: {
     geocoder: new PositionstackGeocoder(import.meta.env.POSITIONSTACK),
   }

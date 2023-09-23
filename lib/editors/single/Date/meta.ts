@@ -3,7 +3,7 @@ import { GrapoiPointer } from '../../../types'
 import { scorer } from '../../../core/Scorer'
 import factory from 'rdf-ext'
 
-export const iri = shFrm('TextFieldEditor').value
+export const iri = shFrm('DatePickerEditor').value
 
 export const score = (shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) => {
   return scorer(shaclPointer, dataPointer)

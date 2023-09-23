@@ -230,3 +230,12 @@ shacl-form {
 }
 
 body.is-sorting {margin: 0; height: 100%; overflow: hidden}
+
+.is-list {
+  transition: background-color .3s ease-in-out;
+}
+
+
+.sortable-chosen {
+  background-color: rgba(0, 53, 70, 0.2) !important;
+}
