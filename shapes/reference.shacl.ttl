@@ -13,6 +13,7 @@ ex:RootShape
 	sh:property [
 		sh:path schema:author;
 		sh:name "Author reference"@en ;
+		sh:nodeKind sh:IRI ;
 		shfrm:source <https://dbpedia.org/sparql> ;
 		sh:select """
 				PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>

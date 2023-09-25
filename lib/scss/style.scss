@@ -16,6 +16,10 @@ shacl-form {
     position: relative;
     background-color: rgba(0, 53, 70, 0.05);
 
+    &.has-errors {
+      background-color: rgb(255, 233, 233);
+    }
+
     .children {
       flex: 1 1 auto;
       padding: 10px;

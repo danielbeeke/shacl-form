@@ -1,7 +1,8 @@
-import { GrapoiPointer, ShaclFormType } from "../types"
+import { GrapoiPointer, Literal, ShaclFormType } from "../types"
 import { rdf, sh, dash } from '../helpers/namespaces'
 import parsePath from 'shacl-engine/lib/parsePath.js'
 import { FieldWrapper } from '../new/FieldWrapper'
+import { FieldItem } from '../new/FieldItem'
 
 export type FormLevelProps = { 
     form: ShaclFormType,
@@ -12,8 +13,7 @@ export type FormLevelProps = {
 }
 
 export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguagePriorities }: FormLevelProps) {
-    const shaclShapes = shaclPointer.hasOut([rdf('type')], [sh('NodeShape')])
-    const shaclProperties = shaclShapes.hasOut([sh('property')]).distinct()
+    const shaclProperties = shaclPointer.hasOut([sh('property')]).distinct()
 
     const normalizedEditors = Object.fromEntries(
         Object.entries(form.options.widgets.single).map(([name, editorOrArray]) => {
@@ -31,43 +31,78 @@ export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguage
         if (path) {
             const pointer = dataPointer.executeAll(path)
 
-            // We will determine for the whole field (all values) what widget to load.
-            let editorTerm = shaclProperty.out([dash('editor')]).term
-            let editorAndOptionsTuple
+            const items = []
 
-            if (editorTerm) {
-                editorAndOptionsTuple = Object.values(normalizedEditors)
-                    .find(singleEditor => singleEditor[0].iri === editorTerm.value)
-            }
+            const filteredTerms = pointer.terms
+                .filter(term => 
+                    !(term as Literal).language 
+                    || form.activeContentLanguages.includes((term as Literal).language)
+                )
 
             // We will determine per value what widget to load.
-            for (const [index, term] of pointer.terms.entries()) {
-                if (!editorAndOptionsTuple) {
-                    const singlePointer = pointer.clone({ ptrs: [pointer.ptrs[index]] })
-                    const scores = Object.entries(normalizedEditors)
-                        .map(([editorName, singleEditor]) => [editorName, singleEditor[0].score ? singleEditor[0].score(shaclProperty, singlePointer) : 0])
-                        .sort((a, b) => b[1] - a[1])
-                    const finalWidget = scores[0][0]
-                    editorAndOptionsTuple = normalizedEditors[finalWidget]
+            for (const [index, term] of filteredTerms.entries()) {
+                const singlePointer = pointer.clone({ ptrs: [pointer.ptrs[index]] })
+
+                // We will determine for the whole field (all values) what widget to load.
+                let editorTerm = shaclProperty.out([dash('editor')]).term
+                let editorAndOptionsTuple
+
+                if (editorTerm) {
+                    editorAndOptionsTuple = Object.values(normalizedEditors)
+                        .find(singleEditor => singleEditor[0].iri === editorTerm.value)
                 }
+
+                const scores = Object.entries(normalizedEditors)
+                    .map(([editorName, singleEditor]) => {
+                        let score = singleEditor[0].score ? singleEditor[0].score(shaclProperty, singlePointer) : 0
+
+                        if (singleEditor[0].iri === editorTerm?.value && score > -1) score += 100
+
+                        return [
+                            editorName, 
+                            score
+                        ]
+                    })
+                    .sort((a, b) => b[1] - a[1])
+
+                const finalWidget = scores[0][0]
+                editorAndOptionsTuple = normalizedEditors[finalWidget]
 
                 const errors = report.results.filter((result: any) => result.value.term.equals(term))
 
-                // Widget, isOrderedList, children, structure, errors, uiLanguagePriorities, dataPointer, form
-
-                level.push(<FieldWrapper 
+                items.push(<FieldItem 
                     uiLanguagePriorities={uiLanguagePriorities}
-                    widgetClass={editorAndOptionsTuple[0]}
+                    widgetMeta={editorAndOptionsTuple[0]}
                     widgetOptions={editorAndOptionsTuple[1]}
-                    shaclPointer={shaclPropertyInner.distinct()}
-                    isOrderedList={false}
-                    key={JSON.stringify([path, index])}
+                    shaclPointer={shaclPropertyInner}
+                    key={JSON.stringify([path, term])}
                     form={form}
+                    term={term}
                     errors={errors}
-                    dataPointer={() => dataPointer}
+                    dataPointer={singlePointer}
                   >
-                  </FieldWrapper>)
+                </FieldItem>)
+
+                const node: GrapoiPointer = shaclProperty.out([sh('node')])
+
+                if (node.term) {
+                    items.push(<FormLevel 
+                        shaclPointer={node} 
+                        dataPointer={singlePointer} 
+                        form={form} 
+                        key={JSON.stringify([path, term, 'nested'])}
+                        report={report} 
+                        uiLanguagePriorities={uiLanguagePriorities} 
+                    />)
+                }
             }
+
+            level.push(<FieldWrapper
+                uiLanguagePriorities={uiLanguagePriorities}
+                shaclPointer={shaclPropertyInner}
+                key={JSON.stringify([path, pointer.terms])}
+                form={form}
+            >{items}</FieldWrapper>)
         }
     }
 

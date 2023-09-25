@@ -157,6 +157,8 @@ export const init = (options: Options) => {
       // const tree = await shaclTree(report, this.#shaclDataset, options, this.#rootShaclIri)
       const shacl = grapoi({ dataset: this.#shaclDataset, factory })
 
+      const shaclShapes = shacl.hasOut([rdf('type')], [sh('NodeShape')])
+
       // TODO try a new structure that has data and definition as input and that creates a render structure instead of two separate structures.
       this.#root.render(createElement(LocalizationProvider, { l10n, children: [
         // createElement(StrictMode, {
@@ -164,7 +166,7 @@ export const init = (options: Options) => {
         //   children: [
             createElement(FormLevel, { 
               form: this,
-              shaclPointer: shacl,
+              shaclPointer: shaclShapes,
               dataPointer: this.dataPointer,
               report,
               key: 'form', 

@@ -110,6 +110,7 @@ ex:RootShape
 				sh:group ex:RightGroup ;
 
     dash:editor dash:AutoCompleteEditor ;
+	sh:nodeKind sh:IRI ;
     shfrm:source <https://dbpedia.org/sparql> ;
     sh:select """
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>

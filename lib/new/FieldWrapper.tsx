@@ -1,27 +1,16 @@
-import { sh, shFrm, rdf } from '../helpers/namespaces'
+import { sh } from '../helpers/namespaces'
 import { bestLanguage } from '../helpers/bestLanguage'
-import { FieldItem } from '../components/field/FieldItem'
-import { GrapoiPointer, Widget, NamedNode, Literal, Term } from '../types'
-import { useRef } from 'react'
-import { ReactSortable } from "react-sortablejs";
-import { replaceList } from '../helpers/replaceList'
-import factory from 'rdf-ext'
+import { GrapoiPointer, ShaclFormType } from '../types'
 import { Icon } from '@iconify-icon/react';
-import { useState, useLayoutEffect } from 'react'
 
 type FieldWrapperProps = { 
-  widgetClass: any, 
   children: any, 
-  structure: Widget, 
-  errors: any,
-  isOrderedList: boolean,
   uiLanguagePriorities: Array<string>,
-  dataPointer: () => GrapoiPointer,
   shaclPointer: GrapoiPointer,
-  form: any
+  form: ShaclFormType
 }
 
-export function FieldWrapper ({ widgetClass, isOrderedList, children, shaclPointer, errors, uiLanguagePriorities, dataPointer, form }: FieldWrapperProps) {
+export function FieldWrapper ({ children, shaclPointer, uiLanguagePriorities }: FieldWrapperProps) {
   const name = bestLanguage(shaclPointer.out([sh('name')]), uiLanguagePriorities)
   const description = bestLanguage(shaclPointer.out([sh('description')]), uiLanguagePriorities)
 
@@ -37,6 +26,7 @@ export function FieldWrapper ({ widgetClass, isOrderedList, children, shaclPoint
     <div className="field-inner">
 
       <div className='items'>
+        {children}
       </div>
 
       {showAdd ? (

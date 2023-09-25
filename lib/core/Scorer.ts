@@ -1,4 +1,4 @@
-import { GrapoiPointer, NamedNode, Term } from '../types'
+import { GrapoiPointer, Literal, NamedNode, Term } from '../types'
 import { sh } from '../helpers/namespaces'
 
 /**
@@ -19,10 +19,15 @@ export class Scorer {
   constructor (shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
     this.#shaclPointer = shaclPointer
     this.#dataPointer = dataPointer
-    this.#dataPointer
   }
 
   datatype (acceptedTypes: Array<NamedNode>, score: number = 1, exclusive = true) {
+    const matchedDataType = acceptedTypes.some(acceptedType => acceptedType.equals((this.#dataPointer.term as Literal).datatype))
+    if (matchedDataType) {
+      this.#scores.push({ type: 'datatype', score: score * 50 })
+      return this
+    }
+
     const datatypes = this.#shaclPointer.out([sh('datatype')]).terms
     const isAllowed = datatypes.every(datatype => acceptedTypes.some(acceptedType => acceptedType.equals(datatype)))
 
@@ -61,9 +66,21 @@ export class Scorer {
     return this
   }
 
-  nodeKind (accepedKinds: Array<NamedNode>, score: number = 1, exclusive = true) {
+  nodeKind (acceptedKinds: Array<NamedNode>, score: number = 1, exclusive = true) {
+    const mapping = {
+      [sh('IRI').value]: ['NamedNode'],
+      [sh('BlankNodeOrIRI').value]: ['BlankNode', 'NamedNode'],
+      [sh('BlankNode').value]: ['BlankNode']
+    }
+
+    const dataKindMatch = acceptedKinds.map(acceptedKind => mapping[acceptedKind.value].includes(this.#dataPointer.term.termType))
+    if (dataKindMatch) {
+      this.#scores.push({ type: 'nodeKind', score })
+      return this
+    }
+
     const kinds = this.#shaclPointer.out([sh('nodeKind')]).terms
-    const isAllowed = kinds.length && kinds.every(kind => accepedKinds.some(acceptedKind => acceptedKind.equals(kind)))
+    const isAllowed = kinds.length && kinds.every(kind => acceptedKinds.some(acceptedKind => acceptedKind.equals(kind)))
     if (isAllowed) this.#scores.push({ type: 'nodeKind', score })
     else if (exclusive) this.#foundIncompatibility = true
     return this

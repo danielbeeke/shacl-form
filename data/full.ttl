@@ -3,7 +3,7 @@
 @prefix ex: <http://example.com/>.
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
 
-<http://example.com/name> <https://schema.org/name> "my broken test", "Der Produktname"@de, "De product naam"@nl, "Le nom du produit"@fr, "The product name"@en;
+<http://example.com/name> <https://schema.org/name> true, "my broken test", "Der Produktname"@de, "De product naam"@nl, "Le nom du produit"@fr, "The product name"@en;
     <https://schema.org/description> "The product description"@en, "Le descriptif du produit"@fr, "Die Produktbeschreibung"@de, "De product beschrijving"@nl;
     <https://schema.org/text> _:b1;
     <https://schema.org/published> true;

@@ -7,7 +7,7 @@ export const iri = dash('EnumSelectEditor').value
 
 export const score = (shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) => {
   return scorer(shaclPointer, dataPointer)
-    .has(sh('in'), 10)
+    .has(sh('in'), 100)
     .toNumber()
 }
 

@@ -1,16 +1,15 @@
-import { ShaclFormSingleEditorUhtml } from '../../../core/ShaclFormSingleEditorUhtml'
+import { ShaclFormSingleEditorReact } from '../../../core/ShaclFormSingleEditorReact'
 import { BlankNode } from '../../../types'
 import { schema, rdfs, sh, shFrm } from '../../../helpers/namespaces'
 import factory from 'rdf-ext'
 import { bestLanguage } from '../../../helpers/bestLanguage'
-import { html } from 'uhtml/async' // You could use React, Vue, Angular, basically anything and export it to a customElement.
 import { swapSubject } from '../../../helpers/swapSubject'
 
 
 /**
  * TODO add support for: dash:stem and / or dash:uriStart
  */
-export default class BlankNodeOrIri extends ShaclFormSingleEditorUhtml<typeof BlankNodeOrIri> {
+export default class BlankNodeOrIri extends ShaclFormSingleEditorReact<typeof BlankNodeOrIri> {
 
   public showIdentifier = false
   public identifierSuggestion = ''
@@ -33,8 +32,8 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditorUhtml<typeof Bl
 
     return <>
       <span className="d-flex align-items-center">
-        <h4 className="me-2 mb-0">${name ?? this.value?.value}</h4>
-        <em className="me-2">${this.value?.value} (${this.value?.termType})</em>
+        <h4 className="me-2 mb-0">{name ?? this.value?.value}</h4>
+        <em className="me-2">{this.value?.value} ({this.value?.termType})</em>
 
         {this.value?.termType === 'BlankNode' && !this.showIdentifier && !enforceIri ? <button className="btn-secondary btn btn-sm" onClick={() => {
           this.showIdentifier = true
@@ -42,15 +41,14 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditorUhtml<typeof Bl
         }}>Add identifier</button>
          : null}
         
-        {this.value?.termType === 'NamedNode' && !this.showIdentifier && !enforceIri ? html`
-        <button class="btn-secondary btn btn-sm" onClick=${() => {
+        {this.value?.termType === 'NamedNode' && !this.showIdentifier && !enforceIri ? <button className="btn-secondary btn btn-sm" onClick={() => {
           const store = this.dataPointer().ptrs[0].dataset
           const newSubject = factory.blankNode()
           swapSubject(store, namesPointer.terms[this.index] as BlankNode, newSubject)
   
           this.renderAll()
         }}>Remove identifier</button>
-        ` : null}
+         : null}
 
       </span>
 

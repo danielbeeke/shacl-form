@@ -20,7 +20,7 @@ export default class Switch extends ShaclFormSingleEditorReact<typeof Switch> {
 
   template () {
     const id = this.predicate.value + this.index
-    const checked = this.value.value === 'true'
+    const checked = this.value?.value === 'true'
 
     return <div className="form-check form-switch" style={{fontSize: 24}}>
       <input className="form-check-input" onChange={(event) => {

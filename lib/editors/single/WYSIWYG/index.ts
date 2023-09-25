@@ -60,7 +60,7 @@ export default class WYSIWYG extends ShaclFormSingleEditorUhtml<typeof WYSIWYG> 
 
     const parser = new Parser()
 
-    if (this.value.value) {
+    if (this.value?.value) {
       let pointer = this.dataPointer().node([this.value])
           
       if (pointer.out().terms.length) {

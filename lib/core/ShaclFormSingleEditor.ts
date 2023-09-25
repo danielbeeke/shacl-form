@@ -30,6 +30,7 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
   public isFooter: boolean = false
   #form: ShaclFormType = undefined as unknown as ShaclFormType
   public widgetSettings: any
+  public term: Term = {} as Term
 
   public static type = 'single'
 
@@ -61,7 +62,7 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
   }
 
   get value (): Term {
-    return this.values[this.index]
+    return this.term
   }
 
   set value (newValue: Term) {
@@ -163,8 +164,8 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
     if (required) props.required = true
 
     props.value = this.value?.value
-    props.language = (this.value as Literal).language
-    props.datatype = (this.value as Literal).datatype
+    props.language = (this.value as Literal)?.language
+    props.datatype = (this.value as Literal)?.datatype
 
     return props as InputProps
   }
