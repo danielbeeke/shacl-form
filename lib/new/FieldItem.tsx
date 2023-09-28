@@ -67,6 +67,7 @@ export function FieldItem ({ widgetMeta, children, errors, widgetOptions, term, 
         <Icon style={{ fontSize: 24, margin: 'auto' }} icon="mdi:drag" />
       </div> : null}
       <div className={isHeader ? 'header' : (isFooter ? 'footer' : 'widget')} ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div>
+      {children ? <div className='children'>{children}</div>: null}
       {showRemove ? (
         // TODO this icon will flash because it is in the FieldItem.
         <button type="button" className='btn btn-remove-item'>

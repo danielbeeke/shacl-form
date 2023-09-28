@@ -70,6 +70,18 @@ export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguage
 
                 const errors = report.results.filter((result: any) => result.value.term.equals(term))
 
+                const node: GrapoiPointer = shaclProperty.out([sh('node')])
+
+                const children = node.term ?
+                <FormLevel 
+                    shaclPointer={node} 
+                    dataPointer={singlePointer} 
+                    form={form} 
+                    key={JSON.stringify([path, term, 'nested'])}
+                    report={report} 
+                    uiLanguagePriorities={uiLanguagePriorities} 
+                /> : null
+
                 items.push(<FieldItem 
                     uiLanguagePriorities={uiLanguagePriorities}
                     widgetMeta={editorAndOptionsTuple[0]}
@@ -81,20 +93,8 @@ export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguage
                     errors={errors}
                     dataPointer={singlePointer}
                   >
+                    {children}
                 </FieldItem>)
-
-                const node: GrapoiPointer = shaclProperty.out([sh('node')])
-
-                if (node.term) {
-                    items.push(<FormLevel 
-                        shaclPointer={node} 
-                        dataPointer={singlePointer} 
-                        form={form} 
-                        key={JSON.stringify([path, term, 'nested'])}
-                        report={report} 
-                        uiLanguagePriorities={uiLanguagePriorities} 
-                    />)
-                }
             }
 
             level.push(<FieldWrapper
