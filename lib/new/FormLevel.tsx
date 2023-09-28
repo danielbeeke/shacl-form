@@ -1,5 +1,5 @@
-import { GrapoiPointer, Literal, ShaclFormType } from "../types"
-import { rdf, sh, dash } from '../helpers/namespaces'
+import { GrapoiPointer, Literal, ShaclFormType, NamedNode } from "../types"
+import { rdf, sh, dash, shFrm } from '../helpers/namespaces'
 import parsePath from 'shacl-engine/lib/parsePath.js'
 import { FieldWrapper } from '../new/FieldWrapper'
 import { FieldItem } from '../new/FieldItem'
@@ -23,25 +23,50 @@ export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguage
 
     const level = []
 
-    for (const shaclProperty of shaclProperties.out([sh('property')])) {
-        const shaclPropertyInner = shaclProperty.trim()
+    const groups = new Map()
 
-        const path = parsePath(shaclPropertyInner.out([sh('path')]))
+    for (const shaclProperty of shaclProperties.out([sh('property')]).trim()) {
+        const path = parsePath(shaclProperty.out([sh('path')]))
+        const groupName = shaclProperty.out([sh('group')]).term
+
+        if (groupName && !groups.has(groupName.value)) {
+            const groupItems: Array<any> = []
+            groups.set(groupName.value, groupItems)
+            const groupPointer = shaclPointer.node([groupName])
+            const groupTypes = groupPointer.out([rdf('type')]).terms
+            let [Group] = groupTypes.map(groupType => form.options.groups[groupType.value]).filter(Boolean)
+            if (!Group) Group = form.options.groups.default
+
+            level.push(<Group key={groupName.value} groupPointer={groupPointer} form={form}>
+                {groupItems}
+            </Group>)
+        }
 
         if (path) {
             const pointer = dataPointer.executeAll(path)
-
             const items = []
 
+            // If this property has this special property.
+            const languageDiscriminator = shaclProperty.out([shFrm('languageDiscriminator')]).term as NamedNode | null
+
+            // If this is the inner language field to be rendered we skip rendering.
+            const isLanguageDiscriminatorField = shaclProperty.in().in().out([shFrm('languageDiscriminator')]).term as NamedNode | null
+            if (
+                isLanguageDiscriminatorField 
+                && path[0].predicates[0].equals(isLanguageDiscriminatorField)
+            ) continue
+
             const filteredTerms = pointer.terms
-                .filter(term => 
-                    !(term as Literal).language 
-                    || form.activeContentLanguages.includes((term as Literal).language)
-                )
+                .filter(term => {
+                    const language = languageDiscriminator ? dataPointer.node([term]).out([languageDiscriminator]).value : (term as Literal).language
+
+                    return !language
+                    || form.activeContentLanguages.includes(language)
+                })
 
             // We will determine per value what widget to load.
-            for (const [index, term] of filteredTerms.entries()) {
-                const singlePointer = pointer.clone({ ptrs: [pointer.ptrs[index]] })
+            for (const term of filteredTerms) {
+                const singlePointer = pointer.node([term])
 
                 // We will determine for the whole field (all values) what widget to load.
                 let editorTerm = shaclProperty.out([dash('editor')]).term
@@ -55,13 +80,8 @@ export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguage
                 const scores = Object.entries(normalizedEditors)
                     .map(([editorName, singleEditor]) => {
                         let score = singleEditor[0].score ? singleEditor[0].score(shaclProperty, singlePointer) : 0
-
                         if (singleEditor[0].iri === editorTerm?.value && score > -1) score += 100
-
-                        return [
-                            editorName, 
-                            score
-                        ]
+                        return [editorName, score]
                     })
                     .sort((a, b) => b[1] - a[1])
 
@@ -72,6 +92,7 @@ export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguage
 
                 const node: GrapoiPointer = shaclProperty.out([sh('node')])
 
+                // Nested nodes.
                 const children = node.term ?
                 <FormLevel 
                     shaclPointer={node} 
@@ -86,23 +107,29 @@ export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguage
                     uiLanguagePriorities={uiLanguagePriorities}
                     widgetMeta={editorAndOptionsTuple[0]}
                     widgetOptions={editorAndOptionsTuple[1]}
-                    shaclPointer={shaclPropertyInner}
+                    shaclPointer={shaclProperty}
                     key={JSON.stringify([path, term])}
                     form={form}
                     term={term}
                     errors={errors}
                     dataPointer={singlePointer}
-                  >
-                    {children}
-                </FieldItem>)
+                >{children}</FieldItem>)
             }
 
-            level.push(<FieldWrapper
+            const field = languageDiscriminator ? items[0].props.children : <FieldWrapper
                 uiLanguagePriorities={uiLanguagePriorities}
-                shaclPointer={shaclPropertyInner}
+                shaclPointer={shaclProperty}
                 key={JSON.stringify([path, pointer.terms])}
                 form={form}
-            >{items}</FieldWrapper>)
+            >{items}</FieldWrapper>
+
+            if (groupName) {
+                const groupItems = groups.get(groupName.value)
+                groupItems.push(field)
+            }
+            else {
+                level.push(field)
+            }
         }
     }
 

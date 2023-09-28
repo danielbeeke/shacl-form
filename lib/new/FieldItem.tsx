@@ -20,8 +20,8 @@ type FieldItemProps = {
 
 export function FieldItem ({ widgetMeta, children, errors, widgetOptions, term, shaclPointer, dataPointer, uiLanguagePriorities, isList = false, isHeader = false, isFooter = false }: FieldItemProps) {
   const [widgetInstance, setWidgetInstance] = useState<ShaclFormSingleEditor<any>>()
-  // const [widgetInstance, setWidgetInstance] = useState<ShaclFormSingleEditor<any>>()
-  const [widgetClass, setWidgetClass] = useState(undefined)
+  const [widgetClass, setWidgetClass] = useState<any>(undefined)
+  const [showErrors, setShowErrors] = useState(false)
 
   useLayoutEffect(() => {
     widgetMeta.resolve().then((widgetModule: any) => setWidgetClass(() => widgetModule.default))
@@ -58,16 +58,23 @@ export function FieldItem ({ widgetMeta, children, errors, widgetOptions, term, 
   (
     <div className={`item ${errorMessages.length ? 'has-errors' : ''} type-${widgetClass?.name} ${isList ? 'is-list' : ''}`}>
 
-      {errorMessages.length ? errorMessages.map(errorMessage => <div key={errorMessage} style={{ flex: '1 1 100%' }} className="alert m-2 alert-danger" role="alert">
-        {errorMessage}
+      {errorMessages.length && showErrors ? <div key={errorMessages.join(',')} style={{ flex: '1 1 100%' }} className="alert mb-0 m-2 py-1 alert-danger" role="alert">
+        <ul className='p-2'>
+          {errorMessages.map(errorMessage => <li key={errorMessage}>{errorMessage}</li>)}
+        </ul>
       </div>
-      ) : null}
+       : null}
 
       {isList ? <div className='ps-1 d-flex my-handle' style={{cursor: 'grab'}}>
         <Icon style={{ fontSize: 24, margin: 'auto' }} icon="mdi:drag" />
       </div> : null}
       <div className={isHeader ? 'header' : (isFooter ? 'footer' : 'widget')} ref={(ref) => { if (widgetInstance && ref) ref.appendChild(widgetInstance) } }></div>
       {children ? <div className='children'>{children}</div>: null}
+
+      {errorMessages.length ? <button type="button" onClick={() => setShowErrors(!showErrors)} className={`btn btn-toggle-errors ${showErrors ? 'btn-danger' : ''}`}>
+          <Icon icon="ic:round-error" />
+        </button> : null}
+
       {showRemove ? (
         // TODO this icon will flash because it is in the FieldItem.
         <button type="button" className='btn btn-remove-item'>

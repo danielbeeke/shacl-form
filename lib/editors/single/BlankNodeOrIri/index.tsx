@@ -25,9 +25,9 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditorReact<typeof Bl
     const enforceIri = nodeKind?.equals(sh('IRI'))
 
     const languageDiscriminator = this.shaclPointer.out([shFrm('languageDiscriminator')]).term
+
     if (languageDiscriminator) {
-      this.style.display = 'none'
-      return <div></div>
+      return null
     }
 
     return <>

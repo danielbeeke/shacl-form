@@ -164,14 +164,16 @@ export const init = (options: Options) => {
         // createElement(StrictMode, {
         //   key: 'strictmode',
         //   children: [
-            createElement(FormLevel, { 
-              form: this,
-              shaclPointer: shaclShapes,
-              dataPointer: this.dataPointer,
-              report,
-              key: 'form', 
-              uiLanguagePriorities: this.#uiLanguagePriorities 
-            })
+        createElement('form', {}, [
+          createElement(FormLevel, { 
+            form: this,
+            shaclPointer: shaclShapes,
+            dataPointer: this.dataPointer,
+            report,
+            key: 'form', 
+            uiLanguagePriorities: this.#uiLanguagePriorities 
+          })
+        ])
         //   ]
         // })
       ]}))
