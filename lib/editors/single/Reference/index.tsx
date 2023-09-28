@@ -1,14 +1,22 @@
 import { ShaclFormSingleEditorReact } from '../../../core/ShaclFormSingleEditorReact'
 import { sh, shFrm } from '../../../helpers/namespaces'
 import { useLayoutEffect, useState } from 'react'
-import { SparqlEndpointFetcher } from "fetch-sparql-endpoint"
 import { debounce } from 'lodash-es'
 import { Icon } from '@iconify-icon/react';
 import '../../../helpers/nextTick'
 
+import { QueryEngine } from '@comunica/query-sparql'
+
+const myEngine = new QueryEngine();
+
 const fetcher = async (endpoint: string, sparql: string, callback: (binding: any) => void) => {
-  (new SparqlEndpointFetcher()).fetchBindings(endpoint, sparql)
-  .then((bindingsStream) => bindingsStream.on('data', callback))
+  const bindingsStream = await myEngine.queryBindings(sparql, {
+    sources: [endpoint]
+  })
+
+  bindingsStream.on('data', (data) => {
+    callback(data.entries.toJSON())
+  })
 }
 
 const debouncedFetcher = debounce(fetcher, 300)
@@ -49,11 +57,33 @@ export default class Reference extends ShaclFormSingleEditorReact<typeof Referen
 
     useLayoutEffect(() => {
       if (searchTerm.length < 4) return
-      
+     
       const tokenizedSparql = sparql
         .replaceAll('?searchTerm', `"""${searchTerm.split(' ').map(word => `'${word}'`).join(' AND ')}"""`)
 
       setResults([])
+
+      if (searchTerm.startsWith('https://') || searchTerm.startsWith('http://')) {
+        debouncedFetcher(searchTerm, `
+          PREFIX dbo:  <http://dbpedia.org/ontology/>
+          PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+          SELECT ?uri ?label ?image {
+            VALUES ?uri { <${searchTerm}> }
+            ?uri rdfs:label ?label .
+            FILTER (langMatches(lang(?label), "en"))
+						
+            OPTIONAL { 
+              ?uri <https://schema.org/image> ?image .
+						}
+          }
+        `, (bindings) => {
+          sessionStorage.setItem(bindings.uri.value, JSON.stringify(bindings))
+          this.value = this.df.namedNode(bindings.uri.value)
+        })
+
+        return
+      }
 
       debouncedFetcher(endpoint, tokenizedSparql, (bindings) => {
         sessionStorage.setItem(bindings.uri.value, JSON.stringify(bindings))

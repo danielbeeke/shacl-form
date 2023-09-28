@@ -21,7 +21,7 @@ ex:RootShape
 
 				SELECT DISTINCT ?uri (SAMPLE(?label) AS ?label) (SAMPLE(?image) AS ?image) {
 						?uri rdfs:label ?label .
-						?label bif:contains ?searchTerm .
+						FILTER(<bif:contains>(?label, ?searchTerm))
 						?uri rdf:type dbo:Person .
 						OPTIONAL { 
 								?uri dbo:thumbnail ?image .
