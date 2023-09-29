@@ -24,12 +24,6 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditorReact<typeof Bl
     const nodeKind = this.shaclPointer.out([sh('nodeKind')]).term
     const enforceIri = nodeKind?.equals(sh('IRI'))
 
-    const languageDiscriminator = this.shaclPointer.out([shFrm('languageDiscriminator')]).term
-
-    if (languageDiscriminator) {
-      return null
-    }
-
     return <>
       <span className="d-flex align-items-center">
         <h4 className="me-2 mb-0">{name ?? this.value?.value}</h4>

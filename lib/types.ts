@@ -26,7 +26,7 @@ export type GrapoiPointer = {
   trim(): GrapoiPointer
   distinct(): GrapoiPointer
   values: Array<any>
-  filter: (item: any) => boolean
+  filter: (callback: (pointer: GrapoiPointer) => boolean) => Array<GrapoiPointer>
   value: any
   isList: () => Boolean,
   deleteList: () => GrapoiPointer,

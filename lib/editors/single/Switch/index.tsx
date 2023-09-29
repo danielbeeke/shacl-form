@@ -1,7 +1,6 @@
 import { dash, xsd } from '../../../helpers/namespaces'
 import { GrapoiPointer } from '../../../types'
 import { scorer } from '../../../core/Scorer'
-import factory from 'rdf-ext'
 import { ShaclFormSingleEditorReact } from '../../../core/ShaclFormSingleEditorReact'
 
 export default class Switch extends ShaclFormSingleEditorReact<typeof Switch> {
@@ -12,10 +11,6 @@ export default class Switch extends ShaclFormSingleEditorReact<typeof Switch> {
     return scorer(shaclPointer, dataPointer)
       .datatype([xsd('boolean')])
       .toNumber()
-  }
-
-  static createNewObject () {
-    return factory.literal('', xsd('boolean'))
   }
 
   template () {

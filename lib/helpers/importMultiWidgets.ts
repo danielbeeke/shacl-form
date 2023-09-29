@@ -31,7 +31,7 @@ export const importMultiWidgets = (widgetGlob: Record<string, () => Promise<unkn
       name: cleanPath(path),
       score: score ? score : () => 100, 
       supportedCombinations,
-      resolve: module
+      resolve: () => module().then((resolvedModule: any) => resolvedModule.default)
     }
   }
 

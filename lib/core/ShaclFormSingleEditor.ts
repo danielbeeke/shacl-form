@@ -46,10 +46,6 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
     return 0
   }
 
-  static createNewObject (_form: any, _shaclPointer: GrapoiPointer) {
-    return factory.namedNode('') as any
-  }
-
   get values (): Array<Term> {
     if (this.dataPointer().out([this.predicate]).isList()) {
       return [...this.dataPointer().out([this.predicate]).list()]

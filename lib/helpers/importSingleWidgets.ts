@@ -35,7 +35,7 @@ export const importSingleWidgets = (widgetGlob: Record<string, () => Promise<unk
       name: identifier,
       score: score ? score : () => 0, 
       createNewObject: createNewObject ? createNewObject : () => factory.namedNode('') as any,
-      resolve: once(() => module())
+      resolve: () => module().then((resolvedModule: any) => resolvedModule.default)
     }
   }
 

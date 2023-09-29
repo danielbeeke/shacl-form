@@ -22,7 +22,7 @@ export class Scorer {
   }
 
   datatype (acceptedTypes: Array<NamedNode>, score: number = 1, exclusive = true) {
-    const matchedDataType = acceptedTypes.some(acceptedType => acceptedType.equals((this.#dataPointer.term as Literal).datatype))
+    const matchedDataType = acceptedTypes.some(acceptedType => acceptedType.equals((this.#dataPointer.term as Literal)?.datatype))
     if (matchedDataType) {
       this.#scores.push({ type: 'datatype', score: score * 50 })
       return this
@@ -73,7 +73,7 @@ export class Scorer {
       [sh('BlankNode').value]: ['BlankNode']
     }
 
-    const dataKindMatch = acceptedKinds.map(acceptedKind => mapping[acceptedKind.value].includes(this.#dataPointer.term.termType))
+    const dataKindMatch = acceptedKinds.map(acceptedKind => mapping[acceptedKind.value].includes(this.#dataPointer.term?.termType))
     if (dataKindMatch) {
       this.#scores.push({ type: 'nodeKind', score })
       return this
