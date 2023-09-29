@@ -164,7 +164,9 @@ export const init = (options: Options) => {
         // createElement(StrictMode, {
         //   key: 'strictmode',
         //   children: [
-        createElement('form', {}, [
+        createElement('form', {
+          key: 'outer-form', 
+        }, [
           createElement(FormLevel, { 
             form: this,
             shaclPointer: shaclShapes,

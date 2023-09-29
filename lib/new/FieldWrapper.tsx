@@ -1,16 +1,18 @@
 import { sh } from '../helpers/namespaces'
 import { bestLanguage } from '../helpers/bestLanguage'
-import { GrapoiPointer, ShaclFormType } from '../types'
+import { GrapoiPointer, ShaclFormType, NamedNode, Term } from '../types'
 import { Icon } from '@iconify-icon/react';
+import { replaceList } from '../helpers/replaceList'
 
 type FieldWrapperProps = { 
   children: any, 
   uiLanguagePriorities: Array<string>,
   shaclPointer: GrapoiPointer,
+  dataPointer: GrapoiPointer,
   form: ShaclFormType
 }
 
-export function FieldWrapper ({ children, shaclPointer, uiLanguagePriorities }: FieldWrapperProps) {
+export function FieldWrapper ({ children, shaclPointer, uiLanguagePriorities, form, dataPointer }: FieldWrapperProps) {
   const name = bestLanguage(shaclPointer.out([sh('name')]), uiLanguagePriorities)
   const description = bestLanguage(shaclPointer.out([sh('description')]), uiLanguagePriorities)
 

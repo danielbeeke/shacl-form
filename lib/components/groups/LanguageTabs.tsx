@@ -21,7 +21,12 @@ function LanguageLabel ({ languageCode }: { languageCode: string }) {
 
     if (window.languageLabeler?.getLabel) 
       window.languageLabeler?.getLabel(languageCode).then(setLabel)
-  })
+
+    setTimeout(() => {
+      if (window.languageLabeler?.getLabel) 
+        window.languageLabeler?.getLabel(languageCode).then(setLabel)
+    }, 100)
+  }, [])
 
   return <>{label ?? ' '}</>
 }

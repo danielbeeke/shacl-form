@@ -119,6 +119,7 @@ export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguage
             const field = languageDiscriminator ? items[0].props.children : <FieldWrapper
                 uiLanguagePriorities={uiLanguagePriorities}
                 shaclPointer={shaclProperty}
+                dataPointer={dataPointer}
                 key={JSON.stringify([path, pointer.terms])}
                 form={form}
             >{items}</FieldWrapper>
