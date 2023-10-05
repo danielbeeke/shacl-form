@@ -61,7 +61,7 @@ export default class WYSIWYG extends ShaclFormSingleEditorUhtml<typeof WYSIWYG> 
     const parser = new Parser()
 
     if (this.value?.value) {
-      let pointer = this.dataPointer().node([this.value])
+      let pointer = this.dataPointer.node([this.value])
           
       if (pointer.out().terms.length) {
         const quads = []
@@ -154,7 +154,7 @@ export default class WYSIWYG extends ShaclFormSingleEditorUhtml<typeof WYSIWYG> 
         const quads = await parser.parse(nquads) as Array<Quad>
 
         if (this.value?.value) {
-          let pointer = this.dataPointer().node([this.value])
+          let pointer = this.dataPointer.node([this.value])
           
           const quadsToRemove = this.df.dataset()
           while (pointer.ptrs.length) {

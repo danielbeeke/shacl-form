@@ -15,7 +15,7 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditorReact<typeof Bl
   public identifierSuggestion = ''
 
   template () {
-    const namesPointer = this.dataPointer().out([this.predicate])
+    const namesPointer = this.dataPointer.out([this.predicate])
     const indexSpecificNamesPointer = namesPointer.clone({
       ptrs: [namesPointer.ptrs[this.index]].filter(Boolean)
     }).trim().out([schema('name'), rdfs('label')])
@@ -36,7 +36,7 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditorReact<typeof Bl
          : null}
         
         {this.value?.termType === 'NamedNode' && !this.showIdentifier && !enforceIri ? <button className="btn-secondary btn btn-sm" onClick={() => {
-          const store = this.dataPointer().ptrs[0].dataset
+          const store = this.dataPointer.ptrs[0].dataset
           const newSubject = factory.blankNode()
           swapSubject(store, namesPointer.terms[this.index] as BlankNode, newSubject)
   
@@ -55,7 +55,7 @@ export default class BlankNodeOrIri extends ShaclFormSingleEditorReact<typeof Bl
         <button className="btn-secondary btn btn-sm" onClick={() => {
           if (!this.identifierSuggestion) return
           
-          const store = this.dataPointer().ptrs[0].dataset
+          const store = this.dataPointer.ptrs[0].dataset
           const newSubject = factory.namedNode(this.identifierSuggestion)
           swapSubject(store, namesPointer.terms[this.index] as BlankNode, newSubject)
           this.showIdentifier = false

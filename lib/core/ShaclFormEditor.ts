@@ -7,7 +7,7 @@ export interface IShaclFormEditorConstructor {
 
 export interface IShaclFormEditor extends HTMLElement {
   shaclPointer: GrapoiPointer,
-  dataPointer: () => GrapoiPointer,
+  dataPointer: GrapoiPointer,
   value: Term
   index: number
   uiLanguagePriorities: Array<string>

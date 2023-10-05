@@ -8,7 +8,7 @@ export const iri = dash('BlankNodeEditor').value
 export const score = (shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) => {
   return scorer(shaclPointer, dataPointer)
     .node()
-    .nodeKind([sh('IRI'), sh('BlankNode'), sh('BlankNodeOrIRI')], 3, false)
+    .nodeKind([sh('IRI'), sh('BlankNode'), sh('BlankNodeOrIRI')], 1, false)
     .toNumber()
 }
 

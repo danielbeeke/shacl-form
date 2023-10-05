@@ -19,10 +19,27 @@ type FieldItemProps = {
   isHeader?: boolean,
   isFooter?: boolean,
   isList?: boolean,
-  children?: any
+  setValue: (term: Term) => void,
+  children?: any,
+  scores: any
 }
 
-export function FieldItem ({ widgetMeta, form, children, errors, widgetOptions, parentDataPointer, term, shaclPointer, dataPointer, uiLanguagePriorities, isList = false, isHeader = false, isFooter = false }: FieldItemProps) {
+export function FieldItem ({ 
+  widgetMeta, 
+  form, 
+  children, 
+  errors, 
+  widgetOptions, 
+  parentDataPointer, 
+  term, 
+  shaclPointer, 
+  dataPointer, 
+  uiLanguagePriorities, 
+  setValue,
+  isList = false, 
+  isHeader = false, 
+  isFooter = false 
+}: FieldItemProps) {
   const [widgetInstance, setWidgetInstance] = useState<ShaclFormSingleEditor<any>>()
   const [widgetClass, setWidgetClass] = useState<any>(undefined)
   const [showErrors, setShowErrors] = useState(false)
@@ -40,8 +57,9 @@ export function FieldItem ({ widgetMeta, form, children, errors, widgetOptions, 
       element.term = term
       element.widgetSettings = widgetOptions
       element.shaclPointer = shaclPointer
-      element.dataPointer = () => dataPointer
+      element.dataPointer = dataPointer
       element.isHeader = isHeader
+      element.setValue = setValue
       element.isFooter = isFooter
       element.uiLanguagePriorities = uiLanguagePriorities
 

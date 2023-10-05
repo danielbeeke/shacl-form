@@ -1,9 +1,6 @@
 import { ShaclFormSingleEditorReact } from '../../../core/ShaclFormSingleEditorReact'
-import { GrapoiPointer } from '../../../types'
 import { dash, sh, shFrm } from '../../../helpers/namespaces'
-import { scorer } from '../../../core/Scorer'
 import Dropzone from 'react-dropzone'
-import factory from 'rdf-ext'
 import { useState } from 'react'
 
 type FileUploadOptions = {
@@ -20,12 +17,6 @@ export default class FileUpload extends ShaclFormSingleEditorReact<typeof FileUp
 
   static iri = shFrm('FileUpload').value
 
-  static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
-    return scorer(shaclPointer, dataPointer)
-      .has(dash('uriStart'))
-      .toNumber()
-  }
-
   template () {
     const [hasError, setHasError] = useState(false)
 
@@ -41,7 +32,7 @@ export default class FileUpload extends ShaclFormSingleEditorReact<typeof FileUp
 
   header () {
     const maxCount = this.shaclPointer.out([sh('maxCount')]).value ?? Infinity
-    const showUpload = maxCount >= this.values.length
+    const showUpload = true // maxCount >= this.values.length
 
     return (
       <div className='widget'>
@@ -88,8 +79,8 @@ export default class FileUpload extends ShaclFormSingleEditorReact<typeof FileUp
         this.isUploading = false
   
         const filePaths = await response.json()
-        for (const filePath of filePaths)
-          this.addValue(factory.namedNode(filePath))
+        // for (const filePath of filePaths)
+          // this.addValue(factory.namedNode(filePath))
       }  
     }
     catch (exception: any) {

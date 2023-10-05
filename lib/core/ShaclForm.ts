@@ -166,6 +166,7 @@ export const init = (options: Options) => {
         //   children: [
         createElement('form', {
           key: 'outer-form', 
+          onSubmit: (event) => event.preventDefault()
         }, [
           createElement(FormLevel, { 
             form: this,

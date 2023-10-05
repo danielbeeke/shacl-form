@@ -23,7 +23,7 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
   public predicate: NamedNode = factory.namedNode('')
   public index: number = 0
   public shaclPointer: GrapoiPointer = {} as GrapoiPointer
-  public dataPointer: () => GrapoiPointer = () => ({} as GrapoiPointer)
+  public dataPointer: GrapoiPointer = {} as GrapoiPointer
   public df = factory
   public uiLanguagePriorities: Array<string> = []
   public isHeader: boolean = false
@@ -46,16 +46,16 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
     return 0
   }
 
-  get values (): Array<Term> {
-    if (this.dataPointer().out([this.predicate]).isList()) {
-      return [...this.dataPointer().out([this.predicate]).list()]
-        .map(part => part.term)
-    }
-    else {
-      return this.dataPointer()
-        .out([this.predicate]).terms
-    }
-  }
+  // get values (): Array<Term> {
+  //   if (this.dataPointer.out([this.predicate]).isList()) {
+  //     return [...this.dataPointer.out([this.predicate]).list()]
+  //       .map(part => part.term)
+  //   }
+  //   else {
+  //     return this.dataPointer
+  //       .out([this.predicate]).terms
+  //   }
+  // }
 
   get value (): Term {
     return this.term
@@ -64,22 +64,24 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
   set value (newValue: Term) {
     if (newValue.equals(this.value)) return
 
-    if (this.isList) {
-      const newValues = [...this.values]
-      newValues[this.index] = newValue
-      replaceList(newValues, this.dataPointer().out([this.predicate]))
-    }
-    else {
-      this.dataPointer()
+    // if (this.isList) {
+    //   const newValues = [...this.values]
+    //   newValues[this.index] = newValue
+    //   replaceList(newValues, this.dataPointer.out([this.predicate]))
+    // }
+    // else {
+      this.dataPointer
       .deleteOut(this.predicate, this.value)
       .addOut(this.predicate, newValue)
-    }
+    // }
+
+    console.log(this.dataPointer.out([this.predicate]).values)
 
     const event = new CustomEvent('value.set', {
       detail: {
         predicate: this.predicate,
         object: newValue,
-        dataPointer: this.dataPointer(),
+        dataPointer: this.dataPointer,
         shaclPointer: this.shaclPointer,
         element: this
       }
@@ -88,28 +90,28 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
     this.renderAll()
   }
 
-  addValue (newValue: Term) {
-    if (this.isList) {
-      const newValues = [...this.values]
-      newValues.push(newValue)
-      replaceList(newValues, this.dataPointer().out([this.predicate]))
-    }
-    else {
-      this.dataPointer().addOut(this.predicate, newValue)
-    }
+  // addValue (newValue: Term) {
+  //   if (this.isList) {
+  //     const newValues = [...this.values]
+  //     newValues.push(newValue)
+  //     replaceList(newValues, this.dataPointer.out([this.predicate]))
+  //   }
+  //   else {
+  //     this.dataPointer.addOut(this.predicate, newValue)
+  //   }
 
-    const event = new CustomEvent('value.set', {
-      detail: {
-        predicate: this.predicate,
-        object: newValue,
-        dataPointer: this.dataPointer(),
-        shaclPointer: this.shaclPointer,
-        element: this
-      }
-    })
-    this.form.dispatchEvent(event)
-    this.renderAll()
-  }
+  //   const event = new CustomEvent('value.set', {
+  //     detail: {
+  //       predicate: this.predicate,
+  //       object: newValue,
+  //       dataPointer: this.dataPointer,
+  //       shaclPointer: this.shaclPointer,
+  //       element: this
+  //     }
+  //   })
+  //   this.form.dispatchEvent(event)
+  //   this.renderAll()
+  // }
 
 
   renderAll () {
@@ -117,7 +119,7 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
   }
 
   get rdfDataset (): DatasetCore {
-    return this.dataPointer().ptrs[0].dataset
+    return this.dataPointer.ptrs[0].dataset
   }
 
   get form () {
@@ -154,14 +156,16 @@ extends HTMLElement implements StaticImplements<IShaclFormEditorConstructor, T> 
     const maxCount = this.shaclPointer.out([sh('maxCount')]).value ?? Infinity
     const minCount = this.shaclPointer.out([sh('minCount')]).value ?? 0
 
-    const nonEmptyValues = this.values.filter(value => value.value)
+    // const nonEmptyValues = this.values.filter(value => value.value)
 
-    const required = minCount > 0 && maxCount >= nonEmptyValues.length
-    if (required) props.required = true
+    // const required = minCount > 0 && maxCount >= nonEmptyValues.length
+    // if (required) props.required = true
 
     props.value = this.value?.value
     props.language = (this.value as Literal)?.language
     props.datatype = (this.value as Literal)?.datatype
+
+    props.setValue = this.setValue
 
     return props as InputProps
   }

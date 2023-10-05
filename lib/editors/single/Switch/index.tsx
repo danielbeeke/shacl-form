@@ -1,17 +1,9 @@
 import { dash, xsd } from '../../../helpers/namespaces'
-import { GrapoiPointer } from '../../../types'
-import { scorer } from '../../../core/Scorer'
 import { ShaclFormSingleEditorReact } from '../../../core/ShaclFormSingleEditorReact'
 
 export default class Switch extends ShaclFormSingleEditorReact<typeof Switch> {
 
   static iri = dash('BooleanSelectEditor').value
-
-  static score(shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) {
-    return scorer(shaclPointer, dataPointer)
-      .datatype([xsd('boolean')])
-      .toNumber()
-  }
 
   template () {
     const id = this.predicate.value + this.index

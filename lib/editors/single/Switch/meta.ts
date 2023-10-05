@@ -7,7 +7,7 @@ export const iri = dash('BooleanSelectEditor').value
 
 export const score = (shaclPointer: GrapoiPointer, dataPointer: GrapoiPointer) => {
   return scorer(shaclPointer, dataPointer)
-    .datatype([xsd('boolean')])
+    .datatype([xsd('boolean')], 5)
     .toNumber()
 }
 

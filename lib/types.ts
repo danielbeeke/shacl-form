@@ -1,6 +1,7 @@
 import type { NamedNode, Quad, Term } from '@rdfjs/types'
 import { ShaclFormSingleEditor } from './core/ShaclFormSingleEditor'
 import { GeocoderBase } from './plugins/GeoCoder/GeoCoderBase'
+import { Store } from 'n3'
 export type { BlankNode, Literal, Quad, Variable, NamedNode, Term } from '@rdfjs/types'
 
 export type ShaclProperties = {
@@ -26,7 +27,7 @@ export type GrapoiPointer = {
   trim(): GrapoiPointer
   distinct(): GrapoiPointer
   values: Array<any>
-  filter: (callback: (pointer: GrapoiPointer) => boolean) => Array<GrapoiPointer>
+  filter: (callback: (pointer: GrapoiPointer) => boolean) => GrapoiPointer
   value: any
   isList: () => Boolean,
   deleteList: () => GrapoiPointer,
@@ -92,6 +93,7 @@ export type InputProps = {
   value: string
   language: string | undefined
   datatype: string | undefined | Term
+  setValue: (term: Term) => void
 }
 
 export type TreeItem = {
@@ -125,5 +127,6 @@ export type ShaclFormType = HTMLDivElement & {
   contentLanguages: Array<string>,
   activeContentLanguages: Array<string>
   activeContentLanguage: string,
-  options: Options
+  options: Options,
+  store: Store
 }

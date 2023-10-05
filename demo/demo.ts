@@ -139,6 +139,14 @@ const demos = [
     dataUrl: '../data/multilingual-discriminator.ttl?raw',
     contentLanguage: 'en,nl',
     activeContentLanguage: 'en',
+  },
+  {
+    title: 'Date',
+    description: 'A date field',
+    shaclUrl: '../shapes/date.shacl.ttl?raw',
+    shaclIri: 'http://example.com/RootShape',
+    contentLanguage: 'en,nl',
+    activeContentLanguage: 'en',
   }
 ]
 

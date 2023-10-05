@@ -8,6 +8,8 @@ export default class String extends ShaclFormSingleEditorReact<typeof String> {
     const isMultiLingual = this.shaclPointer.out([sh('datatype')]).terms.some(term => term.equals(rdf('langString')))
     if (!language && isMultiLingual) language = this.form.activeContentLanguage
 
+    console.log(value)
+
     return <div className='d-flex'>
       <input className="form-control" onBlur={(event) => {
         this.value = this.df.literal(event.target.value, language)

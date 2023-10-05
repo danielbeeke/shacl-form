@@ -1,8 +1,11 @@
-import { GrapoiPointer, Literal, ShaclFormType, NamedNode } from "../types"
+import { GrapoiPointer, Literal, ShaclFormType, NamedNode, Term } from "../types"
 import { rdf, sh, dash, shFrm } from '../helpers/namespaces'
 import parsePath from 'shacl-engine/lib/parsePath.js'
 import { FieldWrapper } from '../new/FieldWrapper'
 import { FieldItem } from '../new/FieldItem'
+import { setValue } from "./setValue"
+import { addCallback } from "./addCallback"
+import factory from 'rdf-ext'
 
 export type FormLevelProps = { 
     form: ShaclFormType,
@@ -37,7 +40,10 @@ const determineWidget = ({ form, shaclPointer, dataPointer }: DetermineWidgetPro
         .sort((a, b) => b[1] - a[1])
 
     const finalWidget = scores[0][0]
-    return normalizedEditors[finalWidget]
+    return {
+        Widget: normalizedEditors[finalWidget],
+        scores
+    }
 }
 
 export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguagePriorities }: FormLevelProps) {
@@ -45,10 +51,9 @@ export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguage
     const level = []
     const groups = new Map()
 
-    for (const shaclProperty of shaclProperties.out([sh('property')]).trim()) {
+    for (const shaclProperty of shaclProperties.out([sh('property')])) {
         const path = parsePath(shaclProperty.out([sh('path')]))
         const groupName = shaclProperty.out([sh('group')]).term
-        const name = shaclProperty.out([sh('name')]).terms
         const node: GrapoiPointer = shaclProperty.out([sh('node')])
         const isOrderedList = !!node.term?.equals(dash('ListShape'))
 
@@ -66,10 +71,10 @@ export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguage
         }
 
         if (path) {
-            const pointer = dataPointer.executeAll(path)
+            let pointer = dataPointer.executeAll(path)
             const items = []
 
-            const fieldWrapperWidgetTuple = determineWidget({ form, shaclPointer: shaclProperty, dataPointer: pointer })
+            const { Widget: fieldWrapperWidgetTuple, scores: WrapperScores } = determineWidget({ form, shaclPointer: shaclProperty, dataPointer: pointer })
 
             // If this property has this special property.
             const languageDiscriminator = shaclProperty.out([shFrm('languageDiscriminator')]).term as NamedNode | null
@@ -80,14 +85,35 @@ export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguage
                 && path[0].predicates[0].equals(isLanguageDiscriminatorField)
             ) continue
 
-            const filteredPointers = pointer.filter(pointer => {
-                const language = languageDiscriminator ? dataPointer.node([pointer.term]).out([languageDiscriminator]).value : (pointer.term as Literal).language
-                return !language || form.activeContentLanguages.includes(language)
-            })
+            const getFilteredPointers = () => {
+                pointer = dataPointer.executeAll(path)
+
+                return pointer.filter(pointer => {
+                    const language = languageDiscriminator ? dataPointer.node([pointer.term]).out([languageDiscriminator]).value : (pointer.term as Literal).language
+                    return !language || form.activeContentLanguages.includes(language)
+                })
+            }
+
+            let filteredPointers = getFilteredPointers()
+
+            if (!filteredPointers.ptrs.length) {
+                const pathCopy = [...path]
+                const lastPathPart = Object.assign({}, pathCopy.at(-1))
+                const object = fieldWrapperWidgetTuple[0].createNewObject(form, shaclProperty)
+                pathCopy.pop()
+                pathCopy.push(Object.assign(lastPathPart, {
+                    operation: 'add',
+                    graphs: [factory.defaultGraph()],
+                    objects: [object]
+                }))
+
+                pointer = dataPointer.executeAll(pathCopy)
+                filteredPointers = getFilteredPointers()
+            }
 
             // We will determine per value what widget to load.
             for (const filteredPointer of filteredPointers) {
-                const editorAndOptionsTuple = determineWidget({ form, shaclPointer: shaclProperty, dataPointer: filteredPointer })
+                const { Widget: editorAndOptionsTuple, scores: fieldScores } = determineWidget({ form, shaclPointer: shaclProperty, dataPointer: filteredPointer })
                 const errors = report.results.filter((result: any) => result.value.term.equals(filteredPointer.term))
 
                 const children: Array<any> = []
@@ -126,12 +152,14 @@ export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguage
                         widgetMeta={editorAndOptionsTuple[0]}
                         widgetOptions={editorAndOptionsTuple[1]}
                         shaclPointer={shaclProperty}
-                        key={JSON.stringify([path, filteredPointer.term])}
+                        scores={fieldScores}
+                        key={JSON.stringify([path])}
                         form={form}
+                        setValue={(term: Term) => setValue(form, filteredPointer.term, term, filteredPointer)}
                         term={filteredPointer.term}
                         errors={errors}
                         dataPointer={filteredPointer}
-                        parentDataPointer={dataPointer.trim()}
+                        parentDataPointer={dataPointer}
                     >{children}</FieldItem>)    
                 }
             }
@@ -140,10 +168,18 @@ export function FormLevel ({ shaclPointer, dataPointer, report, form, uiLanguage
                 uiLanguagePriorities={uiLanguagePriorities}
                 shaclPointer={shaclProperty}
                 dataPointer={dataPointer}
-                widgetMeta={fieldWrapperWidgetTuple[0]}
-                widgetOptions={fieldWrapperWidgetTuple[1]}
+                scores={WrapperScores}
+                addCallback={() => {
+                    addCallback(
+                        form, 
+                        shaclProperty, 
+                        dataPointer, 
+                        fieldWrapperWidgetTuple[0].createNewObject
+                    )
+
+                    form.render()
+                }}
                 key={JSON.stringify([path, pointer.terms])}
-                form={form}
             >{items}</FieldWrapper>
 
             if (groupName) {
